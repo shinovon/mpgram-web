@@ -12,6 +12,9 @@ include 'madeline.php';
 
 $settings['app_info']['api_id']=1488323;
 $settings['app_info']['api_hash'] = '2005074e61d3fd226313e87c667453ef';
+if(!isset($_GET["phone"]){
+    echo '<form action=""><input type="text" name="phone"><input type="submit"></form>';
+}
 if(!isset($_GET["user"])){
 $user = md5($_GET["phone"].rand(0,1000));
 $MadelineProto = new \danog\MadelineProto\API($user.'.madeline', $settings);
