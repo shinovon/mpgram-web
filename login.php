@@ -18,6 +18,7 @@ if(!isset($_GET["phone"])){
 if(!isset($_GET["user"])){
 $user = md5($_GET["phone"].rand(0,1000));
 $MadelineProto = new \danog\MadelineProto\API($user.'.madeline', $settings);
+    echo '<form action=""><input type="text" name="code"><input type="submit"></form>';
 }
 if(!isset($_GET["code"])){
     $MadelineProto->phone_login($_GET["phone"]);
