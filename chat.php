@@ -46,6 +46,7 @@ try {
 	
 	echo '<head><title>'.$name.'</title></head><body>';
 	echo '<a href="chats.php">Назад</a>';
+	echo ' <a href="write.php?peer='.$id.'">Письмо</a>';
 	echo ' <a href="chat.php?peer='.$id.'&upd=1">Обновить</a><br>';
 	echo '<h2>'.$name.'</h2>';
 	
@@ -64,6 +65,7 @@ try {
 		try {
 			$date = date("H:i:s", $m['date']);
 			$mname = null;
+			$uid = null;
 			if($m['out'] == true) {
 				$mname = 'Вы';
 			} else if($pm) {
@@ -84,7 +86,12 @@ try {
 				$mname = var_export($m['from_id'], true);
 			}
 			echo '<div>';
-			echo '<b>'.$mname.'</b> ('.$date.'):<br>';
+			if(!$pm && $uid != null) {
+				echo '<b><a href="chat.php?peer='.$uid.'">'.$mname.'</a></b>';
+			} else {
+				echo '<b>'.$mname.'</b>';
+			}
+			echo ' ('.$date.'):<br>';
 			if(isset($m['message'])) {
 				echo ''.str_replace("\n", "<br>", $m['message']).'';
 			}
