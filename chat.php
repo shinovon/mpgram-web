@@ -68,20 +68,25 @@ try {
 				$mname = 'Вы';
 			} else if($pm) {
 				$mname = $name;
-			//TODO: имена в чате
 			} else if(isset($m['from_id']['user_id'])) {
-				$mname = $m['from_id']['user_id'];
+				$uid = $m['from_id']['user_id'];
+				$p = $MP->getInfo($uid);
+				$mname = $p["User"]["first_name"];
 			} else if(isset($m['from_id']['chat_id'])) {
-				$mname = $m['from_id']['chat_id'];
+				$uid = '-'.$m['from_id']["chat_id"];
+				$p = $MP->getInfo($uid);
+				$mname = $p["Chat"]["title"];
 			} else if(isset($m['from_id']['channel_id'])) {
-				$mname = $m['from_id']['channel_id'];
+				$uid = $m['from_id']['channel_id'];
+				$p = $MP->getInfo($uid);
+				$mname = $p["Chat"]["title"];
 			} else {
 				$mname = var_export($m['from_id'], true);
 			}
 			echo '<div>';
-			echo '<b>'.$mname.'</b> ('.$date.'):';
+			echo '<b>'.$mname.'</b> ('.$date.'):<br>';
 			if(isset($m['message'])) {
-				echo '<p>'.str_replace("\n", "<br>", $m['message']).'</p>';
+				echo ''.str_replace("\n", "<br>", $m['message']).'';
 			}
 			//TODO: файлы
 			echo '</div>';
