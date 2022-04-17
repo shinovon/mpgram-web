@@ -36,9 +36,12 @@ try {
 	$info=$MP->getInfo($id);
 	$name = null;
 	$pm = false;
-	$ch = isset($info['channel_id']);
-	if(isset($info['Chat']) && isset($info['Chat']['title'])) {
-		$name = $info['Chat']['title'];
+	$ch = false;
+	if(isset($info['Chat'])) {
+		$ch = isset($info['type']) && $info['type'] == 'channel';
+		if(isset($info['Chat']['title'])) {
+			$name = $info['Chat']['title'];
+		}
 	} else if(isset($info['User']) && isset($info['User']['first_name'])) {
 		$name = $info['User']['first_name'];
 		$pm = true;
