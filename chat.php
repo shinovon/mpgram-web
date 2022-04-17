@@ -36,7 +36,7 @@ try {
 	$info=$MP->getInfo($id);
 	$name = null;
 	$pm = false;
-	
+	$ch = isset($info['channel_id']);
 	if(isset($info['Chat']) && isset($info['Chat']['title'])) {
 		$name = $info['Chat']['title'];
 	} else if(isset($info['User']) && isset($info['User']['first_name'])) {
@@ -46,7 +46,7 @@ try {
 	
 	echo '<head><title>'.$name.'</title></head><body>';
 	echo '<a href="chats.php">Назад</a>';
-	echo ' <a href="write.php?peer='.$id.'">Письмо</a>';
+	if(!$ch) echo ' <a href="write.php?peer='.$id.'">Письмо</a>';
 	echo ' <a href="chat.php?peer='.$id.'&upd=1">Обновить</a><br>';
 	echo '<h2>'.$name.'</h2>';
 	
@@ -68,7 +68,7 @@ try {
 			$uid = null;
 			if($m['out'] == true) {
 				$mname = 'Вы';
-			} else if($pm) {
+			} else if($pm || $ch) {
 				$mname = $name;
 			} else if(isset($m['from_id']['user_id'])) {
 				$uid = $m['from_id']['user_id'];
