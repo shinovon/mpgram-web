@@ -14,14 +14,15 @@ if(!isset($user) || empty($user)) {
 	header('Location: login.php');
 	die();
 }
+header("Cache-Control: private, no-cache, no-store");
 
-if(!isset($_GET["peer"])) {
+if(!isset($_GET["c"])) {
 	die();
 }
-$id = $_GET["peer"];
+$id = $_GET["c"];
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
-    throw new ErrorException($message, 0, $severity, $filename, $lineno);
+	throw new ErrorException($message, 0, $severity, $filename, $lineno);
 }
 
 set_error_handler('exceptions_error_handler');
@@ -35,7 +36,7 @@ if(isset($_GET["msg"])) {
 		$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline');
 		$MP->start();
 		$MP->messages->sendMessage(['peer' => $id, 'message' => $_GET["msg"]]);
-		header('Location: chat.php?peer='.$id);
+		header('Location: chat.php?c='.$id);
 	} catch (Exception $e) {
 		echo $e->getMessage();
 	}
@@ -43,10 +44,10 @@ if(isset($_GET["msg"])) {
 }
 
 echo '<head><title>Письмо</title></head><body>';
-echo '<a href="chat.php?peer='.$id.'">Назад</a>';
+echo '<a href="chat.php?c='.$id.'">Назад</a>';
 echo '<h2>Письмо</h2>';
 echo '<form action="">';
-echo '<input type="hidden" name="peer" value="'.$id.'">';
+echo '<input type="hidden" name="c" value="'.$id.'">';
 echo '<textarea name="msg" cols="25" rows="2"></textarea></p>';
 echo '<input type="submit">';
 echo '</form>';
