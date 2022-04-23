@@ -15,24 +15,27 @@ $p = '';
 if(isset($_GET['p'])) $p = $_GET['p'];
 if(strpos($p, 't') === 0) {
 	$t = file_get_contents($u);
+	if(strpos($t, 'tgme_widget_message_photo') !== false) {
+		$t = substr($t, strpos($t, 'tgme_widget_message_photo'));
+	}
 	preg_match('/background-image:url\(\'(.+?)\'\)/', $t, $rr, PREG_OFFSET_CAPTURE, 0);
 	if(!isset($rr[1])) {
 		http_response_code(500);
 		die();
 	}
 	$u = $rr[1][0];
-	if(strpos($t, 'message_reply_thumb') !== false) {
-	$o = $rr[0][1]+strlen($rr[0][0]);
-		preg_match('/background-image:url\(\'(.+?)\'\)/', $t, $rr, PREG_OFFSET_CAPTURE, $o);
-		if(isset($rr[1])) {
-			$u = $rr[1][0];
-		}
-	}
 	$t = null;
 	$rr = null;
 	$p = substr($p, 1);
 }
+/*if(strpos($u, '//') === 0) {
+	$u = 'https:'.$u;
+}
+if(strpos($u, '.png') == strlen($u)-4) {
+	$img = imagecreatefrompng($u);
+} else {*/
 $img = imagecreatefromjpeg($u);
+//}
 if(!$img) {
 	http_response_code(500);
 	die();
