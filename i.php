@@ -43,9 +43,9 @@ $q = 50;
 if($p == 'orig') {
 	$q = 80;
 } else if($p == 'prev') {
-	if($w > 320) {
-		$h = ($h/$w)*320;
-		$w = 320;
+	if($w > 240) {
+		$h = ($h/$w)*240;
+		$w = 240;
 		$img = resize($img, $w, $h);
 	} else if($h > 180) {
 		$w = ($w/$h)*180;
