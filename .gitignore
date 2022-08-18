@@ -7,4 +7,3 @@ madeline.php
 *.phar.version
 vendor
 composer.lock
-composer.json

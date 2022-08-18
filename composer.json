@@ -1,0 +1,28 @@
+{
+    "name": "yourname/yourproject",
+    "description": "Project description",
+    "type": "project",
+    "require": {
+        "danog/madelineproto": "^7"
+    },
+    "license": "AGPL-3.0-only",
+    "authors": [
+        {
+            "name": "Daniil Gentili",
+            "email": "daniil.gentili.dg@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Your\\Project\\": "src/"
+        }
+    },
+	"config": {
+		"platform": {
+			"php": "7.4"
+		},
+        "allow-plugins": {
+            "phabel/phabel": true
+        }
+	}
+}
