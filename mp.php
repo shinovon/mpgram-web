@@ -132,6 +132,7 @@ class MP {
 		foreach($rm as $m) {
 			try {
 				$mname1 = null;
+				$uid = null;
 				if(isset($m['from_id'])) {
 					$uid = MP::getId($MP, $m['from_id']);
 					$mname1 = MP::getNameFromId($MP, $uid);
@@ -139,7 +140,6 @@ class MP {
 				if(mb_strlen($mname1, 'UTF-8') > 30)
 					$mname1 = mb_substr($mname1, 0, 30, 'UTF-8');
 				$mname = null;
-				$uid = null;
 				$l = false;
 				if($m['out'] == true && !$ch) {
 					$uid = MP::getSelfId($MP);
@@ -164,13 +164,11 @@ class MP {
 				if(mb_strlen($fwname, 'UTF-8') > 30)
 					$fwname = mb_substr($fwname, 0, 30, 'UTF-8');
 				echo '<div class="m" id="msg_'.$id.'_'.$m['id'].'">';
-				echo '<b class="mn">';
 				if(!$pm && $uid != null && $l) {
-					echo '<a href="chat.php?c='.$uid.'">'.MP::dehtml($mname).'</a>';
+					echo '<b><a href="chat.php?c='.$uid.'" class="mn">'.MP::dehtml($mname).'</a></b>';
 				} else {
-					echo MP::dehtml($mname);
+					echo '<b class="mn">'.MP::dehtml($mname).'</b>';
 				}
-				echo '</b>';
 				echo ' '.date("H:i", $m['date']-$timeoff);
 				if($m['media_unread']) {
 					echo ' •';
