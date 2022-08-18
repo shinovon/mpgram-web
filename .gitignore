@@ -1,0 +1,10 @@
+*.jpg
+s/
+img/
+madeline.php
+*.log
+*.phar
+*.phar.version
+vendor
+composer.lock
+composer.json

@@ -1,27 +1,18 @@
 <?php
-define('sessionspath', '');
 
-header('Content-Type: text/html; charset=utf-8');
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-$msglimit = 20;
-$msgoffset = 0;
 
-if(isset($_GET['limit'])) {
-	$msglimit = (int) $_GET['limit'];
-}
-if(isset($_GET['off'])) {
-	$msgoffset = (int) $_GET['off'];
-}
+include 'mp.php';
 
-$lang = 'ru';
-if(isset($_GET['lang'])) {
-	$lang = $_GET['lang'];
-	setcookie('lang', $lang, time() + (86400 * 365));
-} else if(isset($_COOKIE['lang'])) {
-	$lang = $_COOKIE['lang'];
-}
+$iev = MP::getIEVersion();
+$timeoff = MP::getSettingInt('timeoff');
+$lang = MP::getSetting('lang', 'ru');
+$theme = MP::getSettingInt('theme');
+$autoupd = MP::getSettingInt('autoupd', ($iev == 0 || $iev > 4) ? 1 : 0);
+$updint = MP::getSettingInt('updint', 10);
+$dynupd = MP::getSettingInt('dynupd', 1);
 
 try {
 	include 'locale_'.$lang.'.php';
@@ -30,18 +21,29 @@ try {
 	include 'locale_'.$lang.'.php';
 }
 
-$user = null;
-if(isset($_COOKIE['user']))
-	$user = $_COOKIE['user'];
-if(!isset($user) || empty($user)) {
-	//не авторизирован, отправить в логинизацию
-	header('Location: login.php');
+$msglimit = 20;
+$msgoffset = 0;
+$reverse = false;
+if(isset($_GET['r'])) {
+	$reverse = true;
+	$msglimit = 8;
+}
+if(isset($_GET['limit'])) {
+	$msglimit = (int) $_GET['limit'];
+}
+if(isset($_GET['off'])) {
+	$msgoffset = (int) $_GET['off'];
+}
+
+$user = MP::getUser();
+if(!$user) {
+	header('Location: login.php?logout=1');
 	die();
 }
+
+header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: private, no-cache, no-store');
-if (!file_exists('madeline.php')) {
-	copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
-}
+
 $id = null;
 if(isset($_GET['peer'])) {
 	$id = $_GET['peer'];
@@ -54,18 +56,15 @@ if(isset($_GET['peer'])) {
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
 	throw new ErrorException($message, 0, $severity, $filename, $lineno);
 }
-
 set_error_handler('exceptions_error_handler');
 
-include 'util.php';
+include 'themes.php';
+Themes::setTheme($theme);
+
 $imgs = true;
 try {
-	include 'madeline.php';
-	include 'api_settings.php';
-	$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline', getSettings());
-	$MP->start();
+	$MP = MP::getMadelineAPI($user);
 	$info = $MP->getInfo($id);
-	//echo '<xmp>'.var_export($info, true).'</xmp>';
 	$un = null;
 	$lid = null;
 	$name = null;
@@ -81,38 +80,22 @@ try {
 		}
 		if(isset($info['Chat']['id'])) {
 			$lid = $info['Chat']['id'];
+			$id = (int)'-100'.$lid;
 		}
-	} else if(isset($info['User']) && isset($info['User']['first_name'])) {
-		$name = $info['User']['first_name'];
+	} else if(isset($info['User'])) {
 		$pm = true;
+		if(isset($info['User']['first_name'])) {
+			$name = $info['User']['first_name'];
+		}
 		if(isset($info['User']['username'])) {
 			$un = $info['User']['username'];
 		}
 		if(isset($info['User']['id'])) {
 			$lid = $info['User']['id'];
+			$id = (int)$lid;
 		}
 	}
-	
-	echo '<head><title>'.Utils::dehtml($name).'</title></head><body>';
-	echo '<a href="chats.php">'.$lng['back'].'</a>';
-	if(!$ch) echo ' <a href="write.php?c='.$id.'">'.$lng['write_msg'].'</a>';
-	echo ' <a href="chat.php?c='.$id.'&upd=1">'.$lng['refresh'].'</a><br>';
-	echo '<h2>'.Utils::dehtml($name).'</h2>';
-	if($msgoffset > 0) {
-		$i = $msgoffset - $msglimit;
-		if($i < 0) {
-			$i = 0;
-		}
-		echo '<p><a href="chat.php?c='.$id.'&off='.$i.'&limit='.$msglimit.'">'.$lng['history_up'].'</a></p>';
-	}
-	try {
-		if($ch) {
-			$MP->channels->readHistory(['channel' => $id, 'max_id' => 0]);
-		} else {
-			$MP->messages->readHistory(['peer' => $id, 'max_id' => 0]);
-		}
-	} catch (Exception $e) {
-	}
+
 	$r = $MP->messages->getHistory([
 	'peer' => $id,
 	'offset_id' => 0,
@@ -122,78 +105,133 @@ try {
 	'max_id' => 0,
 	'min_id' => 0,
 	'hash' => 0]);
-	
 	$rm = $r['messages'];
-	foreach($rm as $m) {
-		try {
-			$mname = null;
-			$uid = null;
-			$l = false;
-			if($m['out'] == true) {
-				$uid = Utils::getSelfId($MP);
-				$mname = 'Вы';
-			} else if($pm || $ch) {
-				$uid = $id;
-				$mname = $name;
-			} else {
-				$l = true;
-				$uid = Utils::getId($MP,$m['from_id']);
-				$mname = Utils::getNameFromId($MP, $uid);
-			}
-			$fwid = null;
-			$fwname = null;
-			$fwid = null;
-			if(isset($m['fwd_from'])) {
-				if(isset($m['fwd_from']['from_name'])) {
-					$fwname = $m['fwd_from']['from_name'];
-				} else if(isset($m['fwd_from']['from_id'])){
-					$fwid = Utils::getId($MP, $m['fwd_from']['from_id']);
-					$fwname = Utils::getNameFromId($MP, $fwid, true);
-				}
-			}
-			echo '<div>';
-			if(!$pm && $uid != null && $l) {
-				echo '<b><a href="chat.php?c='.$uid.'">'.Utils::dehtml($mname).'</a></b>';
-			} else {
-				echo '<b>'.Utils::dehtml($mname).'</b>';
-			}
-			echo ' ('.date("H:i:s", $m['date']).'):';
-			if($fwname != null) {
-				echo '<br>'.$lng['fwd_from'].' <b>'.Utils::dehtml($fwname).'</b>';
-			}
-			if(isset($m['message']) && strlen($m['message']) > 0) {
-				echo '<br>';
-				echo str_replace("\n", "<br>", Utils::dehtml($m['message'])).'';
-			}
-			if(isset($m['media'])) {
-				$media = $m['media'];
-				if(isset($media['photo'])) {
-					$load = false;
-					if($imgs && isset($un)) {
-						try {
-							$iur = 'https://t.me/'.$un.'/'.$m['id'].'?embed=1';
-							$iur = 'i.php?u='.urlencode($iur).'&p=t';
-							echo '<br><a href="'.$iur.'orig"><img alt="'.$lng['media_att'].'" src="'.$iur.'prev"></img></a>';
-							$load = true;
-						} catch (Exception $e) {
+	$ii = $rm[0]['id'];
+	echo '<head><title>'.MP::dehtml($name).'</title>';
+	echo Themes::head();
+	if($msgoffset == 0 && $autoupd == 1) {
+		if($dynupd == 1) {
+echo '<script type="text/javascript">
+<!--
+var ii = "'.$ii.'";
+var count = 0;
+function a() {
+	count++;
+	if(count > 60) return;
+	try {
+		var r = new XMLHttpRequest();
+		r.onload = function() {
+			try {
+				var x = r.responseText;
+				//console.log(x);
+				if(x != null && x.length > 1) {
+					var j = x.indexOf("||");
+					if(j != -1) {
+						ii = x.substring(0, j);
+						x = x.substring(j+2);
+						if(x.length > 1) {
+							var msgs = document.getElementById("msgs");
+							var d = document.createElement("div");
+							d.innerHTML = x;
+							'.($reverse ? 
+							'for (var i = 0; i < d.childNodes.length; i++) {
+								msgs.appendChild(d.childNodes[i]);
+							}
+							while (msgs.childNodes.length > '.$msglimit.') {
+								msgs.removeChild(msgs.firstChild);
+							}' : 'for (var i = d.childNodes.length-1; i >= 0; i--) {
+								msgs.insertBefore(d.childNodes[i], msgs.firstChild);
+							}
+							while (msgs.childNodes.length > '.$msglimit.') {
+								msgs.removeChild(msgs.lastChild);
+							}').'
 						}
 					}
-					if(!$load) {
-						echo '<br><img alt="'.$lng['media_att'].'"></img>';
-					}
-				} else {
-					echo '<br><i>'.$lng['media_att'].'</i>';
 				}
+				setTimeout("a()", '.$updint.'000);
+			} catch(e) {
+				alert(e);
 			}
-			echo '</div>';
-		} catch (Exception $e) {
-			echo "<xmp>$e</xmp>";
+		}
+
+		r.open("GET", "'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&i="+ii+"&lang='.$lang.'&timeoff='.$timeoff.'");
+		r.send();
+	} catch(e) {
+		alert(e);
+	}
+}
+try {
+	setTimeout("a()", '.$updint.'000);
+} catch(e) {
+	alert(e);
+}
+//--></script>';
+	} else {
+	echo '<script type="text/javascript">
+         <!--
+            setTimeout("location.reload(true);", '.$updint.'000);
+         //--></script>';
+	}
+	}
+	echo '</head>'."\n";
+	echo Themes::bodyStart();
+	echo '<div class="top_bar"><a href="chats.php">'.MP::x($lng['back']).'</a>';
+	$sname = $name;
+	if(mb_strlen($sname, 'UTF-8') > 30) $sname = mb_substr($sname, 0, 30, 'UTF-8');
+	//if(!$ch) echo ' <a href="write.php?c='.$id.'&n='.urlencode($sname).'">'.$lng['write_msg'].'</a>';
+	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></div>';
+	echo '<h3 class="chat_title">'.MP::dehtml($name).'</h3>';
+	if(!$ch && !$reverse) {
+		echo '<form action="write.php">';
+		echo '<input type="hidden" name="c" value="'.$id.'">';
+		echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
+		echo '<input type="submit">';
+		echo '</form>';
+	}
+	if(!$reverse) {
+		if($msgoffset > 0) {
+			$i = $msgoffset - $msglimit;
+			if($i < 0) $i = 0;
+			echo '<p><a href="chat.php?c='.$id.'&off='.$i.'&limit='.$msglimit.'">'.MP::x($lng['history_up']).'</a></p>';
+		}
+	} else {
+		if(count($rm) >= $msglimit) {
+			echo '<p><a href="chat.php?c='.$id.'&off='.($msgoffset+$msglimit).'&limit='.$msglimit.'&reverse=1">'.MP::x($lng['history_up']).'</a></p>';
 		}
 	}
-	echo '<p><a href="chat.php?c='.$id.'&off='.($msgoffset+20).'&limit='.$msglimit.'">'.$lng['history_down'].'</a></p>';
-	echo '</body>';
+	if($reverse) $rm = array_reverse($rm);
+	echo '<div id="msgs">';
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $un, $timeoff);
+	echo '</div>';
+	if(!$reverse) {
+		if(count($rm) >= $msglimit) {
+			echo '<p><a href="chat.php?c='.$id.'&off='.($msgoffset+$msglimit).'&limit='.$msglimit.'">'.MP::x($lng['history_down']).'</a></p>';
+		}
+	} else {
+		if($msgoffset > 0) {
+			$i = $msgoffset - $msglimit;
+			if($i < 0) $i = 0;
+			echo '<p><a href="chat.php?c='.$id.'&off='.$i.'&limit='.$msglimit.'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
+        }
+	}
+	if(!$ch && $reverse) {
+		echo '<form action="write.php">';
+		echo '<input type="hidden" name="c" value="'.$id.'">';
+		echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
+		echo '<input type="submit">';
+		echo '</form>';
+	}
+	try {
+		if($ch || (int)$id < 0) {
+			$MP->channels->readHistory(['channel' => $id, 'max_id' => 0]);
+		} else {
+			$MP->messages->readHistory(['peer' => $id, 'max_id' => 0]);
+		}
+	} catch (Exception $e) {
+	}
+	echo Themes::bodyEnd();
 } catch (Exception $e) {
-	echo '<b>'.$lng['error'].'!</b><br>';
+	echo '<b>'.MP::x($lng['error']).'!</b><br>';
 	echo "<xmp>$e</xmp>";
 }
 ?>
