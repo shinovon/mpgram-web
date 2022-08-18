@@ -8,7 +8,9 @@ require_once("api_values.php");
 if(!defined("api_id") || api_id == 0) {
 	throw new Exception('api_id is not set!');
 }
-
+if(!file_exists(sessionspath)) {
+	mkdir(sessionspath, 0777);
+}
 class MP {
 	static $win1251;
 	static $enc;
@@ -43,6 +45,9 @@ class MP {
 
 	static function getNameFromInfo($p, $full = false) {
 		if(isset($p['User'])) {
+			if(!isset($p['User']['first_name'])) {
+				return 'Deleted Account';
+			}
 			try {
 				return trim($p['User']['first_name']).($full && isset($p['User']['last_name']) ? ' '.trim($p['User']['last_name']) : '');
 			} catch (Exception $e) {
@@ -327,6 +332,9 @@ class MP {
 									if($dl) {
 										$fp = $dir.'/'.$n;
 										$x = dirname(__FILE__).'/'.$fp;
+										if(!file_exists($dir)) {
+											mkdir($dir, 0777);
+										}
 										if (!file_exists($x) && !file_exists($x.'.lock')) {
 											$MP->downloadToFile($media, $x);
 										}
