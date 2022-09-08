@@ -25,11 +25,14 @@ class Locale {
 	'set_chat_autoupdate' => 'Авто-обновление чата',
 	'set_chat_autoupdate_interval' => 'Интервал обновления (с)',
 	'set_language' => 'Язык',
-	'about' => 'О MPgram',
+	'about' => 'О MPGram',
 	'set_theme' => 'Тема',
 	'set_theme_dark' => 'Тёмная',
 	'set_theme_light' => 'Светлая',
 	'set_chat' => 'Чат',
+	'action_channelcreate' => 'Канал создан',
+	'action_chateditphoto' => 'Фото изменено',
+	'action_chatedittitle' => 'Имя было изменено на',
 	);
 }
 $lng = Locale::$lng;

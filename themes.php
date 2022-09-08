@@ -84,6 +84,13 @@ class Themes {
 		'.(static::$theme == 0 ? '' : '.ml, .mf, .mn {
 			color: #168acd;
 		}').
-		'--></style>';
+		'.ma {
+			text-align: center;
+			margin-bottom: 10px;
+		}
+		.cma {
+			color: #168acd;
+		}
+		--></style>';
 	}
 }

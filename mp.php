@@ -101,22 +101,40 @@ class MP {
 		return null;
 	}
 
-	static function parseMessageAction($a, $mfn, $mfid, $n, $lng, $MP) {
+	static function parseMessageAction($a, $mfn, $mfid, $n, $lng, $chat=true, $MP) {
 		$fn = $mfn !== null ? $mfn : $n;
 		$txt = '';
 		try {
 			$at = substr(strtolower($a['_']), strlen('messageaction'));
 			switch($at) {
 				case 'chatadduser':
-					$u = $a['users'][0];
-					if($u == $mfid) {
-						$txt = $fn.' '.static::x($lng['action_join']);
+				case 'chatjoinedbylink':
+					$u = null;
+					if(isset($a['users'])) {
+						$u = $a['users'][0];
+					}
+					if($mfid !== null && $chat) {
+						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a>';
 					} else {
-						$txt = $fn.' '.static::x($lng['action_add']).' '.MP::dehtml(MP::getNameFromId($MP, $u));
+						$txt = MP::dehtml($fn);
+					}
+					if($u == $mfid || $u === null) {
+						$txt .= ' '.static::x($lng['action_join']);
+					} else {
+						$txt .= ' '.static::x($lng['action_add']).' '.MP::dehtml(MP::getNameFromId($MP, $u));
 					}
 					break;
 				case 'pinmessage':
 					$txt = $fn.' '.static::x($lng['action_pin']);
+					break;
+				case 'channelcreate':
+					$txt = static::x($lng['action_channelcreate']);
+					break;
+				case 'chateditphoto':
+					$txt = static::x($lng['action_chateditphoto']);
+					break;
+				case 'chatedittitle':
+					$txt = static::x($lng['action_chatedittitle']).' '.MP::dehtml($a['title']);
 					break;
 				default:
 					$txt = $at;
@@ -163,15 +181,19 @@ class MP {
 				}
 				if(mb_strlen($fwname, 'UTF-8') > 30)
 					$fwname = mb_substr($fwname, 0, 30, 'UTF-8');
-				echo '<div class="m" id="msg_'.$id.'_'.$m['id'].'">';
-				if(!$pm && $uid != null && $l) {
-					echo '<b><a href="chat.php?c='.$uid.'" class="mn">'.MP::dehtml($mname).'</a></b>';
+				if(!isset($m['action'])) {
+					echo '<div class="m" id="msg_'.$id.'_'.$m['id'].'">';
+					if(!$pm && $uid != null && $l) {
+						echo '<b><a href="chat.php?c='.$uid.'" class="mn">'.MP::dehtml($mname).'</a></b>';
+					} else {
+						echo '<b class="mn">'.MP::dehtml($mname).'</b>';
+					}
+					echo ' '.date("H:i", $m['date']-$timeoff);
+					if($m['media_unread']) {
+						echo ' •';
+					}
 				} else {
-					echo '<b class="mn">'.MP::dehtml($mname).'</b>';
-				}
-				echo ' '.date("H:i", $m['date']-$timeoff);
-				if($m['media_unread']) {
-					echo ' •';
+					echo '<div class="ma" id="msg_'.$id.'_'.$m['id'].'">';
 				}
 				if($fwname != null) {
 					echo '<div class="mf">'.static::x($lng['fwd_from']).' <b>'.MP::dehtml($fwname).'</b></div>';
@@ -222,6 +244,7 @@ class MP {
 				}
 				if(isset($m['media'])) {
 					$media = $m['media'];
+					$reason = null;
 					if(isset($media['photo'])) {
 						$load = false;
 						if($imgs) {
@@ -235,48 +258,56 @@ class MP {
 								}
 							} else {
 								$d = $MP->getDownloadInfo($m);
-								$n = $d['name'].$d['ext'];
-								if($d['ext'] == '.png'
-								|| $d['ext'] == '.jpg'
-								|| $d['ext'] == '.jpeg'
-								|| $d['ext'] == '.gif') {
-									if($d['size'] < MAX_PHOTO_SIZE) {
-										$x = dirname(__FILE__).'/img/'.$n;
-										if (!file_exists('img/'.$n) && !file_exists('img/'.$n.'.lock')) {
-											$MP->downloadToFile($media, $x);
+								$filename = hash('sha1', $d['name']);
+								switch(substr($d['ext'], 1)) {
+									case 'jpg':
+									case 'jpeg':
+									case 'gif':
+									case 'png':
+										if($d['size'] < MAX_PHOTO_SIZE) {
+											$dest = dirname(__FILE__).'/img/'.$filename;
+											if (!file_exists('img/'.$filename) && !file_exists('img/'.$filename.'.lock')) {
+												$MP->downloadToFile($media, $dest);
+											}
+											$load = true;
+											echo '<div><a href="i.php?i='.$filename.'&p=orig"><img src="i.php?i='.urlencode($filename).'&p=prev"></img></a></div>';
+										} else {
+											$reason = 'Слишком большой объем';
 										}
-										$load = true;
-										echo '<div><a href="i.php?u=/img/'.$n.'&p=orig"><img src="i.php?u=/img/'.$n.'&p=prev"></img></a></div>';
-									} else {
-										$load = true;
-										echo static::x('<div><i>'.$lng['media_att'].' (Слишком большой объем)</i></div>');
-									}
+										break;
+									default:
+										break;
 								}
 							}
 						}
 						if(!$load) {
-							echo '<div><i>'.$lng['media_att'].'</i></div>';
+							echo '<div><i>'.$lng['media_att'].($reason != null ? ' ('.$reason.')' : '').'</i></div>';
 						}
 					} else if(isset($media['document'])) {
 						$d = $MP->getDownloadInfo($m);
 						$fn = $d['name'];
-						$fe = $d['ext'];
-						$n = $fn.$fe;
+						$fext = $d['ext'];
+						$n = $fn.$fext;
 						if(isset($media['document']['attributes'])
 							&& isset($media['document']['attributes'][0])
 						&& isset($media['document']['attributes'][0]['file_name'])) {
 							$n = $media['document']['attributes'][0]['file_name'];
 						}
+						$filename = $fn;
+						if(!$filename) {
+							$filename = $n;
+						}
+						$filename = hash('sha1', $filename);
 						echo '<div>';
 						try {
-							if(stripos($n, '.php') === false && !empty($fe) && strtolower($fe) !== '.php') {
+							if(stripos($n, '.php') === false && !empty($fext) && strtolower($fext) !== '.php') {
 								if($d['size'] > MAX_FILE_SIZE) {
 									// не скачивать большие файлы
-									if(mb_strlen($n, 'UTF-8') > 20) {
+									if(mb_strlen($n, 'UTF-8') > 25) {
 										$n = $fn;
-										if(mb_strlen($n, 'UTF-8') > 20)
-											$n = mb_substr($n, 0, 20, 'UTF-8').'..';
-										$n .= $fe;
+										if(mb_strlen($n, 'UTF-8') > 25)
+											$n = mb_substr($n, 0, 25, 'UTF-8').'..';
+										$n .= $fext;
 									}
 									echo '<i>'.MP::dehtml($n).'</i>';
 								} else {
@@ -286,7 +317,7 @@ class MP {
 									$fq = 'orig';
 									$dir = 'img';
 									$dl = false;
-									switch(strtolower(substr($fe, 1))) {
+									switch(strtolower(substr($fext, 1))) {
 										case 'webp':
 											if(strpos($d['name'], 'sticker_') === 0 && $d['size'] < 64 * MAX_STICKER_SIZE) {
 												$dl = true;
@@ -328,29 +359,31 @@ class MP {
 											break;
 									}
 									if($dl) {
-										$fp = $dir.'/'.$n;
-										$x = dirname(__FILE__).'/'.$fp;
+										if(!$img) {
+											$filename .= $fext;
+										}
+										$dest = dirname(__FILE__).'/'.$dir.'/'.$filename;
 										if(!file_exists($dir)) {
 											mkdir($dir, 0777);
 										}
-										if (!file_exists($x) && !file_exists($x.'.lock')) {
-											$MP->downloadToFile($media, $x);
+										if (!file_exists($dest) && !file_exists($dest.'.lock')) {
+											$MP->downloadToFile($media, $dest);
 										}
 										if($img) {
 											if($open) {
-												echo '<div><a href="i.php?u=/'.$fp.'&p='.$fq.'"><img src="i.php?u=/'.$dir.'/'.$n.'&p='.$q.'"></img></a></div>';
+												echo '<div><a href="i.php?i='.urlencode($filename).'&p='.$fq.'"><img src="i.php?i='.urlencode($filename).'&p='.$q.'"></img></a></div>';
 											} else {
-												echo '<div><img src="i.php?u=/'.$fp.'&p='.$q.'"></img></div>';
+												echo '<div><img src="i.php?i='.urlencode($filename).'&p='.$q.'"></img></div>';
 											}
 										} else {
-											echo '<div><a href="'.$fp.'">'.$n.'</a></div>';
+											echo '<div><a href="'.$dir.'/'.urlencode($filename).'">'.$n.'</a></div>';
 										}
 									} else {
-										if(mb_strlen($n, 'UTF-8') > 20) {
+										if(mb_strlen($n, 'UTF-8') > 25) {
 											$n = $fn;
-											if(mb_strlen($n, 'UTF-8') > 20)
-												$n = mb_substr($n, 0, 20, 'UTF-8').'..';
-											$n .= $fe;
+											if(mb_strlen($n, 'UTF-8') > 25)
+												$n = mb_substr($n, 0, 25, 'UTF-8').'..';
+											$n .= $fext;
 										}
 										echo '<i>'.MP::dehtml($n).'</i>';
 									}
@@ -366,7 +399,7 @@ class MP {
 							echo '<a href="'.$media['webpage']['url'].'">';
 							echo $media['webpage']['site_name'];
 							echo '</a>';
-						} else {
+						} else if(isset($media['webpage']['url'])) {
 							echo '<a href="'.$media['webpage']['url'].'">';
 							echo $media['webpage']['url'];
 							echo '</a>';
@@ -380,9 +413,7 @@ class MP {
 					}
 				}
 				if(isset($m['action'])) {
-					echo '<div class="ma">';
-					echo MP::parseMessageAction($m['action'], $mname1, $uid, $name, $lng, $MP);
-					echo '</div>';
+					echo MP::parseMessageAction($m['action'], $mname1, $uid, $name, $lng, true, $MP);
 				}
 				echo '</div>';
 			} catch (Exception $e) {

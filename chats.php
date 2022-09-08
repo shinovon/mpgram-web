@@ -79,7 +79,6 @@ try {
 	echo '<a href="login.php?logout=1">'.MP::x($lng['logout']).'</a>';
 	echo ' <a href="chats.php?upd=1">'.MP::x($lng['refresh']).'</a>';
 	echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
-	echo ' <a href="about.php">'.MP::x($lng['about']).'</a>';
 	echo '</div><br>';
 	echo '</header>';
 
@@ -126,21 +125,27 @@ try {
 					//} else {
 						$t = date('H:i', $msg['date']-$timeoff);
 					//}
-					echo '<div class="cm"><a href="chat.php?c='.$id.'">'.$t.' ';
+					echo '<div class="cm">'.$t.' ';
 					if(isset($msg['message']) && strlen($msg['message']) > 0) {
+						echo '<a href="chat.php?c='.$id.'">';
 						if($mfn !== null && ($id > 0 ? $mfid != $selfid : true))
 							echo $mfn.': ';
 						$txt = str_replace("\n", " ", MP::dehtml($msg['message']));
 						if(mb_strlen($txt, 'UTF-8') > 70) $txt = mb_substr($txt, 0, 70, 'UTF-8').'..';
 						echo $txt;
+						echo '</a>';
 					} else if(isset($msg['action'])) {
-						echo MP::parseMessageAction($msg['action'], $mfn, $mfid, $n, $lng, $MP);
+						echo '<a href="chat.php?c='.$id.'" class="cma">'.MP::parseMessageAction($msg['action'], $mfn, $mfid, $n, $lng, false, $MP).'</a>';
 					} else if(isset($msg['media'])) {
+						echo '<a href="chat.php?c='.$id.'" class="cma">';
+						if($mfn !== null && ($id > 0 ? $mfid != $selfid : true))
+							echo $mfn.': ';
 						echo MP::x($lng['media_att']);
+						echo '</a>';
 					} else {
 						echo '.';
 					}
-					echo '</a></div>';
+					echo '</div>';
 				} catch (Exception $e) {
 				}
 				echo '</div>';

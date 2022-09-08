@@ -106,10 +106,10 @@ try {
 	'min_id' => 0,
 	'hash' => 0]);
 	$rm = $r['messages'];
-	$ii = $rm[0]['id'];
 	echo '<head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
-	if($msgoffset == 0 && $autoupd == 1) {
+	if($msgoffset == 0 && $autoupd == 1 && count($rm) > 0) {
+	$ii = $rm[0]['id'];
 		if($dynupd == 1) {
 echo '<script type="text/javascript">
 <!--

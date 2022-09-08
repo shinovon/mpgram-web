@@ -6,14 +6,21 @@ function resize($image, $w, $h) {
     imagecopyresampled($temp, $image, 0, 0, 0, 0, $w, $h, $oldw, $oldh);
     return $temp;
 }
-if(!isset($_GET['u'])) {
-	http_response_code(400);
-	die();
-}
-$u = $_GET['u'];
-if(strpos($u, '/img/') === 0 && strpos($u, '/', 5) !== 0) { 
-	$u = substr($u, 1);
-} else if(strpos($u, 'http') !== 0) {
+$u = null;
+if(isset($_GET['u'])) {
+	$u = $_GET['u'];
+	if(strpos($u, 'https://t.me') !== 0) {
+		die();
+	}
+} else if(isset($_GET['i'])) {
+	if(strpos($u, '/') !== false) {
+		die();
+	}
+	if(strpos($u, '.') !== false) {
+		die();
+	}
+	$u = 'img/'.$_GET['i'];
+} else {
 	http_response_code(400);
 	die();
 }
@@ -22,10 +29,6 @@ $webp = false;
 $png = false;
 if(isset($_GET['p'])) $p = $_GET['p'];
 if(strpos($p, 't') === 0) {
-	if(strpos($u, 'https://t.me') !== 0) {
-		http_response_code(400);
-		die();
-	}
 	header('Cache-Control: public, max-age=86400');
 	$t = file_get_contents($u);
 	if(strpos($t, 'tgme_widget_message_photo') !== false) {
