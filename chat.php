@@ -72,6 +72,7 @@ try {
 	$name = null;
 	$pm = false;
 	$ch = false;
+	$left = false;
 	if(isset($info['Chat'])) {
 		$ch = isset($info['type']) && $info['type'] == 'channel';
 		if(isset($info['Chat']['title'])) {
@@ -80,6 +81,7 @@ try {
 		if(isset($info['Chat']['username'])) {
 			$un = $info['Chat']['username'];
 		}
+		$left = isset($info['Chat']['left']) && $info['Chat']['left'];
 		if(isset($info['Chat']['id'])) {
 			$lid = $info['Chat']['id'];
 			$id = (int)'-100'.$lid;
@@ -96,6 +98,13 @@ try {
 			$lid = $info['User']['id'];
 			$id = (int)$lid;
 		}
+	}
+	if($left && isset($_GET['join'])) {
+		$MP->channels->joinChannel(['channel' => $id]);
+		$left = false;
+	} else if(!$left && isset($_GET['leave'])) {
+		$MP->channels->leaveChannel(['channel' => $id]);
+		$left = true;
 	}
 
 	$r = $MP->messages->getHistory([
@@ -183,14 +192,20 @@ try {
 	//if(!$ch) echo ' <a href="write.php?c='.$id.'&n='.urlencode($sname).'">'.$lng['write_msg'].'</a>';
 	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></div>';
 	echo '<h3 class="chat_title">'.MP::dehtml($name).'</h3>';
-	if(!$ch && !$reverse) {
-		echo '<form action="write.php">';
-		echo '<input type="hidden" name="c" value="'.$id.'">';
-		echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
-		echo '<input type="submit">';
-		echo '</form>';
-	}
 	if(!$reverse) {
+		if($left) {
+			echo '<form action="chat.php">';
+			echo '<input type="hidden" name="c" value="'.$id.'">';
+			echo '<input type="hidden" name="join" value="1">';
+			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
+			echo '</form>';
+		} else if(!$ch) {
+			echo '<form action="write.php">';
+			echo '<input type="hidden" name="c" value="'.$id.'">';
+			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
+			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
+			echo '</form>';
+		}
 		if($msgoffset > 0) {
 			$i = $msgoffset - $msglimit;
 			if($i < 0) $i = 0;
@@ -216,12 +231,20 @@ try {
 			echo '<p><a href="chat.php?c='.$id.'&off='.$i.'&limit='.$msglimit.'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
         }
 	}
-	if(!$ch && $reverse) {
-		echo '<form action="write.php">';
-		echo '<input type="hidden" name="c" value="'.$id.'">';
-		echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
-		echo '<input type="submit">';
-		echo '</form>';
+	if($reverse) {
+		if($left) {
+			echo '<form action="chat.php">';
+			echo '<input type="hidden" name="c" value="'.$id.'">';
+			echo '<input type="hidden" name="join" value="1">';
+			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
+			echo '</form>';
+		} else if(!$ch) {
+			echo '<form action="write.php">';
+			echo '<input type="hidden" name="c" value="'.$id.'">';
+			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
+			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
+			echo '</form>';
+		}
 	}
 	try {
 		if($ch || (int)$id < 0) {

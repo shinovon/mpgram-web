@@ -33,6 +33,9 @@ class Locale {
 	'action_channelcreate' => 'Канал создан',
 	'action_chateditphoto' => 'Фото изменено',
 	'action_chatedittitle' => 'Имя было изменено на',
+	'join' => 'Зайти',
+	'leave' => 'Выйти',
+	'send' => 'Отправить',
 	);
 }
 $lng = Locale::$lng;

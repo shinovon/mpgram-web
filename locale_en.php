@@ -33,6 +33,9 @@ class Locale {
 	'action_channelcreate' => 'Channel created',
 	'action_chateditphoto' => 'Photo updated',
 	'action_chatedittitle' => 'Name was changed to',
+	'join' => 'Join',
+	'leave' => 'Leave',
+	'send' => 'Send',
 	);
 }
 $lng = Locale::$lng;
