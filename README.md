@@ -7,4 +7,5 @@ Lightweight telegram web client based on MadelineProto
 - You should deny access to sessions folder (`s/` by default, see in `config.php`) and MadelineProto.log
 - You must have php-gd extension installed to get images working (for example: `apt install php7.4-gd` on debian)
 - You need to set browscap in php.ini to get better device labels
-- MadelineProto install command: `composer update` (composer 2 needs to be installed)
+- MadelineProto install command: `composer update` (composer v2+ needs to be installed)
+- More instructions for installing MadelineProto <a href="https://docs.madelineproto.xyz/docs/INSTALLATION.html">here</a>
