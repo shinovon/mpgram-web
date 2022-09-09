@@ -1,6 +1,7 @@
 <?php
-// Перенаправление на HTTPS
-if(isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
+include 'config.php';
+// HTTPS redirecting
+if(FORCE_HTTPS || (CHROME_HTTPS && isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false)) {
 	$s = 'https://' . $_SERVER['SERVER_NAME'];
 	if(isset($_SERVER['PHP_SELF'])) {
 		$ss = $_SERVER['PHP_SELF'];

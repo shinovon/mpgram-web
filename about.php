@@ -1,4 +1,7 @@
 <?php
+
+include 'redirect.php';
+
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: private, no-cache, no-store');
 include 'mp.php';

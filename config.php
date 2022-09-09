@@ -9,3 +9,5 @@ define('MAX_FILE_GIF_SIZE', 512 * 1024);
 define('DOWNLOAD_MP3', true);
 define('MAX_FILE_MP3_SIZE', 6 * 1024 * 1024);
 define('PNG_STICKERS', true);
+define('FORCE_HTTPS', false);
+define('CHROME_HTTPS', false);
