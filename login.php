@@ -156,10 +156,10 @@ if($user != null
 			die();
 		} else {
 			$c = $_GET['c'];
-			$cc = $_SESSION['captcha'];
-			if(strtolower($c) !== $cc) {
+			$b = isset($_SESSION['captcha']);
+			if(!$b || strtolower($c) !== $_SESSION['captcha']) {
 				htmlStart();
-				unset($_SESSION['captcha']);
+				if($b) unset($_SESSION['captcha']);
 				echo 'CAPTCHA:<br>';
 				echo '<p><img src="captcha.php"></p>';
 				echo '<form action="login.php">';
@@ -170,7 +170,7 @@ if($user != null
 				echo '<input type="text" name="c">';
 				echo '<input type="submit">';
 				echo '</form>';
-				echo '<b>Wrong!</b>';
+				if($b) echo '<b>Wrong!</b>';
 				echo Themes::bodyEnd();
 				die();
 			}

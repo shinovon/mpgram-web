@@ -66,6 +66,10 @@ Themes::setTheme($theme);
 $imgs = true;
 try {
 	$MP = MP::getMadelineAPI($user);
+	try {
+		$MP->getPwrChat($id, true);
+	} catch (Exception $e) {
+	}
 	$info = $MP->getInfo($id);
 	$un = null;
 	$lid = null;
@@ -106,7 +110,6 @@ try {
 		$MP->channels->leaveChannel(['channel' => $id]);
 		$left = true;
 	}
-
 	$r = $MP->messages->getHistory([
 	'peer' => $id,
 	'offset_id' => 0,
