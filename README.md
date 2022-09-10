@@ -1,6 +1,8 @@
 # MPGram Web
 Lightweight telegram web client based on MadelineProto
 
+Test instance: <a href="https://mp.nnchan.ru/">https://mp.nnchan.ru</a>, but it is highly recommended to make your own instance.
+
 ## Setup notes
 - You need to generate api id by creating a telegram app in <a href="https://my.telegram.org/apps">https://my.telegram.org/apps</a> and put `api_id` & `api_hash` into `api_values.php`
 - Server settings are located in `config.php`
