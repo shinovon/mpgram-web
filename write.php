@@ -35,7 +35,7 @@ if(isset($_POST["msg"])) {
 if($msg !== null) {
 	try {
 		$MP = MP::getMadelineAPI($user);
-		$MP->messages->sendMessage(['peer' => $id, 'message' => $_GET["msg"]]);
+		$MP->messages->sendMessage(['peer' => $id, 'message' => $msg]);
 		header('Location: chat.php?c='.$id);
 	} catch (Exception $e) {
 		echo $e->getMessage();
