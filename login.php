@@ -133,40 +133,40 @@ if($user != null
 	// уже авторизован
 	header('Location: chats.php');
 	die();
-} else if(isset($_GET['phone'])) {
-	$p = $_GET['phone'];
+} else if(isset($_POST['phone'])) {
+	$p = $_POST['phone'];
 	if(empty($p) || strlen($p) < 10 || !is_numeric(str_replace('-','',str_replace('+','', $p)))) {
 		header('Location: login.php?wrong=number');
 		die();
 	}
 	if(!isset($_SESSION['captcha_entered'])) {
-		if(!isset($_GET['c'])) {
+		if(!isset($_POST['c'])) {
 			htmlStart();
 			echo 'CAPTCHA:<br>';
 			echo '<p><img src="captcha.php?r='.time().'"></p>';
-			echo '<form action="login.php">';
-			if(isset($_GET['code']))
-				echo '<input type="hidden" name="code" value="'.$_GET['code'].'">';
-			if(isset($_GET['phone']))
-				echo '<input type="hidden" name="phone" value="'.$_GET['phone'].'">';
+			echo '<form action="login.php" method="post">';
+			if(isset($_POST['code']))
+				echo '<input type="hidden" name="code" value="'.$_POST['code'].'">';
+			if(isset($_POST['phone']))
+				echo '<input type="hidden" name="phone" value="'.$_POST['phone'].'">';
 			echo '<input type="text" name="c">';
 			echo '<input type="submit">';
 			echo '</form>';
 			echo Themes::bodyEnd();
 			die();
 		} else {
-			$c = $_GET['c'];
+			$c = $_POST['c'];
 			$b = isset($_SESSION['captcha']);
 			if(!$b || strtolower($c) !== $_SESSION['captcha']) {
 				htmlStart();
 				if($b) unset($_SESSION['captcha']);
 				echo 'CAPTCHA:<br>';
 				echo '<p><img src="captcha.php"></p>';
-				echo '<form action="login.php">';
-				if(isset($_GET['code']))
-					echo '<input type="hidden" name="code" value="'.$_GET['code'].'">';
-				if(isset($_GET['phone']))
-					echo '<input type="hidden" name="phone" value="'.$_GET['phone'].'">';
+				echo '<form action="login.php" method="post">';
+				if(isset($_POST['code']))
+					echo '<input type="hidden" name="code" value="'.$_POST['code'].'">';
+				if(isset($_POST['phone']))
+					echo '<input type="hidden" name="phone" value="'.$_POST['phone'].'">';
 				echo '<input type="text" name="c">';
 				echo '<input type="submit">';
 				echo '</form>';
@@ -178,7 +178,7 @@ if($user != null
 		}
 	}
 	if(!isset($user) || $nouser) {
-		$user = md5($_GET['phone'].rand(0,1000));
+		$user = md5($_POST['phone'].rand(0,1000));
 		MP::cookie('user', $user, time() + (86400 * 365));
 		$MP = MP::getMadelineAPI($user);
 		htmlStart();
@@ -187,10 +187,10 @@ if($user != null
 			unset($_SESSION['captcha_entered']);
 			header('Location: chats.php');
 			die();
-		} else if(isset($_GET['pass'])) {
+		} else if(isset($_POST['pass'])) {
 			$MP = MP::getMadelineAPI($user);
 			try {
-				$p = $_GET['pass'];
+				$p = $_POST['pass'];
 				$a = $MP->complete2falogin($p);
 				echo '<xmp>';
 				echo $a;
@@ -204,11 +204,11 @@ if($user != null
 				echo '</xmp>';
 			}
 			die();
-		} else if(isset($_GET['code'])) {
-			if(!empty($_GET['code']) && is_numeric($_GET['code'])) {
+		} else if(isset($_POST['code'])) {
+			if(!empty($_POST['code']) && is_numeric($_POST['code'])) {
 				try {
 					$MP = MP::getMadelineAPI($user);
-					$a = $MP->complete_phone_login((int)$_GET['code']);
+					$a = $MP->complete_phone_login((int)$_POST['code']);
 					$hash = null;
 					if(isset($a['phone_code_hash'])) {
 						$hash = $a['phone_code_hash'];
@@ -222,10 +222,10 @@ if($user != null
 					} else if(isset($a['_']) && $a['_'] === 'account.password') {
 						htmlStart();
 						echo 'Pass-code:<br>';
-						echo '<form action="login.php">';
+						echo '<form action="login.php" method="post">';
 						echo '<input type="text" name="pass">';
-						if(isset($_GET['phone']))
-							echo '<input type="hidden" name="phone" value="'.$_GET['phone'].'">';
+						if(isset($_POST['phone']))
+							echo '<input type="hidden" name="phone" value="'.$_POST['phone'].'">';
 						echo '<input type="submit">';
 						echo '</form>';
 						echo Themes::bodyEnd();
@@ -233,7 +233,7 @@ if($user != null
 					} else if(isset($a['_']) && $a['_'] === 'account.needSignup') {
 						htmlStart();
 						echo 'REGISTER:<br>';
-						echo '<form action="reg.php">';
+						echo '<form action="reg.php" method="post">';
 						echo '<b>First name</b><br>';
 						echo '<input type="text" name="first_name">';
 						echo '<b>Last name</b><br>';
@@ -271,7 +271,7 @@ if($user != null
 	// ввод кода
 	if(isset($hash)) {
 		try {
-			$MP->auth->resendCode(['phone' => $_GET['phone'], 'phone_code_hash' => $hash]);
+			$MP->auth->resendCode(['phone' => $_POST['phone'], 'phone_code_hash' => $hash]);
 		} catch (Exception $e) {
 			echo $e->getMessage();
 			echo Themes::bodyEnd();
@@ -279,7 +279,7 @@ if($user != null
 		}
 	} else {
 		try {
-			$MP->phone_login($_GET['phone']);
+			$MP->phone_login($_POST['phone']);
 		} catch (Exception $e) {
 			if(strpos($e->getMessage(), 'PHONE_NUMBER_INVALID') !== false) {
 				header('Location: login.php?wrong=number');
@@ -292,10 +292,10 @@ if($user != null
 		}
 	}
 	echo MP::x($lng['phone_code']).':<br>';
-	echo '<form action="login.php">';
+	echo '<form action="login.php" method="post">';
 	echo '<input type="text" name="code">';
-	if(isset($_GET['phone']))
-		echo '<input type="hidden" name="phone" value="'.$_GET['phone'].'">';
+	if(isset($_POST['phone']))
+		echo '<input type="hidden" name="phone" value="'.$_POST['phone'].'">';
 	echo '<input type="submit">';
 	echo '</form>';
 	echo Themes::bodyEnd();
@@ -306,7 +306,7 @@ if($user != null
 		echo MP::x('<b>Ваша сессия истекла!</b><br>');
 	}
 	echo MP::x($lng['phone_number']).':<br>';
-	echo '<form action="login.php">';
+	echo '<form action="login.php" method="post">';
 	echo '<input type="text" value="" name="phone">';
 	echo '<input type="submit">';
 	echo '</form>';

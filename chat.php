@@ -203,7 +203,7 @@ try {
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
 			echo '</form>';
 		} else if(!$ch) {
-			echo '<form action="write.php">';
+			echo '<form action="write.php" method="post">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
 			echo '<input type="submit" value="'.MP::x($lng['send']).'">';

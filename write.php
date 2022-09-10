@@ -9,11 +9,15 @@ if(!$user) {
 	header('Location: login.php?logout=1');
 	die();
 }
-
-if(!isset($_GET["c"])) {
+$id = null;
+if(isset($_POST['c'])) {
+	$id = $_POST['c'];
+} else if(isset($_GET['c'])) {
+	$id = $_GET['c'];
+} else {
 	die();
 }
-$id = $_GET["c"];
+$id = $_POST["c"];
 
 header("Content-Type: text/html; charset=utf-8");
 header("Cache-Control: private, no-cache, no-store");
@@ -22,8 +26,13 @@ function exceptions_error_handler($severity, $message, $filename, $lineno) {
 	throw new ErrorException($message, 0, $severity, $filename, $lineno);
 }
 set_error_handler('exceptions_error_handler');
-
-if(isset($_GET["msg"])) {
+$msg = null;
+if(isset($_POST["msg"])) {
+	$msg = $_POST["msg"];
+} else if(isset($_GET["msg"])) {
+	$msg = $_GET["msg"];
+}
+if($msg !== null) {
 	try {
 		$MP = MP::getMadelineAPI($user);
 		$MP->messages->sendMessage(['peer' => $id, 'message' => $_GET["msg"]]);
@@ -41,7 +50,7 @@ if(isset($_GET['n'])) {
 echo '<head><title>Письмо</title></head><body>';
 //echo '<h2>Написать '.$name.'</h2>';
 //echo '<h2>Письмо</h2>';
-echo '<form action="write.php">';
+echo '<form action="write.php" method="post">';
 echo '<input type="hidden" name="c" value="'.$id.'">';
 echo '<input type="text" value="" name="msg"><br>';
 echo '<input type="submit">';
