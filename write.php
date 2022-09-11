@@ -17,7 +17,6 @@ if(isset($_POST['c'])) {
 } else {
 	die();
 }
-$id = $_POST["c"];
 
 header("Content-Type: text/html; charset=utf-8");
 header("Cache-Control: private, no-cache, no-store");
@@ -47,9 +46,7 @@ $name = null;
 if(isset($_GET['n'])) {
 	$name = $_GET['n'];
 }
-echo '<head><title>Письмо</title></head><body>';
-//echo '<h2>Написать '.$name.'</h2>';
-//echo '<h2>Письмо</h2>';
+echo '<body>';
 echo '<form action="write.php" method="post">';
 echo '<input type="hidden" name="c" value="'.$id.'">';
 echo '<input type="text" value="" name="msg"><br>';
@@ -58,9 +55,6 @@ echo '</form>';
 if($name) {
 	echo '<b>'.$name.'</b><br>';
 }
-echo '<a href="chat.php?c='.$id.'">Назад</a>';
+echo '<a href="chat.php?c='.$id.'">Back</a>';
 echo '</body>';
-//} catch (Exception $e) {
-//	echo $e->getMessage();
-//}
 ?>

@@ -203,10 +203,14 @@ try {
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
 			echo '</form>';
 		} else if(!$ch) {
-			echo '<form action="write.php" method="post">';
+			echo '<form action="write.php" method="post" style="display: inline;">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
 			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
+			echo '</form>';
+			echo '<form action="file.php" style="display: inline; float: right;">';
+			echo '<input type="hidden" name="c" value="'.$id.'">';
+			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
 			echo '</form>';
 		}
 		if($msgoffset > 0) {
@@ -242,10 +246,14 @@ try {
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
 			echo '</form>';
 		} else if(!$ch) {
-			echo '<form action="write.php">';
+			echo '<form action="write.php" method="post" style="display: inline;">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
 			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
+			echo '</form>';
+			echo '<form action="file.php" style="display: inline; float: right;">';
+			echo '<input type="hidden" name="c" value="'.$id.'">';
+			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
 			echo '</form>';
 		}
 	}
