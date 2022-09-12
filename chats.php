@@ -24,7 +24,7 @@ if(!$user) {
 	die();
 }
 
-$count = 15;
+$count = MP::getSettingInt('chats', 15);
 if(isset($_GET['count'])) {
 	$count = (int) $_GET['count'];
 }

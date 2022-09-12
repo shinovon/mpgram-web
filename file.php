@@ -45,14 +45,12 @@ if(isset($_POST['sent'])) {
 	if(isset($_POST['msg'])) {
 		$msg = $_POST['msg'];
 	}
-	var_dump($_POST);
-	var_dump($_FILES);
 	$file = false;
 	$filename = null;
 	$type = null;
 	$attr = false;
 	if(isset($_FILES['file']) && $_FILES['file']['size'] != 0) {
-		if($_FILES['file']['size'] > 5 * 1024 * 1024) {
+		if($_FILES['file']['size'] > MAX_SEND_FILE_SIZE) {
 			$reason = 'File is too large!';
 		} else {
 			$file = $_FILES['file']['tmp_name'];
@@ -75,9 +73,17 @@ if(isset($_POST['sent'])) {
 						}
 						break;
 					case 'mp3':
+					case 'amr':
+					case '3gp':
+					case 'mp4':
 					case 'gif':
 					case 'zip':
 					case 'jar':
+					case 'jad':
+					case 'sis':
+					case 'sisx':
+					case 'apk':
+					case 'deb':
 						$type = 'inputMediaUploadedDocument';
 						$attr = true;
 						break;

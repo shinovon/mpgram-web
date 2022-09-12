@@ -36,6 +36,9 @@ class Locale {
 	'join' => 'Join',
 	'leave' => 'Leave',
 	'send' => 'Send',
+	'sending_file' => 'Sending a file',
+	'send_file' => 'Attach a file',
+	'set_chats_count' => 'Chats count',
 	);
 }
 $lng = Locale::$lng;

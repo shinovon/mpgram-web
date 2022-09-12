@@ -36,6 +36,9 @@ class Locale {
 	'join' => 'Зайти',
 	'leave' => 'Выйти',
 	'send' => 'Отправить',
+	'sending_file' => 'Отправка файла',
+	'send_file' => 'Отправить файл',
+	'set_chats_count' => 'Количество чатов',
 	);
 }
 $lng = Locale::$lng;

@@ -11,3 +11,4 @@ define('MAX_FILE_MP3_SIZE', 6 * 1024 * 1024);
 define('PNG_STICKERS', true);
 define('FORCE_HTTPS', false);
 define('CHROME_HTTPS', false);
+define('MAX_SEND_FILE_SIZE', 10 * 1024 * 1024);

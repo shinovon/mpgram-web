@@ -4,6 +4,7 @@ $autoupd = 1;
 $dynupd = 1;
 $updint = 10;
 $theme = 0;
+$chats = 15;
 $set = isset($_GET['set']);
 include 'mp.php';
 if($set) {
@@ -29,10 +30,19 @@ if($set) {
 	if(isset($_GET['theme'])) {
 		$theme = (int) $_GET['theme'];
 	}
+	if(isset($_GET['chats'])) {
+		$chats = (int) $_GET['chats'];
+		if($chats < 10) {
+			$chats = 10;
+		} else if($chats > 100) {
+			$chats = 100;
+		}
+	}
 	MP::cookie('lang', $lang, time() + (86400 * 365));
 	MP::cookie('autoupd', $autoupd, time() + (86400 * 365));
 	MP::cookie('updint', $updint, time() + (86400 * 365));
 	MP::cookie('theme', $theme, time() + (86400 * 365));
+	MP::cookie('chats', $chats, time() + (86400 * 365));
 } else {
 	if(isset($_COOKIE['lang'])) {
 		$lang = $_COOKIE['lang'];
@@ -45,6 +55,9 @@ if($set) {
 	}
 	if(isset($_COOKIE['theme'])) {
 		$theme = (int)$_COOKIE['theme'];
+	}
+	if(isset($_COOKIE['chats'])) {
+		$chats = (int)$_COOKIE['chats'];
 	}
 }
 
@@ -84,6 +97,8 @@ echo '<label for="autoupd">'.MP::x($lng['set_chat_autoupdate']).'</label><br>';
 //echo '<label for="autoupd">Авто-обновление чата</label><br>';
 echo '<p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
 echo '<input type="text" size="3" id="updint" name="updint" value="'.$updint.'"></p>';
+echo '<p><label for="chats">'.MP::x($lng['set_chats_count']).'</label>:<br>';
+echo '<input type="text" size="3" id="chats" name="chats" value="'.$chats.'"></p>';
 echo '<p><b>'.MP::x($lng['set_theme']).'</b></p>';
 $themes = array(
 0 => $lng['set_theme_dark'],
