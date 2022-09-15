@@ -1,140 +1,128 @@
 <?php
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-
-include 'mp.php';
-$user = MP::getUser();
-if(!$user) {
-	header('Location: login.php?logout=1');
-	die();
-}
-
-$lang = MP::getSetting('lang', 'ru');
-$theme = MP::getSettingInt('theme');
-
-try {
-	include 'locale_'.$lang.'.php';
-} catch (Exception $e) {
-	$lang = 'ru';
-	include 'locale_'.$lang.'.php';
-}
-
-$id = null;
-if(isset($_POST['c'])) {
-	$id = $_POST['c'];
-} else if(isset($_GET['c'])) {
-	$id = $_GET['c'];
-} else {
-	die();
-}
-
-header("Content-Type: text/html; charset=utf-8");
-header("Cache-Control: private, no-cache, no-store");
-
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
 	throw new ErrorException($message, 0, $severity, $filename, $lineno);
 }
 set_error_handler('exceptions_error_handler');
-
-include 'themes.php';
-Themes::setTheme($theme);
-$reason = false;
-if(isset($_POST['sent'])) {
-	$msg = '';
-	if(isset($_POST['msg'])) {
-		$msg = $_POST['msg'];
+require_once 'vendor/autoload.php';
+use Amp\ByteStream;
+class StringStream implements \Amp\ByteStream\OutputStream {
+	public $d;
+	public function write(string $data): Amp\Promise {
+		$this->d .= $data;
+		return true;
 	}
-	$file = false;
-	$filename = null;
-	$type = null;
-	$attr = false;
-	if(isset($_FILES['file']) && $_FILES['file']['size'] != 0) {
-		if($_FILES['file']['size'] > MAX_SEND_FILE_SIZE) {
-			$reason = 'File is too large!';
+	public function end(string $finalData = ""): Amp\Promise {
+		$this->d .= $finalData;
+		return true;
+	}
+	public function get() {
+		return $this->d;
+	}
+}
+
+function resize($image, $w, $h) {
+    $oldw = imagesx($image);
+    $oldh = imagesy($image);
+    $temp = imagecreatetruecolor($w, $h);
+    imagecopyresampled($temp, $image, 0, 0, 0, 0, $w, $h, $oldw, $oldh);
+    return $temp;
+}
+try {
+	include 'mp.php';
+	$user = MP::getUser();
+	if(!$user) {
+		http_response_code(401);
+		die();
+	}
+	$MP = MP::getMadelineAPI($user);
+	$msg = null;
+	$cid = $_GET['c'];
+	$mid = $_GET['m'];
+	if((int)$cid < 0) {
+		$msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
+	} else {
+		$msg = $MP->channels->getMessages(['peer' => $cid, 'id' => [$mid]]);
+	}
+	if($msg && isset($msg['messages']) && isset($msg['messages'][0])) {
+		$msg = $msg['messages'][0];
+	}
+	
+	$di = $MP->getDownloadInfo($msg['media']);
+	$p = '';
+	if(isset($_GET['p'])) {
+		$p = $_GET['p'];
+	}
+	if(strpos($p, 'r') === 0) {
+		header('Cache-Control: private, max-age=86400');
+		$p = substr($p, 1);
+		$stream = new StringStream();
+		$MP->downloadToStream($di, $stream);
+		$img = imagecreatefromstring($stream->get());
+		if($p == 'stickerp') {
+			$w1 = $w = imagesx($img);
+			$h1 = $h = imagesy($img);
+
+			if($w > 180) {
+				$h = ($h/$w)*180;
+				$w = 180;
+				$temp = imagecreatetruecolor($w, $h);
+				$c = imagecolorallocatealpha($temp, 0, 0, 0, 127);
+				imagefill($temp, 0, 0, $c);
+				imagealphablending($temp, false);
+				imagesavealpha($temp, true);
+				imagecopyresampled($temp, $img, 0, 0, 0, 0, $w, $h, $w1, $h1);
+				$img = $temp;
+			}
+			header('Content-Type: image/png');
+			imagepng($img);
+		} else if($p == 'png') {
+			header('Content-Type: image/png');
+			imagepng($img);
 		} else {
-			$file = $_FILES['file']['tmp_name'];
-			$filename = $_FILES['file']['name'];
-			$extidx = strrpos($filename, '.');
-			if($extidx === false) {
-				$reason = 'Invalid file';
-			} else {
-				$ext = strtolower(substr($filename, $extidx+1));
-				switch($ext) {
-					case 'jpg':
-					case 'jpeg':
-					case 'png':
-						$newfile = $file.'.'.$ext;
-						if(!move_uploaded_file($file, $newfile)) {
-							$reason = 'Failed to move file';
-						} else {
-							$type = 'inputMediaUploadedPhoto';
-							$file = $newfile;
-						}
-						break;
-					case 'mp3':
-					case 'amr':
-					case '3gp':
-					case 'mp4':
-					case 'gif':
-					case 'zip':
-					case 'jar':
-					case 'jad':
-					case 'sis':
-					case 'sisx':
-					case 'apk':
-					case 'deb':
-						$type = 'inputMediaUploadedDocument';
-						$attr = true;
-						break;
-					default:
-						$reason = 'This type of file ('.$ext.') is not supported!';
-						break;
+			$w = imagesx($img);
+			$h = imagesy($img);
+			$q = 50;
+			if($p == 'orig') {
+				$q = 80;
+			} else if($p == 'prev') {
+				if($w > 240) {
+					$h = ($h/$w)*240;
+					$w = 240;
+					$img = resize($img, $w, $h);
+				} else if($h > 180) {
+					$w = ($w/$h)*180;
+					$h = 180;
+					$img = resize($img, $w, $h);
+				}
+			} else if($p == 'min') {
+				$q = 30;
+				if($w > 180) {
+					$h = ($h/$w)*180;
+					$w = 180;
+					$img = resize($img, $w, $h);
+				} else if($h > 90) {
+					$w = ($w/$h)*90;
+					$h = 90;
+					$img = resize($img, $w, $h);
+				}
+			} else if($p == 'sticker') {
+				$q = 75;
+				if($w > 180) {
+					$h = ($h/$w)*180;
+					$w = 180;
+					$img = resize($img, $w, $h);
+				} else if($h > 90) {
+					$w = ($w/$h)*90;
+					$h = 90;
+					$img = resize($img, $w, $h);
 				}
 			}
 		}
+		header('Content-Type: image/jpeg');
+		imagejpeg($img, null, $q);
+	} else {
+		$MP->downloadToBrowser($di);
 	}
-	if(!$reason) {
-		try {
-			if(!$file) {
-				if(strlen($msg) > 0) {
-					$MP = MP::getMadelineAPI($user);
-					$MP->messages->sendMessage(['peer' => $id, 'message' => $msg]);
-					header('Location: chat.php?c='.$id);
-					die();
-				}
-			} else {
-				$attributes = [];
-				if($attr) {
-					array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
-				}
-				$MP = MP::getMadelineAPI($user);
-				$MP->messages->sendMedia(['peer' => $id, 'message' => $msg, 'media' => 
-				['_' => $type, 'file' => $file,
-				'attributes' => $attributes
-				]]);
-				header('Location: chat.php?c='.$id);
-				die();
-			}
-		} catch (Exception $e) {
-			echo $e->getMessage();
-		}
-	}
+} catch (Exception $e) {
+	http_response_code(500);
 }
-
-echo '<head><title>'.$lng['sending_file'].'</title>';
-echo Themes::head();
-echo '</head>';
-echo Themes::bodyStart();
-echo '<div><a href="chat.php?c='.$id.'">'.$lng['back'].'</a></div><br>';
-if($reason) {
-	echo '<b>'.$reason.'</b>';
-}
-echo '<form action="file.php" method="post" enctype="multipart/form-data">';
-echo '<input type="hidden" name="c" value="'.$id.'">';
-echo '<input type="hidden" name="sent" value="1">';
-echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
-echo '<input type="file" id="file" name="file"><br>';
-echo '<input type="submit" value="'.$lng['send'].'">';
-echo '</form>';
-echo Themes::bodyEnd();

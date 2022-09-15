@@ -1,6 +1,6 @@
 <?php
-if(defined('mp_loaded')) die();
-define('utils_loaded', true);
+if(defined('mp_loaded')) return;
+define('mp_loaded', true);
 
 require_once("config.php");
 require_once("api_values.php");
@@ -247,42 +247,8 @@ class MP {
 					$media = $m['media'];
 					$reason = null;
 					if(isset($media['photo'])) {
-						$load = false;
 						if($imgs) {
-							if($id < 0 && isset($un) && isset($m['message']) && strlen($m['message']) > 0) {
-								try {
-									$iur = 'https://t.me/'.$un.'/'.$m['id'].'?embed=1';
-									$iur = 'i.php?u='.urlencode($iur).'&p=t';
-									echo '<div><a href="'.$iur.'orig"><img alt="'.$lng['media_att'].'" src="'.$iur.'prev"></img></a></div>';
-									$load = true;
-								} catch (Exception $e) {
-								}
-							} else {
-								$d = $MP->getDownloadInfo($m);
-								$filename = hash('sha1', $d['name']);
-								switch(substr($d['ext'], 1)) {
-									case 'jpg':
-									case 'jpeg':
-									case 'gif':
-									case 'png':
-										if($d['size'] < MAX_PHOTO_SIZE) {
-											$dest = dirname(__FILE__).'/img/'.$filename;
-											if (!file_exists('img/'.$filename) && !file_exists('img/'.$filename.'.lock')) {
-												$MP->downloadToFile($media, $dest);
-											}
-											$load = true;
-											echo '<div><a href="i.php?i='.$filename.'&p=orig"><img src="i.php?i='.urlencode($filename).'&p=prev"></img></a></div>';
-										} else {
-											$reason = $lng['size_too_large'];
-										}
-										break;
-									default:
-										break;
-								}
-							}
-						}
-						if(!$load) {
-							echo '<div><i>'.$lng['media_att'].($reason != null ? ' ('.$reason.')' : '').'</i></div>';
+							echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=rprev"></img></a></div>';
 						}
 					} else if(isset($media['document'])) {
 						$d = $MP->getDownloadInfo($m);
@@ -294,132 +260,55 @@ class MP {
 						&& isset($media['document']['attributes'][0]['file_name'])) {
 							$n = $media['document']['attributes'][0]['file_name'];
 						}
-						$filename = $fn;
-						if(!$filename) {
-							$filename = $n;
-						}
-						$filename = hash('sha1', $filename);
 						echo '<div>';
 						try {
-							if(stripos($n, '.php') === false && !empty($fext) && strtolower($fext) !== '.php') {
-								if($d['size'] > MAX_FILE_SIZE) {
-									// не скачивать большие файлы
-									if(mb_strlen($n, 'UTF-8') > 25) {
-										$n = $fn;
-										if(mb_strlen($n, 'UTF-8') > 25)
-											$n = mb_substr($n, 0, 25, 'UTF-8').'..';
-										$n .= $fext;
-									}
-									echo '<div class="mw"><b>'.MP::dehtml($n).'</b><br>';
-									echo round($d['size']/1024.0/1024.0, 2).' MB ('.$lng['size_too_large'].')';
-									echo '</div>';
-								} else {
-									$img = true;
-									$open = true;
-									$q = 'prev';
-									$fq = 'orig';
-									$dir = 'img';
-									$dl = false;
-									$reason = null;
-									switch(strtolower(substr($fext, 1))) {
-										case 'webp':
-											if(strpos($d['name'], 'sticker_') === 0) {
-												if($d['size'] > MAX_STICKER_SIZE) {
-													$reason = $lng['file_too_large'];
-													break;
-												}
-												$dl = true;
-												$open = false;
-												if(PNG_STICKERS && isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
-													$q = 'wstickerp';
-												} else {
-													$q = 'wsticker';
-												}
-											}
-											break;
-										case 'jpg':
-										case 'jpeg':
-											if($d['size'] < MAX_FILE_JPG_SIZE) {
-												$img = true;
-												$dl = true;
-											} else {
-												$reason = $lng['file_too_large'];
-											}
-											break;
-										case 'png':
-											if($d['size'] < MAX_FILE_PNG_SIZE) {
-												$q = 'lprev';
-												$fq = 'lpng';
-												$dl = true;
-												$img = true;
-											} else {
-												$reason = $lng['file_too_large'];
-											}
-											break;
-										case 'gif':
-											if($d['size'] < MAX_FILE_GIF_SIZE) {
-												$dl = true;
-												$img = false;
-											} else {
-												$reason = $lng['file_too_large'];
-											}
-											break;
-										case 'tgs':
-											break;
-										case 'mp3':
-											if(DOWNLOAD_MP3) {
-												if($d['size'] > MAX_FILE_MP3_SIZE) {
-													$reason = $lng['file_too_large'];
-													break;
-												}
-												$img = false;
-												$dl = true;
-												$dir = 'doc';
-												break;
-											}
-										default:
-											if(DOWNLOAD_DOCUMENTS) {
-												if($d['size'] > MAX_DOCUMENT_SIZE) {
-													$reason = $lng['file_too_large'];
-													break;
-												}
-												$img = false;
-												$dl = true;
-												$dir = 'doc';
-											}
-											break;
-									}
-									if($dl) {
-										$dest = dirname(__FILE__).'/'.$dir.'/'.$filename;
-										if(!file_exists($dir)) {
-											mkdir($dir, 0777);
-										}
-										if (!file_exists($dest) && !file_exists($dest.'.lock')) {
-											$MP->downloadToFile($media, $dest);
-										}
-										if($img) {
-											if($open) {
-												echo '<div><a href="i.php?i='.urlencode($filename).'&p='.$fq.'"><img src="i.php?i='.urlencode($filename).'&p='.$q.'"></img></a></div>';
-											} else {
-												echo '<div><img src="i.php?i='.urlencode($filename).'&p='.$q.'"></img></div>';
-											}
+							$img = true;
+							$open = true;
+							$q = 'rprev';
+							$fq = 'rorig';
+							switch(strtolower(substr($fext, 1))) {
+								case 'webp':
+									if(strpos($d['name'], 'sticker_') === 0) {
+										$dl = true;
+										$open = false;
+										if(PNG_STICKERS) {
+											$q = 'rstickerp';
 										} else {
-											echo '<div class="mw"><b><a href="d.php?n='.urlencode($filename).'&f='.urlencode($n).'">'.MP::dehtml($n).'</a></b><br>';
-											echo round($d['size']/1024.0/1024.0, 2).' MB';
-											echo '</div>';
+											$q = 'rsticker';
 										}
-									} else {
-										if(mb_strlen($n, 'UTF-8') > 25) {
-											$n = $fn;
-											if(mb_strlen($n, 'UTF-8') > 25)
-												$n = mb_substr($n, 0, 25, 'UTF-8').'..';
-											$n .= $fext;
-										}
-										echo '<div class="mw"><b>'.MP::dehtml($n).'</b><br>';
-										echo round($d['size']/1024.0/1024.0, 2).' MB'.($reason !== null ? '( '.$reason.')' : '');
-										echo '</div>';
 									}
+									break;
+								case 'jpg':
+								case 'jpeg':
+									$img = true;
+									break;
+								case 'png':
+									$q = 'rprev';
+									$fq = 'rorig';
+									$img = true;
+									break;
+								case 'gif':
+									$img = false;
+									break;
+								case 'tgs':
+									break;
+								case 'mp3':
+									$img = false;
+									break;
+								default:
+									$img = false;
+									break;
+							}
+							if($img) {
+								if($open) {
+									echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p='.$fq.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></a></div>';
+								} else {
+									echo '<div><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></div>';
 								}
+							} else {
+								echo '<div class="mw"><b><a href="file.php?m='.$m['id'].'&c='.$id.'">'.MP::dehtml($n).'</a></b><br>';
+								echo round($d['size']/1024.0/1024.0, 2).' MB';
+								echo '</div>';
 							}
 						} catch (Exception $e) {
 							echo $e;
