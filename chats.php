@@ -127,7 +127,7 @@ try {
 					//} else {
 						$t = date('H:i', $msg['date']-$timeoff);
 					//}
-					echo '<div class="cm">'.$t.' ';
+					echo '<br><div class="cm">'.$t.' ';
 					if(isset($msg['message']) && strlen($msg['message']) > 0) {
 						echo '<a href="chat.php?c='.$id.'">';
 						if($mfn !== null && ($id > 0 ? $mfid != $selfid : true))

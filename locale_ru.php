@@ -39,6 +39,7 @@ class Locale {
 	'sending_file' => 'Отправка файла',
 	'send_file' => 'Отправить файл',
 	'set_chats_count' => 'Количество чатов',
+	'size_too_large' => 'Слишком большой объем',
 	);
 }
 $lng = Locale::$lng;

@@ -195,6 +195,7 @@ class MP {
 				} else {
 					echo '<div class="ma" id="msg_'.$id.'_'.$m['id'].'">';
 				}
+				echo '<br>';
 				if($fwname != null) {
 					echo '<div class="mf">'.static::x($lng['fwd_from']).' <b>'.MP::dehtml($fwname).'</b></div>';
 				}
@@ -272,7 +273,7 @@ class MP {
 											$load = true;
 											echo '<div><a href="i.php?i='.$filename.'&p=orig"><img src="i.php?i='.urlencode($filename).'&p=prev"></img></a></div>';
 										} else {
-											$reason = 'Слишком большой объем';
+											$reason = $lng['size_too_large'];
 										}
 										break;
 									default:
@@ -309,7 +310,9 @@ class MP {
 											$n = mb_substr($n, 0, 25, 'UTF-8').'..';
 										$n .= $fext;
 									}
-									echo '<i>'.MP::dehtml($n).'</i>';
+									echo '<div class="mw"><b>'.MP::dehtml($n).'</b><br>';
+									echo round($d['size']/1024.0/1024.0, 2).' MB ('.$lng['size_too_large'].')';
+									echo '</div>';
 								} else {
 									$img = true;
 									$open = true;
@@ -317,9 +320,14 @@ class MP {
 									$fq = 'orig';
 									$dir = 'img';
 									$dl = false;
+									$reason = null;
 									switch(strtolower(substr($fext, 1))) {
 										case 'webp':
-											if(strpos($d['name'], 'sticker_') === 0 && $d['size'] < 64 * MAX_STICKER_SIZE) {
+											if(strpos($d['name'], 'sticker_') === 0) {
+												if($d['size'] > MAX_STICKER_SIZE) {
+													$reason = $lng['file_too_large'];
+													break;
+												}
 												$dl = true;
 												$open = false;
 												if(PNG_STICKERS && isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
@@ -334,6 +342,8 @@ class MP {
 											if($d['size'] < MAX_FILE_JPG_SIZE) {
 												$img = true;
 												$dl = true;
+											} else {
+												$reason = $lng['file_too_large'];
 											}
 											break;
 										case 'png':
@@ -342,16 +352,37 @@ class MP {
 												$fq = 'lpng';
 												$dl = true;
 												$img = true;
+											} else {
+												$reason = $lng['file_too_large'];
 											}
 											break;
 										case 'gif':
 											if($d['size'] < MAX_FILE_GIF_SIZE) {
 												$dl = true;
 												$img = false;
+											} else {
+												$reason = $lng['file_too_large'];
 											}
 											break;
+										case 'tgs':
+											break;
 										case 'mp3':
-											if(DOWNLOAD_MP3 && $d['size'] < MAX_FILE_MP3_SIZE) {
+											if(DOWNLOAD_MP3) {
+												if($d['size'] > MAX_FILE_MP3_SIZE) {
+													$reason = $lng['file_too_large'];
+													break;
+												}
+												$img = false;
+												$dl = true;
+												$dir = 'doc';
+												break;
+											}
+										default:
+											if(DOWNLOAD_DOCUMENTS) {
+												if($d['size'] > MAX_DOCUMENT_SIZE) {
+													$reason = $lng['file_too_large'];
+													break;
+												}
 												$img = false;
 												$dl = true;
 												$dir = 'doc';
@@ -359,9 +390,6 @@ class MP {
 											break;
 									}
 									if($dl) {
-										if(!$img) {
-											$filename .= $fext;
-										}
 										$dest = dirname(__FILE__).'/'.$dir.'/'.$filename;
 										if(!file_exists($dir)) {
 											mkdir($dir, 0777);
@@ -376,7 +404,9 @@ class MP {
 												echo '<div><img src="i.php?i='.urlencode($filename).'&p='.$q.'"></img></div>';
 											}
 										} else {
-											echo '<div><a href="'.$dir.'/'.urlencode($filename).'">'.$n.'</a></div>';
+											echo '<div class="mw"><b><a href="d.php?n='.urlencode($filename).'&f='.urlencode($n).'">'.MP::dehtml($n).'</a></b><br>';
+											echo round($d['size']/1024.0/1024.0, 2).' MB';
+											echo '</div>';
 										}
 									} else {
 										if(mb_strlen($n, 'UTF-8') > 25) {
@@ -385,7 +415,9 @@ class MP {
 												$n = mb_substr($n, 0, 25, 'UTF-8').'..';
 											$n .= $fext;
 										}
-										echo '<i>'.MP::dehtml($n).'</i>';
+										echo '<div class="mw"><b>'.MP::dehtml($n).'</b><br>';
+										echo round($d['size']/1024.0/1024.0, 2).' MB'.($reason !== null ? '( '.$reason.')' : '');
+										echo '</div>';
 									}
 								}
 							}

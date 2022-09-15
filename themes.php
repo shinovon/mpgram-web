@@ -63,7 +63,7 @@ class Themes {
 		.r, .mw {
 			border-left: 2px solid '.(static::$theme == 0 ? 'white' : '#168acd').';
 			padding-left: 4px;
-			margin-bottom: 1px;
+			margin-bottom: 2px;
 		}
 		.rn, .mwt {
 			'.(static::$theme == 0 ? '' : 'color: #37a1de;').
