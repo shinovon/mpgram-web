@@ -25,6 +25,8 @@ try {
 
 $msglimit = 20;
 $msgoffset = 0;
+$msgoffsetid = 0;
+$msgmaxid = 0;
 $reverse = false;
 if(isset($_GET['r'])) {
 	$reverse = true;
@@ -33,8 +35,14 @@ if(isset($_GET['r'])) {
 if(isset($_GET['limit'])) {
 	$msglimit = (int) $_GET['limit'];
 }
-if(isset($_GET['off'])) {
-	$msgoffset = (int) $_GET['off'];
+if(isset($_GET['offset'])) {
+	$msgoffset = (int) $_GET['offset'];
+}
+if(isset($_GET['offset_from'])) {
+	$msgoffsetid = (int) $_GET['offset_from'];
+}
+if(isset($_GET['max_id'])) {
+	$msgmaxid = (int) $_GET['max_id'];
 }
 
 $user = MP::getUser();
@@ -68,7 +76,6 @@ try {
 	$MP = MP::getMadelineAPI($user);
 	$info = $MP->getInfo($id);
 	$un = null;
-	$lid = null;
 	$name = null;
 	$pm = false;
 	$ch = false;
@@ -83,9 +90,6 @@ try {
 			$un = $info['Chat']['username'];
 		}
 		$left = isset($info['Chat']['left']) && $info['Chat']['left'];
-		if(isset($info['Chat']['id'])) {
-			$lid = $info['Chat']['id'];
-		}
 	} else if(isset($info['User'])) {
 		$pm = true;
 		if(isset($info['User']['first_name'])) {
@@ -93,10 +97,6 @@ try {
 		}
 		if(isset($info['User']['username'])) {
 			$un = $info['User']['username'];
-		}
-		if(isset($info['User']['id'])) {
-			$lid = $info['User']['id'];
-			$id = (int)$lid;
 		}
 	}
 	if($left && isset($_GET['join'])) {
@@ -108,17 +108,26 @@ try {
 	}
 	$r = $MP->messages->getHistory([
 	'peer' => $id,
-	'offset_id' => 0,
+	'offset_id' => $msgoffsetid,
 	'offset_date' => 0,
 	'add_offset' => $msgoffset,
 	'limit' => $msglimit,
-	'max_id' => 0,
+	'max_id' => $msgmaxid,
 	'min_id' => 0,
 	'hash' => 0]);
+	$id_offset = null;
+	if(isset($r['offset_id_offset'])) {
+		$id_offset = $r['offset_id_offset'];
+		if($msgoffset < 0) {
+			$id_offset = $id_offset+$msgoffset+1;
+		}
+	}
+	$endReached = $id_offset === 0 || ($id_offset === null && $msgoffset <= 0);
+	$hasOffset = $msgoffset > 0 || $msgoffsetid > 0;
 	$rm = $r['messages'];
 	echo '<head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
-	if($msgoffset == 0 && $autoupd == 1 && count($rm) > 0) {
+	if((!$hasOffset || $endReached) && $autoupd == 1 && count($rm) > 0) {
 	$ii = $rm[0]['id'];
 		if($dynupd == 1) {
 echo '<script type="text/javascript">
@@ -188,7 +197,6 @@ try {
 	echo '<div class="top_bar"><a href="chats.php">'.MP::x($lng['back']).'</a>';
 	$sname = $name;
 	if(mb_strlen($sname, 'UTF-8') > 30) $sname = mb_substr($sname, 0, 30, 'UTF-8');
-	//if(!$ch) echo ' <a href="write.php?c='.$id.'&n='.urlencode($sname).'">'.$lng['write_msg'].'</a>';
 	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></div>';
 	echo '<h3 class="chat_title">'.MP::dehtml($name).'</h3>';
 	if(!$reverse) {
@@ -209,32 +217,34 @@ try {
 			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
 			echo '</form>';
 		}
-		if($msgoffset > 0) {
-			$i = $msgoffset - $msglimit;
-			if($i < 0) $i = 0;
-			echo '<p><a href="chat.php?c='.$id.'&off='.$i.'&limit='.$msglimit.'">'.MP::x($lng['history_up']).'</a></p>';
+		if($hasOffset && !$endReached) {
+			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
+				echo '<p><a href="chat.php?c='.$id.'">'.MP::x($lng['history_up']).'</a></p>';
+			} else {
+				echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[0]['id'].'&offset='.(-$msglimit-1).'">'.MP::x($lng['history_up']).'</a></p>';
+			}
 		}
 	} else {
 		if(count($rm) >= $msglimit) {
-			echo '<p><a href="chat.php?c='.$id.'&off='.($msgoffset+$msglimit).'&limit='.$msglimit.'&reverse=1">'.MP::x($lng['history_up']).'</a></p>';
+			echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[count($rm)-1]['id'].'&reverse=1">'.MP::x($lng['history_up']).'</a></p>';
 		}
+		$rm = array_reverse($rm);
 	}
-	if($reverse) $rm = array_reverse($rm);
 	echo '<div id="msgs">';
 	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $un, $timeoff, isset($info['channel_id']));
 	echo '</div>';
 	if(!$reverse) {
 		if(count($rm) >= $msglimit) {
-			echo '<p><a href="chat.php?c='.$id.'&off='.($msgoffset+$msglimit).'&limit='.$msglimit.'">'.MP::x($lng['history_down']).'</a></p>';
+			echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[count($rm)-1]['id'].'">'.MP::x($lng['history_down']).'</a></p>';
 		}
 	} else {
-		if($msgoffset > 0) {
-			$i = $msgoffset - $msglimit;
-			if($i < 0) $i = 0;
-			echo '<p><a href="chat.php?c='.$id.'&off='.$i.'&limit='.$msglimit.'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
-        }
-	}
-	if($reverse) {
+		if($hasOffset && !$endReached) {
+			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
+				echo '<p><a href="chat.php?c='.$id.'">'.MP::x($lng['history_up']).'</a></p>';
+			} else {
+				echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[0]['id'].'&offset='.(-$msglimit-1).'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
+			}
+		}
 		if($left) {
 			echo '<form action="chat.php">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
@@ -253,6 +263,7 @@ try {
 			echo '</form>';
 		}
 	}
+	if($endReached)
 	try {
 		if($ch || (int)$id < 0) {
 			$MP->channels->readHistory(['channel' => $id, 'max_id' => 0]);

@@ -122,11 +122,11 @@ try {
 						$mfn = MP::dehtml(MP::getNameFromId($MP, $msg['from_id']));
 					}
 					$t = null;
-					//if(date('d.m.Y') !== date('d.m.Y', $msg['date'])) {
-						//$t = date('d.m.Y', $msg['date']);
-					//} else {
+					if(date('d.m.Y', time()-$timeoff) !== date('d.m.Y', $msg['date']-$timeoff)) {
+						$t = date('d.m.Y', $msg['date']-$timeoff);
+					} else {
 						$t = date('H:i', $msg['date']-$timeoff);
-					//}
+					}
 					echo '<br><div class="cm">'.$t.' ';
 					if(isset($msg['message']) && strlen($msg['message']) > 0) {
 						echo '<a href="chat.php?c='.$id.'">';
