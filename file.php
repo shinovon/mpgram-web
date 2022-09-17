@@ -41,7 +41,7 @@ try {
 	if((int)$cid < 0) {
 		$msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
 	} else {
-		$msg = $MP->channels->getMessages(['peer' => $cid, 'id' => [$mid]]);
+		$msg = $MP->messages->getMessages(['peer' => $cid, 'id' => [$mid]]);
 	}
 	if($msg && isset($msg['messages']) && isset($msg['messages'][0])) {
 		$msg = $msg['messages'][0];
