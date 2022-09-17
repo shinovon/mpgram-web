@@ -66,10 +66,6 @@ Themes::setTheme($theme);
 $imgs = true;
 try {
 	$MP = MP::getMadelineAPI($user);
-	try {
-		$MP->getPwrChat($id, true);
-	} catch (Exception $e) {
-	}
 	$info = $MP->getInfo($id);
 	$un = null;
 	$lid = null;
@@ -77,6 +73,7 @@ try {
 	$pm = false;
 	$ch = false;
 	$left = false;
+	$id = MP::getId($MP, $info);
 	if(isset($info['Chat'])) {
 		$ch = isset($info['type']) && $info['type'] == 'channel';
 		if(isset($info['Chat']['title'])) {
@@ -88,7 +85,6 @@ try {
 		$left = isset($info['Chat']['left']) && $info['Chat']['left'];
 		if(isset($info['Chat']['id'])) {
 			$lid = $info['Chat']['id'];
-			$id = (int)'-100'.$lid;
 		}
 	} else if(isset($info['User'])) {
 		$pm = true;
@@ -225,7 +221,7 @@ try {
 	}
 	if($reverse) $rm = array_reverse($rm);
 	echo '<div id="msgs">';
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $un, $timeoff);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $un, $timeoff, isset($info['channel_id']));
 	echo '</div>';
 	if(!$reverse) {
 		if(count($rm) >= $msglimit) {

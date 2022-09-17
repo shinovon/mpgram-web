@@ -146,7 +146,7 @@ class MP {
 		return $txt;
 	}
 	
-	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name= null, $un=null, $timeoff=0) {
+	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name= null, $un=null, $timeoff=0, $chid=false) {
 		foreach($rm as $m) {
 			try {
 				$mname1 = null;
@@ -203,7 +203,7 @@ class MP {
 					$replyid = $m['reply_to']['reply_to_msg_id'];
 					if($replyid) {
 						$replymsg = null;
-						if($id < 0) {
+						if($chid) {
 							$replymsg = $MP->channels->getMessages(['channel' => $id, 'id' => [$replyid]]);
 						} else {
 							$replymsg = $MP->messages->getMessages(['peer' => $id, 'id' => [$replyid]]);
@@ -338,7 +338,7 @@ class MP {
 				}
 				echo '</div>';
 			} catch (Exception $e) {
-				echo "<xmp>$e</xmp>";
+				echo '<xmp>'.$e->getMessage()."\n".$e->getTraceAsString().'</xmp>';
 			}
 		}
 	}
