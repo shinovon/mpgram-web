@@ -1,4 +1,5 @@
 <?php
+if(!defined('mp_loaded'))
 require_once 'mp.php';
 class Themes {
 	static $theme = 0;
@@ -90,6 +91,9 @@ class Themes {
 		}
 		.cma {
 			color: #168acd;
+		}
+		.u {
+			color: '.(static::$theme == 0 ? 'darkgrey' : 'grey').';
 		}
 		--></style>';
 	}

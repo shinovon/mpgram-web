@@ -28,6 +28,12 @@ if(isset($_POST['c'])) {
 } else {
 	die();
 }
+$reply_to = null;
+if(isset($_POST['reply_to'])) {
+	$reply_to = $_POST['reply_to'];
+} else if(isset($_GET['reply_to'])) {
+	$reply_to = $_GET['reply_to'];
+}
 
 header("Content-Type: text/html; charset=utf-8");
 header("Cache-Control: private, no-cache, no-store");
@@ -40,89 +46,100 @@ set_error_handler('exceptions_error_handler');
 include 'themes.php';
 Themes::setTheme($theme);
 $reason = false;
-if(isset($_POST['sent'])) {
-	$msg = '';
-	if(isset($_POST['msg'])) {
-		$msg = $_POST['msg'];
-	}
-	$file = false;
-	$filename = null;
-	$type = null;
-	$attr = false;
-	if(isset($_FILES['file']) && $_FILES['file']['size'] != 0) {
-		if($_FILES['file']['size'] > 10 * 1024 * 1024) {
-			$reason = 'File is too large!';
-		} else {
-			$file = $_FILES['file']['tmp_name'];
-			$filename = $_FILES['file']['name'];
-			$extidx = strrpos($filename, '.');
-			if($extidx === false) {
-				$reason = 'Invalid file';
+try {
+	if(isset($_POST['sent'])) {
+		$msg = '';
+		if(isset($_POST['msg'])) {
+			$msg = $_POST['msg'];
+		}
+		$file = false;
+		$filename = null;
+		$type = null;
+		$attr = false;
+		if(isset($_FILES['file']) && $_FILES['file']['size'] != 0) {
+			if($_FILES['file']['size'] > 10 * 1024 * 1024) {
+				$reason = 'File is too large!';
 			} else {
-				$ext = strtolower(substr($filename, $extidx+1));
-				switch($ext) {
-					case 'jpg':
-					case 'jpeg':
-					case 'png':
-						$newfile = $file.'.'.$ext;
-						if(!move_uploaded_file($file, $newfile)) {
-							$reason = 'Failed to move file';
-						} else {
-							$type = 'inputMediaUploadedPhoto';
-							$file = $newfile;
-						}
-						break;
-					case 'mp3':
-					case 'amr':
-					case '3gp':
-					case 'mp4':
-					case 'gif':
-					case 'zip':
-					case 'jar':
-					case 'jad':
-					case 'sis':
-					case 'sisx':
-					case 'apk':
-					case 'deb':
-						$type = 'inputMediaUploadedDocument';
-						$attr = true;
-						break;
-					default:
-						$reason = 'This type of file ('.$ext.') is not supported!';
-						break;
+				$file = $_FILES['file']['tmp_name'];
+				$filename = $_FILES['file']['name'];
+				$extidx = strrpos($filename, '.');
+				if($extidx === false) {
+					$reason = 'Invalid file';
+				} else {
+					$ext = strtolower(substr($filename, $extidx+1));
+					switch($ext) {
+						case 'jpg':
+						case 'jpeg':
+						case 'png':
+							$newfile = $file.'.'.$ext;
+							if(!move_uploaded_file($file, $newfile)) {
+								$reason = 'Failed to move file';
+							} else {
+								$type = 'inputMediaUploadedPhoto';
+								$file = $newfile;
+							}
+							break;
+						case 'mp3':
+						case 'amr':
+						case '3gp':
+						case 'mp4':
+						case 'gif':
+						case 'zip':
+						case 'jar':
+						case 'jad':
+						case 'sis':
+						case 'sisx':
+						case 'apk':
+						case 'deb':
+							$type = 'inputMediaUploadedDocument';
+							$attr = true;
+							break;
+						default:
+							$reason = 'This type of file ('.$ext.') is not supported!';
+							break;
+					}
 				}
 			}
 		}
-	}
-	if(!$reason) {
-		try {
-			if(!$file) {
-				if(strlen($msg) > 0) {
+		if(!$reason) {
+			try {
+				if(!$file) {
+					if(strlen($msg) > 0) {
+						$MP = MP::getMadelineAPI($user);
+						$params = ['peer' => $id, 'message' => $msg];
+						if($reply_to) {
+							$params['reply_to_msg_id'] = $reply_to;
+						}
+						$MP->messages->sendMessage($params);
+						header('Location: chat.php?c='.$id);
+						die();
+					}
+				} else {
 					$MP = MP::getMadelineAPI($user);
-					$MP->messages->sendMessage(['peer' => $id, 'message' => $msg]);
+					$params = ['peer' => $id, 'message' => $msg];
+					if($reply_to) {
+						$params['reply_to_msg_id'] = $reply_to;
+					}
+					$attributes = [];
+					if($attr) {
+						array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
+					}
+					$params['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes];
+					$MP->messages->sendMedia($params);
 					header('Location: chat.php?c='.$id);
 					die();
 				}
-			} else {
-				$attributes = [];
-				if($attr) {
-					array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
-				}
-				$MP = MP::getMadelineAPI($user);
-				$MP->messages->sendMedia(['peer' => $id, 'message' => $msg, 'media' => 
-				['_' => $type, 'file' => $file,
-				'attributes' => $attributes
-				]]);
-				header('Location: chat.php?c='.$id);
+			} catch (Exception $e) {
+				echo $e;
 				die();
 			}
-		} catch (Exception $e) {
-			echo $e->getMessage();
 		}
 	}
+} catch (Exception $e) {
+	echo $e;
+	die();
 }
-
-echo '<head><title>'.$lng['sending_file'].'</title>';
+echo '<head><title>'.$lng['send_message'].'</title>';
 echo Themes::head();
 echo '</head>';
 echo Themes::bodyStart();
@@ -130,11 +147,14 @@ echo '<div><a href="chat.php?c='.$id.'">'.$lng['back'].'</a></div><br>';
 if($reason) {
 	echo '<b>'.$reason.'</b>';
 }
-echo '<form action="file.php" method="post" enctype="multipart/form-data">';
+echo '<form action="sendfile.php" method="post" enctype="multipart/form-data">';
 echo '<input type="hidden" name="c" value="'.$id.'">';
 echo '<input type="hidden" name="sent" value="1">';
+if($reply_to) {
+echo '<input type="hidden" name="reply_to" value="'.$reply_to.'">';
+}
 echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
-echo '<input type="file" id="file" name="file"><br>';
+echo '<br><input type="file" id="file" name="file"><br>';
 echo '<input type="submit" value="'.$lng['send'].'">';
 echo '</form>';
 echo Themes::bodyEnd();

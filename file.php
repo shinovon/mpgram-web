@@ -38,7 +38,7 @@ try {
 	$msg = null;
 	$cid = $_GET['c'];
 	$mid = $_GET['m'];
-	if((int)$cid < 0) {
+	if(strpos($cid, '-100') === 0) {
 		$msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
 	} else {
 		$msg = $MP->messages->getMessages(['peer' => $cid, 'id' => [$mid]]);

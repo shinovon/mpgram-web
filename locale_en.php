@@ -40,6 +40,10 @@ class Locale {
 	'send_file' => 'Attach a file',
 	'set_chats_count' => 'Chats count',
 	'size_too_large' => 'Size is too large',
+	'send_message' => 'Send a message',
+	'or' => 'or',
+	'choose_sticker' => 'Choose sticker',
+	'reply' => 'Reply',
 	);
 }
 $lng = Locale::$lng;

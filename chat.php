@@ -231,7 +231,7 @@ try {
 		$rm = array_reverse($rm);
 	}
 	echo '<div id="msgs">';
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $un, $timeoff, isset($info['channel_id']));
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $un, $timeoff, isset($info['channel_id']), true);
 	echo '</div>';
 	if(!$reverse) {
 		if(count($rm) >= $msglimit) {

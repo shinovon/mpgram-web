@@ -146,7 +146,7 @@ class MP {
 		return $txt;
 	}
 	
-	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name= null, $un=null, $timeoff=0, $chid=false) {
+	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name= null, $un=null, $timeoff=0, $chid=false, $unswer=false) {
 		foreach($rm as $m) {
 			try {
 				$mname1 = null;
@@ -191,6 +191,9 @@ class MP {
 					echo ' '.date("H:i", $m['date']-$timeoff);
 					if($m['media_unread']) {
 						echo ' •';
+					}
+					if($unswer && !$ch) {
+						echo ' <a href="sendfile.php?c='.$id.'&reply_to='.$m['id'].'" class="u">'.$lng['reply'].'</a>';
 					}
 				} else {
 					echo '<div class="ma" id="msg_'.$id.'_'.$m['id'].'">';
