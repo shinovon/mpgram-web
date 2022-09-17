@@ -36,18 +36,23 @@ try {
 	}
 	$MP = MP::getMadelineAPI($user);
 	$msg = null;
-	$cid = $_GET['c'];
-	$mid = $_GET['m'];
-	if(strpos($cid, '-100') === 0) {
-		$msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
+	$di = null;
+	if(isset($_GET['sticker'])) {
+		$di = $MP->getDownloadInfo(['_' => 'document', 'id' => (int)$_GET['sticker'], 'access_hash' => (int)$_GET['access_hash'], 'attributes' => [], 'dc_id' => 2, 'mime_type' => 'image/webp']);
 	} else {
-		$msg = $MP->messages->getMessages(['peer' => $cid, 'id' => [$mid]]);
+		$cid = $_GET['c'];
+		$mid = $_GET['m'];
+		if(strpos($cid, '-100') === 0) {
+			$msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
+		} else {
+			$msg = $MP->messages->getMessages(['peer' => $cid, 'id' => [$mid]]);
+		}
+		if($msg && isset($msg['messages']) && isset($msg['messages'][0])) {
+			$msg = $msg['messages'][0];
+		}
+		
+		$di = $MP->getDownloadInfo($msg['media']);
 	}
-	if($msg && isset($msg['messages']) && isset($msg['messages'][0])) {
-		$msg = $msg['messages'][0];
-	}
-	
-	$di = $MP->getDownloadInfo($msg['media']);
 	$p = '';
 	if(isset($_GET['p'])) {
 		$p = $_GET['p'];

@@ -147,14 +147,21 @@ echo '<div><a href="chat.php?c='.$id.'">'.$lng['back'].'</a></div><br>';
 if($reason) {
 	echo '<b>'.$reason.'</b>';
 }
-echo '<form action="sendfile.php" method="post" enctype="multipart/form-data">';
+echo '<form action="sendfile.php" method="post" enctype="multipart/form-data" style="display: inline;">';
 echo '<input type="hidden" name="c" value="'.$id.'">';
 echo '<input type="hidden" name="sent" value="1">';
 if($reply_to) {
-echo '<input type="hidden" name="reply_to" value="'.$reply_to.'">';
+	echo '<input type="hidden" name="reply_to" value="'.$reply_to.'">';
 }
 echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
 echo '<br><input type="file" id="file" name="file"><br>';
 echo '<input type="submit" value="'.$lng['send'].'">';
+echo '</form>';
+echo '<form action="sendsticker.php" style="display: inline;">';
+echo '<input type="hidden" name="c" value="'.$id.'">';
+if($reply_to) {
+	echo '<input type="hidden" name="reply_to" value="'.$reply_to.'">';
+}
+echo '<input type="submit" value="'.$lng['choose_sticker'].'">';
 echo '</form>';
 echo Themes::bodyEnd();
