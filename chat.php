@@ -15,6 +15,8 @@ $theme = MP::getSettingInt('theme');
 $autoupd = MP::getSettingInt('autoupd', ($iev == 0 || $iev > 4) ? 1 : 0);
 $updint = MP::getSettingInt('updint', 10);
 $dynupd = MP::getSettingInt('dynupd', 1);
+$reverse = MP::getSettingInt('reverse', 0) == 1;
+$autoscroll = MP::getSettingInt('autoscroll', 1) == 1;
 
 try {
 	include 'locale_'.$lang.'.php';
@@ -27,11 +29,6 @@ $msglimit = 20;
 $msgoffset = 0;
 $msgoffsetid = 0;
 $msgmaxid = 0;
-$reverse = false;
-if(isset($_GET['r'])) {
-	$reverse = true;
-	$msglimit = 8;
-}
 if(isset($_GET['limit'])) {
 	$msglimit = (int) $_GET['limit'];
 }
@@ -166,6 +163,7 @@ function a() {
 							}').'
 						}
 					}
+					'.($autoscroll && $reverse ? 'autoScroll();' : '').'
 				}
 				setTimeout("a()", '.$updint.'000);
 			} catch(e) {
@@ -187,13 +185,28 @@ try {
 //--></script>';
 	} else {
 	echo '<script type="text/javascript">
-         <!--
-            setTimeout("location.reload(true);", '.$updint.'000);
-         //--></script>';
+<!--
+setTimeout("location.reload(true);", '.$updint.'000);
+//--></script>';
 	}
+	}
+	if($reverse) {
+	echo '<script type="text/javascript">
+<!--
+function autoScroll() {
+try {
+	document.getElementById("text").scrollIntoView();
+} catch(e) {
+}
+}
+//--></script>';
 	}
 	echo '</head>'."\n";
-	echo Themes::bodyStart();
+	if($reverse && $autoscroll) {
+		echo Themes::bodyStart('class="c" onload="autoScroll();"');
+	} else {
+		echo Themes::bodyStart();
+	}
 	echo '<div class="top_bar"><a href="chats.php">'.MP::x($lng['back']).'</a>';
 	$sname = $name;
 	if(mb_strlen($sname, 'UTF-8') > 30) $sname = mb_substr($sname, 0, 30, 'UTF-8');
@@ -252,7 +265,7 @@ try {
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
 			echo '</form>';
 		} else if(!$ch) {
-			echo '<form action="write.php" method="post" style="display: inline;">';
+			echo '<form action="write.php" method="post" style="display: inline;" id="text">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
 			echo '<input type="submit" value="'.MP::x($lng['send']).'">';

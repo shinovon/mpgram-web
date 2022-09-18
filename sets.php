@@ -5,13 +5,12 @@ $dynupd = 1;
 $updint = 10;
 $theme = 0;
 $chats = 15;
+$reverse = 0;
+$autoscroll = 0;
 $set = isset($_GET['set']);
 include 'mp.php';
 if($set) {
-	$autoupd = isset($_GET['autoupd']);
-	if($autoupd == 'on') $autoupd = 1;
-	else $autoupd = 0;
-	
+	$autoupd = isset($_GET['autoupd']) ? 1 : 0;
 	$idf = $dynupd == 1 ? 10 : 25;
 	if(isset($_GET['lang'])) {
 		$lang = $_GET['lang'];
@@ -38,11 +37,16 @@ if($set) {
 			$chats = 100;
 		}
 	}
+	$reverse = isset($_GET['reverse']) ? 1 : 0;
+	$autoscroll = isset($_GET['autoscroll']) ? 1 : 0;
+	
 	MP::cookie('lang', $lang, time() + (86400 * 365));
 	MP::cookie('autoupd', $autoupd, time() + (86400 * 365));
 	MP::cookie('updint', $updint, time() + (86400 * 365));
 	MP::cookie('theme', $theme, time() + (86400 * 365));
 	MP::cookie('chats', $chats, time() + (86400 * 365));
+	MP::cookie('reverse', $reverse, time() + (86400 * 365));
+	MP::cookie('autoscroll', $autoscroll, time() + (86400 * 365));
 } else {
 	if(isset($_COOKIE['lang'])) {
 		$lang = $_COOKIE['lang'];
@@ -58,6 +62,12 @@ if($set) {
 	}
 	if(isset($_COOKIE['chats'])) {
 		$chats = (int)$_COOKIE['chats'];
+	}
+	if(isset($_COOKIE['reverse'])) {
+		$reverse = (int)$_COOKIE['reverse'];
+	}
+	if(isset($_COOKIE['autoscroll'])) {
+		$autoscroll = (int)$_COOKIE['autoscroll'];
 	}
 }
 
@@ -92,7 +102,11 @@ foreach($langs as $k=>$v) {
 }
 echo '<p><b>'.MP::x($lng['set_chat']).'</b></p>';
 echo '<p><input type="checkbox" id="autoupd" name="autoupd"'.($autoupd ? ' checked' : '').'>';
-echo '<label for="autoupd">'.MP::x($lng['set_chat_autoupdate']).'</label><br>';
+echo '<label for="autoupd">'.MP::x($lng['set_chat_autoupdate']).'</label>';
+echo '<br><input type="checkbox" id="reverse" name="reverse"'.($reverse ? ' checked' : '').'>';
+echo '<label for="autoupd">'.MP::x($lng['set_chat_reverse_mode']).'</label>';
+echo '<br><input type="checkbox" id="autoscroll" name="autoscroll"'.($autoscroll ? ' checked' : '').'>';
+echo '<label for="autoupd">'.MP::x($lng['set_chat_autoscroll']).'</label>';
 //echo '<p><input type="checkbox" id="dynupd" name="dynupd"'.($autoupd ? ' checked' : '').'>';
 //echo '<label for="autoupd">Авто-обновление чата</label><br>';
 echo '<p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';

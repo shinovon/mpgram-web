@@ -44,6 +44,8 @@ class Locale {
 	'or' => 'или',
 	'choose_sticker' => 'Выбрать стикер',
 	'reply' => 'Ответ',
+	'set_chat_reverse_mode' => 'Обратный порядок сообщений в чате',
+	'set_chat_autoscroll' => 'Авто-прокрутка до новых сообщений',
 	);
 }
 $lng = Locale::$lng;

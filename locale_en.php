@@ -44,6 +44,8 @@ class Locale {
 	'or' => 'or',
 	'choose_sticker' => 'Choose sticker',
 	'reply' => 'Reply',
+	'set_chat_reverse_mode' => 'Reverse chat',
+	'set_chat_autoscroll' => 'Auto-scroll to new messages',
 	);
 }
 $lng = Locale::$lng;
