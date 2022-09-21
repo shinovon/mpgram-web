@@ -46,6 +46,7 @@ class Locale {
 	'reply' => 'Reply',
 	'set_chat_reverse_mode' => 'Reverse chat',
 	'set_chat_autoscroll' => 'Auto-scroll to new messages',
+	'set_msgs_limit' => 'Messages in chat',
 	);
 }
 $lng = Locale::$lng;

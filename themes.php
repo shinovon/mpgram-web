@@ -95,6 +95,13 @@ class Themes {
 		.u {
 			color: '.(static::$theme == 0 ? 'darkgrey' : 'grey').';
 		}
+		.in {
+			display: inline;
+		}
+		.inr {
+			display: inline;
+			float: right;
+		}
 		--></style>';
 	}
 }

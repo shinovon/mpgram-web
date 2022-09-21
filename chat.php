@@ -25,13 +25,10 @@ try {
 	include 'locale_'.$lang.'.php';
 }
 
-$msglimit = 20;
+$msglimit = MP::getSettingInt('limit', 20);
 $msgoffset = 0;
 $msgoffsetid = 0;
 $msgmaxid = 0;
-if(isset($_GET['limit'])) {
-	$msglimit = (int) $_GET['limit'];
-}
 if(isset($_GET['offset'])) {
 	$msgoffset = (int) $_GET['offset'];
 }
@@ -103,6 +100,33 @@ try {
 		$MP->channels->leaveChannel(['channel' => $id]);
 		$left = true;
 	}
+	
+	function printInputField() {
+		global $left;
+		global $ch;
+		global $id;
+		global $lng;
+		echo '<div class="in" id="text">';
+		if($left) {
+			echo '<form action="chat.php">';
+			echo '<input type="hidden" name="c" value="'.$id.'">';
+			echo '<input type="hidden" name="join" value="1">';
+			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
+			echo '</form>';
+		} else if(!$ch) {
+			echo '<form action="write.php"'.(isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false ? ' method="post"' : '').' class="in">';
+			echo '<input type="hidden" name="c" value="'.$id.'">';
+			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
+			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
+			echo '</form>';
+			echo '<form action="sendfile.php" class="inr" style="float: right;">';
+			echo '<input type="hidden" name="c" value="'.$id.'">';
+			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
+			echo '</form>';
+		}
+		echo '</div>';
+	}
+
 	$r = $MP->messages->getHistory([
 	'peer' => $id,
 	'offset_id' => $msgoffsetid,
@@ -213,23 +237,7 @@ try {
 	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></div>';
 	echo '<h3 class="chat_title">'.MP::dehtml($name).'</h3>';
 	if(!$reverse) {
-		if($left) {
-			echo '<form action="chat.php">';
-			echo '<input type="hidden" name="c" value="'.$id.'">';
-			echo '<input type="hidden" name="join" value="1">';
-			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
-			echo '</form>';
-		} else if(!$ch) {
-			echo '<form action="write.php" method="post" style="display: inline;">';
-			echo '<input type="hidden" name="c" value="'.$id.'">';
-			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
-			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
-			echo '</form>';
-			echo '<form action="sendfile.php" style="display: inline; float: right;">';
-			echo '<input type="hidden" name="c" value="'.$id.'">';
-			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
-			echo '</form>';
-		}
+		printInputField();
 		if($hasOffset && !$endReached) {
 			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
 				echo '<p><a href="chat.php?c='.$id.'">'.MP::x($lng['history_up']).'</a></p>';
@@ -253,28 +261,12 @@ try {
 	} else {
 		if($hasOffset && !$endReached) {
 			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
-				echo '<p><a href="chat.php?c='.$id.'">'.MP::x($lng['history_up']).'</a></p>';
+				echo '<p><a href="chat.php?c='.$id.'">'.MP::x($lng['history_down']).'</a></p>';
 			} else {
 				echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[0]['id'].'&offset='.(-$msglimit-1).'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
 			}
 		}
-		if($left) {
-			echo '<form action="chat.php">';
-			echo '<input type="hidden" name="c" value="'.$id.'">';
-			echo '<input type="hidden" name="join" value="1">';
-			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
-			echo '</form>';
-		} else if(!$ch) {
-			echo '<form action="write.php" method="post" style="display: inline;" id="text">';
-			echo '<input type="hidden" name="c" value="'.$id.'">';
-			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
-			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
-			echo '</form>';
-			echo '<form action="sendfile.php" style="display: inline; float: right;">';
-			echo '<input type="hidden" name="c" value="'.$id.'">';
-			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
-			echo '</form>';
-		}
+		printInputField();
 	}
 	if($endReached)
 	try {
