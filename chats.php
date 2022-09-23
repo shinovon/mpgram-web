@@ -29,6 +29,8 @@ if(isset($_GET['count'])) {
 	$count = (int) $_GET['count'];
 }
 
+$archived = isset($_GET['archive']);
+
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
 }
@@ -76,22 +78,48 @@ try {
 	echo Themes::bodyStart();
 	$selfid = MP::getSelfId($MP);
 	$selfname = MP::dehtml(MP::getSelfName($MP));
+	$hasArchiveChats = false;
 	echo '<header>';
-	echo '<b class="self_name">'.MP::x($selfname).'</b><div class="top_bar">';
-	echo '<a href="login.php?logout=1">'.MP::x($lng['logout']).'</a>';
-	echo ' <a href="chats.php?upd=1">'.MP::x($lng['refresh']).'</a>';
-	echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
+	echo '<b>'.MP::x($selfname).'</b><div>';
+	if(!$archived) {
+		$hasArchiveChats = count($MP->messages->getDialogs([
+			'limit' => 1, 
+			'exclude_pinned' => true,
+			'folder_id' => 1
+			])['dialogs']) > 0;;
+		echo '<a href="login.php?logout=1">'.MP::x($lng['logout']).'</a>';
+		echo ' <a href="chats.php?upd">'.MP::x($lng['refresh']).'</a>';
+		echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
+		if($hasArchiveChats) {
+			echo ' <a href="chats.php?archive">'.MP::x($lng['archived_chats']).'</a>';
+		}
+	} else {
+		echo ' <a href="chats.php">'.MP::x($lng['back']).'</a>';
+	}
 	echo '</div><br>';
 	echo '</header>';
-
 	try {
-		$r = $MP->messages->getDialogs([
-		'offset_date' => 0,
-		'offset_id' => 0,
-		'add_offset' => 0,
-		'limit' => $count, 
-		'hash' => 0,
-		]);
+		$r = null;
+		if($archived) {
+			$r = $MP->messages->getDialogs([
+			'offset_date' => 0,
+			'offset_id' => 0,
+			'add_offset' => 0,
+			'limit' => $count, 
+			'hash' => 0,
+			'exclude_pinned' => true,
+			'folder_id' => 1
+			]);
+		} else {
+			$r = $MP->messages->getDialogs([
+			'offset_date' => 0,
+			'offset_id' => 0,
+			'add_offset' => 0,
+			'limit' => $count, 
+			'hash' => 0,
+			'folder_id' => 0
+			]);
+		}
 		$dialogs = $r['dialogs'];
 		$msgs = $r['messages'];
 		$c = 0;
