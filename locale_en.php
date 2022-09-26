@@ -48,6 +48,8 @@ class Locale {
 	'set_chat_autoscroll' => 'Auto-scroll to new messages',
 	'set_msgs_limit' => 'Messages in chat',
 	'archived_chats' => 'Archived chats',
+	'reply_to' => 'Reply to',
+	'message_to' => 'Message to',
 	);
 }
 $lng = Locale::$lng;

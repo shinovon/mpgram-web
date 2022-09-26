@@ -25,7 +25,11 @@ echo '<h1>MPGram Web</h1>';
 echo MP::x('<p>MPGram Web (aka MIDletPascalGram Web) is lightweight telegram web client based on MadelineProto library, for devices with internet access and basic HTML & CSS support</p>');
 echo MP::x('<p>Links:<br>');
 echo '<a href="https://github.com/shinovon/mpgram-web">GitHub</a><br>';
-echo '<a href="https://vk.com/mpgram">VK</a>';
+if(MP::getUser()) {
+	echo '<a href="chat.php?c=nnmidletschat">Discussion chat</a>';
+} else {
+	echo '<a href="https://t.me/nnmidletschat">Discussion chat</a>';
+}
 echo '</p>';
 echo MP::x('<p>Developers:<br>');
 echo '<b>Shinovon</b> <a href="https://github.com/shinovon">github</a>';

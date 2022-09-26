@@ -100,12 +100,12 @@ try {
 		$MP->channels->leaveChannel(['channel' => $id]);
 		$left = true;
 	}
-	
 	function printInputField() {
 		global $left;
 		global $ch;
 		global $id;
 		global $lng;
+		global $reverse;
 		echo '<div class="in" id="text">';
 		if($left) {
 			echo '<form action="chat.php">';
@@ -114,15 +114,20 @@ try {
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
 			echo '</form>';
 		} else if(!$ch) {
-			echo '<form action="write.php"'.(isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false ? ' method="post"' : '').' class="in">';
+			$chr = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false;
+			echo '<form action="write.php"'.($chr ? ' method="post"' : '').' class="in">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
 			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
 			echo '</form>';
-			echo '<form action="sendfile.php" class="inr" style="float: right;">';
+			echo '<form action="sendfile.php" class="in'.($chr ? 'r' : '').'">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
 			echo '</form>';
+		}
+		if($reverse) {
+			echo '<div><a href="chats.php">'.MP::x($lng['back']).'</a>';
+			echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></div>';
 		}
 		echo '</div>';
 	}
@@ -231,11 +236,11 @@ try {
 	} else {
 		echo Themes::bodyStart();
 	}
-	echo '<div class="top_bar"><a href="chats.php">'.MP::x($lng['back']).'</a>';
+	echo '<div><a href="chats.php">'.MP::x($lng['back']).'</a>';
+	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></div>';
 	$sname = $name;
 	if(mb_strlen($sname, 'UTF-8') > 30) $sname = mb_substr($sname, 0, 30, 'UTF-8');
-	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></div>';
-	echo '<h3 class="chat_title">'.MP::dehtml($name).'</h3>';
+	echo '<h3>'.MP::dehtml($name).'</h3>';
 	if(!$reverse) {
 		printInputField();
 		if($hasOffset && !$endReached) {
@@ -280,6 +285,6 @@ try {
 	echo Themes::bodyEnd();
 } catch (Exception $e) {
 	echo '<b>'.MP::x($lng['error']).'!</b><br>';
-	echo "<xmp>$e</xmp>";
+	echo $e;
 }
 ?>

@@ -139,11 +139,22 @@ try {
 	echo $e;
 	die();
 }
-echo '<head><title>'.$lng['send_message'].'</title>';
+$title = null;
+try {
+	$title = MP::x($reply_to ? $lng['reply_to'] : $lng['message_to']);
+	$title .= ' '.MP::dehtml(MP::getNameFromId(MP::getMadelineAPI($user), $id));
+} catch(Exception $e) {
+}
+echo '<head><title>'.($title ? $title : $lng['send_message']).'</title>';
 echo Themes::head();
 echo '</head>';
 echo Themes::bodyStart();
-echo '<div><a href="chat.php?c='.$id.'">'.$lng['back'].'</a></div><br>';
+echo '<div><a href="chat.php?c='.$id.'">'.$lng['back'].'</a></div>';
+if($title) {
+	echo '<h3>'.$title.'</h3><br>';
+} else {
+	echo '<br>';
+}
 if($reason) {
 	echo '<b>'.$reason.'</b>';
 }

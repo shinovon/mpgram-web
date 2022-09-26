@@ -48,6 +48,8 @@ class Locale {
 	'set_chat_autoscroll' => 'Авто-прокрутка до новых сообщений',
 	'set_msgs_limit' => 'Количество сообщений в чате',
 	'archived_chats' => 'Архивные чаты',
+	'reply_to' => 'Ответ:',
+	'message_to' => 'Сообщение:',
 	);
 }
 $lng = Locale::$lng;
