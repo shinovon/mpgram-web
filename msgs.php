@@ -36,10 +36,6 @@ try {
 		if(isset($info['Chat']['username'])) {
 			$un = $info['Chat']['username'];
 		}
-		if(isset($info['Chat']['id'])) {
-			$lid = $info['Chat']['id'];
-			$id = (int)'-100'.$lid;
-		}
 	} else if(isset($info['User']) && isset($info['User']['first_name'])) {
 		$name = $info['User']['first_name'];
 		$pm = true;
