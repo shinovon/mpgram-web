@@ -154,80 +154,21 @@ try {
 	echo '<head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
 	if((!$hasOffset || $endReached) && $autoupd == 1 && count($rm) > 0) {
-	$ii = $rm[0]['id'];
+		$ii = $rm[0]['id'];
 		if($dynupd == 1) {
-echo '<script type="text/javascript">
+			echo '<script type="text/javascript">
 <!--
-var ii = "'.$ii.'";
-var count = 0;
-function a() {
-	count++;
-	if(count > 60) return;
-	try {
-		var r = new XMLHttpRequest();
-		r.onload = function() {
-			try {
-				var x = r.responseText;
-				//console.log(x);
-				if(x != null && x.length > 1) {
-					var j = x.indexOf("||");
-					if(j != -1) {
-						ii = x.substring(0, j);
-						x = x.substring(j+2);
-						if(x.length > 1) {
-							var msgs = document.getElementById("msgs");
-							var d = document.createElement("div");
-							d.innerHTML = x;
-							'.($reverse ? 
-							'for (var i = 0; i < d.childNodes.length; i++) {
-								msgs.appendChild(d.childNodes[i]);
-							}
-							while (msgs.childNodes.length > '.$msglimit.') {
-								msgs.removeChild(msgs.firstChild);
-							}' : 'for (var i = d.childNodes.length-1; i >= 0; i--) {
-								msgs.insertBefore(d.childNodes[i], msgs.firstChild);
-							}
-							while (msgs.childNodes.length > '.$msglimit.') {
-								msgs.removeChild(msgs.lastChild);
-							}').'
-						}
-					}
-					'.($autoscroll && $reverse ? 'autoScroll();' : '').'
-				}
-				setTimeout("a()", '.$updint.'000);
-			} catch(e) {
-				alert(e);
-			}
+var b="'.$ii.'";var c=0;function a(){c++;if(c>70)return;try{var r=new XMLHttpRequest();r.onload=function(){try{var e=r.responseText;if(e!=null&&e.length>1){var f=e.indexOf("||");if(f!=-1){b=e.substring(0,f);e=e.substring(f+2);if(e.length>1){var msgs=document.getElementById("msgs");var d=document.createElement("div");d.innerHTML=e;for(var i=d.childNodes.length-1;i>=0;i--){'.($reverse ? 'msgs.appendChild(d.childNodes[i])':'msgs.insertBefore(d.childNodes[i],msgs.firstChild)').';}while(msgs.childNodes.length>'.$msglimit.'){msgs.removeChild(msgs.'.($reverse ? 'first' : 'last').'Child);}}}'.($autoscroll && $reverse ? 'setTimeout("autoScroll()",500);' : '').'};setTimeout("a()",'.$updint.'000);}catch(e){alert(e);}};r.open("GET","'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&i="+b+"&lang='.$lang.'&timeoff='.$timeoff.'");r.send();}catch(e){alert(e);}}try{setTimeout("a()",'.$updint.'000);}catch(e){alert(e);}
+//--></script>';
+		} else {
+			echo '<script type="text/javascript"><!--
+setTimeout("location.reload(true);",'.$updint.'000);
+//--></script>';
 		}
-
-		r.open("GET", "'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&i="+ii+"&lang='.$lang.'&timeoff='.$timeoff.'");
-		r.send();
-	} catch(e) {
-		alert(e);
-	}
-}
-try {
-	setTimeout("a()", '.$updint.'000);
-} catch(e) {
-	alert(e);
-}
-//--></script>';
-	} else {
-	echo '<script type="text/javascript">
-<!--
-setTimeout("location.reload(true);", '.$updint.'000);
-//--></script>';
-	}
 	}
 	if($reverse) {
-	echo '<script type="text/javascript">
-<!--
-function autoScroll() {
-try {
-	document.getElementById("text").scrollIntoView();
-} catch(e) {
-}
-}
+		echo '<script type="text/javascript"><!--
+function autoScroll(){try{document.getElementById("text").scrollIntoView();}catch(e){}}
 //--></script>';
 	}
 	echo '</head>'."\n";
