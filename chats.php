@@ -36,6 +36,29 @@ function exceptions_error_handler($severity, $message, $filename, $lineno) {
 }
 set_error_handler('exceptions_error_handler');
 
+try {
+	if(PHP_OS_FAMILY === "Linux") {
+		// Automatically kill madeline sessions
+		$x = file_get_contents('./lastclean');
+		if(!$x || (time() - (int)$x) > 1 * 60 * 60) {
+			try {
+				$x = explode("\n", shell_exec('ps -ef | grep -v grep | grep \'MadelineProto worker\' | awk \'{print $2,";",$7}\''));
+				foreach($x as $p) {
+					$p = str_replace(' ', '', $p);
+					$a = explode(';', $p);
+					if(count($a) < 2) continue;
+					if((int) substr($a[1], 0, strpos($a[1], ':')) > 1) {
+						exec('kill '.$a[0]);
+					}
+				}
+			} catch (Exception $e) {
+			}
+			file_put_contents('./lastclean', time());
+		}
+	}
+} catch (Exception $e) {
+}
+
 if(MP::$win1251) {
 	header('Content-Type: text/html; charset=windows-1251');
 } else {
