@@ -9,11 +9,11 @@ class StringStream implements \Amp\ByteStream\OutputStream {
 	public $d;
 	public function write(string $data): Amp\Promise {
 		$this->d .= $data;
-		return true;
+		return new Success(\strlen($data));
 	}
 	public function end(string $finalData = ""): Amp\Promise {
 		$this->d .= $finalData;
-		return true;
+		return new Success(\strlen($finalData));
 	}
 	public function get() {
 		return $this->d;
