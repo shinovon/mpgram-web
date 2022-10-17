@@ -60,6 +60,7 @@ try {
 	if(count($rm) == 0 || !isset($rm[0])) die();
 	echo $rm[0]['id'].'||';
 	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $un, $timeoff, true);
+	// Mark as read
 	try {
 		if($ch || (int)$id < 0) {
 			$MP->channels->readHistory(['channel' => $id, 'max_id' => 0]);

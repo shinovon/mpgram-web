@@ -54,50 +54,27 @@ if(isset($_GET['phone'])) {
 	$phone = $_POST['phone'];
 }
 
-if(!$logout) {
-	if(isset($_COOKIE['user']))
-		$user = $_COOKIE['user'];
-	else if(isset($_SESSION['user']))
-		$user = $_SESSION['user'];
-	// проверка сессии
-	$nouser = $user == null || empty($user) || strlen($user) != 32 || !file_exists(sessionspath.$user.'.madeline');
-}
+if(isset($_COOKIE['user']))
+	$user = $_COOKIE['user'];
+else if(isset($_SESSION['user']))
+	$user = $_SESSION['user'];
+// Check session existance
+$nouser = $user == null || empty($user) || strlen($user) != 32 || !file_exists(sessionspath.$user.'.madeline');
 if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
 	$nouser = true;
 	$logout = true;
 	MP::delcookie('user');
 	MP::delcookie('code');
 	try {
-		// удаление файлов сессии
+		// Remove all session files
 		if(file_exists(sessionspath.$user.'.madeline')) {
 			try {
-				exec('kill -9 `ps -ef | grep -v grep | grep '.$user.'.madeline | awk \'{print $2}\'`');
+				if(PHP_OS_FAMILY === "Linux") {
+					exec('kill -9 `ps -ef | grep -v grep | grep '.$user.'.madeline | awk \'{print $2}\'`');
+				}
 			} catch (Exception $e) {
 			}
-			try {
-				unlink(sessionspath.$user.'.madeline.callback.ipc');
-			} catch (Exception $e) {
-			}
-			try {
-				unlink(sessionspath.$user.'.madeline.ipcState');
-			} catch (Exception $e) {
-			}
-			try {
-				unlink(sessionspath.$user.'.madeline.ipc');
-			} catch (Exception $e) {
-			}
-			try {
-				unlink(sessionspath.$user.'.madeline.lightState.php');
-			} catch (Exception $e) {
-			}
-			try {
-				unlink(sessionspath.$user.'.madeline.safe.php');
-			} catch (Exception $e) {
-			}
-			try {
-				unlink(sessionspath.$user.'.madeline');
-			} catch (Exception $e) {
-			}
+			MP::deleteSessionFile($user);
 		}
 	} catch (Exception $e) {
 		echo $e;
@@ -197,7 +174,7 @@ if($user != null
 	if(!isset($user) || $nouser) {
 		$user = md5($phone.rand(0,1000));
 		MP::cookie('user', $user, time() + (86400 * 365));
-		$MP = MP::getMadelineAPI($user);
+		$MP = MP::getMadelineAPI($user, true);
 		htmlStart();
 	} else {
 		if(isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {

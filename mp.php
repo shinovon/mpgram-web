@@ -425,9 +425,14 @@ class MP {
 		return $sets;
 	}
 	
-	static function getMadelineAPI($user) {
+	static function getMadelineAPI($user, $login = false) {
 		require_once 'vendor/autoload.php';
-		return new \danog\MadelineProto\API(sessionspath.$user.'.madeline', static::getMadelineSettings());
+		if($login) {
+			$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline', static::getMadelineSettings());
+		} else {
+			$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline');
+		}
+		return $MP;
 	}
 
 	static function getSetting($name, $def=null, $write=false) {
