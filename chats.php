@@ -42,12 +42,12 @@ try {
 		$x = file_get_contents('./lastclean');
 		if(!$x || (time() - (int)$x) > 1 * 60 * 60) {
 			try {
-				$x = explode("\n", shell_exec('ps -ef | grep -v grep | grep \'MadelineProto worker\' | awk \'{print $2,";",$7}\''));
+				$x = explode("\n", shell_exec('ps -ax | grep -v grep | grep \'MadelineProto worker\' | awk \'{print $1,";",$4}\''));
 				foreach($x as $p) {
 					$p = str_replace(' ', '', $p);
 					$a = explode(';', $p);
 					if(count($a) < 2) continue;
-					if((int) substr($a[1], 0, strpos($a[1], ':')) > 1) {
+					if((int) substr($a[1], strpos($a[1], ':') + 1) >= 30) {
 						exec('kill '.$a[0]);
 					}
 				}
