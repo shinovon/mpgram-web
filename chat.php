@@ -209,7 +209,7 @@ function autoScroll(){try{document.getElementById("text").scrollIntoView();}catc
 			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
 				echo '<p><a href="chat.php?c='.$id.'">'.MP::x($lng['history_down']).'</a></p>';
 			} else {
-				echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[0]['id'].'&offset='.(-$msglimit-1).'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[count($rm)-1]['id'].'&offset='.(-$msglimit-1).'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
 			}
 		}
 		printInputField();
