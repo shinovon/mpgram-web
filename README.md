@@ -11,3 +11,22 @@ Test instance: <a href="https://mp.nnchan.ru/">https://mp.nnchan.ru</a>, but it 
 - You need to set browscap in php.ini to get better device labels
 - MadelineProto install command: `composer update` (composer v2+ needs to be installed)
 - More instructions for installing MadelineProto <a href="https://docs.madelineproto.xyz/docs/INSTALLATION.html">here</a>
+
+## Tested browsers
+Fully supported:
+- Internet Explorer 6.0 and above
+- Opera 9.0 and above
+- Nokia Browser for Symbian (Symbian 9.2 and above)
+- S40 6th Edition
+- Mozilla Firefox 2.0
+- All modern browsers (Chrome, Safari, etc)
+
+Partially supported (Auto update doesn't work and/or no auto scroll)
+- Internet Explorer 4.0
+- Opera Mini (All versions)
+- S40 5th Edition or older
+- Internet Explorer Mobile (?)
+
+Not supported
+- Internet Explorer 3.0 and older
+- ?
