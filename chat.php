@@ -158,8 +158,11 @@ try {
 		if($dynupd == 1) {
 			echo '<script type="text/javascript">
 <!--
+function rr(){if(typeof XMLHttpRequest===\'undefined\'){XMLHttpRequest=function(){try{return new ActiveXObject("Msxml2.XMLHTTP.6.0");}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP.3.0");}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP");}catch(e){}try{return new ActiveXObject("Microsoft.XMLHTTP");}catch(e){}throw new Error("NO XMLHttpRequest Support!");};}return new XMLHttpRequest();}
 function ee(e){if(e.message !== undefined && e.message !== null){alert(e.message);}else{alert(e.toString());}}
-var b="'.$ii.'";var c=0;function a(){c++;if(c>70)return;try{var r=new XMLHttpRequest();r.onload=function(){try{var e=r.responseText;if(e!=null&&e.length>1){var f=e.indexOf("||");if(f!=-1){b=e.substring(0,f);e=e.substring(f+2);if(e.length>1){var msgs=document.getElementById("msgs");var d=document.createElement("div");d.innerHTML=e;for(var i=d.childNodes.length-1;i>=0;i--){'.($reverse ? 'msgs.appendChild(d.childNodes[i])':'msgs.insertBefore(d.childNodes[i],msgs.firstChild)').';}while(msgs.childNodes.length>'.$msglimit.'){msgs.removeChild(msgs.'.($reverse ? 'first' : 'last').'Child);}}}'.($autoscroll && $reverse ? 'setTimeout("autoScroll()",500);' : '').'};setTimeout("a()",'.$updint.'000);}catch(e){ee(e);}};r.open("GET","'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&i="+b+"&lang='.$lang.'&timeoff='.$timeoff.'");r.send(null);}catch(e){ee(e);}}try{setTimeout("a()",'.$updint.'000);}catch(e){ee(e);}
+var r = null;
+function h(){if(r.readyState == 4){try{var e=r.responseText;if(e!=null&&e.length>1){var f=e.indexOf("||");if(f!=-1){b=e.substring(0,f);e=e.substring(f+2);if(e.length>1){var msgs=document.getElementById("msgs");var d=document.createElement("div");d.innerHTML=e;for(var i=d.childNodes.length-1;i>=0;i--){'.($reverse ? 'msgs.appendChild(d.childNodes[i])':'msgs.insertBefore(d.childNodes[i],msgs.firstChild)').';}while(msgs.childNodes.length>'.$msglimit.'){msgs.removeChild(msgs.'.($reverse ? 'first' : 'last').'Child);}}}'.($autoscroll && $reverse ? 'setTimeout("autoScroll()",500);' : '').'}}catch(e){ee(e);}}}
+var b="'.$ii.'";var c=0;function a(){c++;if(c>70)return;try{r=rr();r.onreadystatechange=h;setTimeout("a();",'.$updint.'000);;r.open("GET","'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&i="+b+"&lang='.$lang.'&timeoff='.$timeoff.'");r.send(null);}catch(e){ee(e);}}try{setTimeout("a()",'.$updint.'000);}catch(e){ee(e);}
 //--></script>';
 		} else {
 			echo '<script type="text/javascript"><!--

@@ -13,6 +13,9 @@ $id = $_GET['id'];
 $timeoff = MP::getSettingInt('timeoff');
 $lang = MP::getSetting('lang', 'ru');
 
+header('Content-Type: text/html; charset=utf-8');
+header('Cache-Control: private, no-cache, no-store');
+
 try {
 	include 'locale_'.$lang.'.php';
 } catch (Exception $e) {
