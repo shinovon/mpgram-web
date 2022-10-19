@@ -193,7 +193,7 @@ class MP {
 						echo ' •';
 					}
 					if($unswer && !$ch) {
-						echo ' <a href="sendfile.php?c='.$id.'&reply_to='.$m['id'].'" class="u">'.$lng['reply'].'</a>';
+						echo ' <a href="sendfile.php?c='.$id.'&reply_to='.$m['id'].'" class="u">'.MP::x($lng['reply']).'</a>';
 					}
 				} else {
 					echo '<div class="ma" id="msg_'.$id.'_'.$m['id'].'">';
@@ -274,7 +274,8 @@ class MP {
 									if(strpos($d['name'], 'sticker_') === 0) {
 										$dl = true;
 										$open = false;
-										if(PNG_STICKERS) {
+										$ie = MP::getIEVersion();
+										if(PNG_STICKERS && $ie == 0 && $ie > 4) {
 											$q = 'rstickerp';
 										} else {
 											$q = 'rsticker';
