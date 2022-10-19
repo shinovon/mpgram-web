@@ -36,7 +36,7 @@ class Themes {
 			margin-right: auto;').'
 			font-family: system-ui;
 			'.(static::$theme == 0 ?
-			'background-color: black;
+			'background: #000;
 			color: #eee;' : 'color: #111;').'
 		}
 		a {
