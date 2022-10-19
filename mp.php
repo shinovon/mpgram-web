@@ -486,6 +486,33 @@ class MP {
 	static function delCookie($n) {
 		header('Set-Cookie: '.$n.'=; expires='.date('r', time() - 86400), false);
 	}
+	
+	static function deleteSessionFile($user) {
+		try {
+			unlink(sessionspath.$user.'.madeline.callback.ipc');
+		} catch (Exception $e) {
+		}
+		try {
+			unlink(sessionspath.$user.'.madeline.ipcState');
+		} catch (Exception $e) {
+		}
+		try {
+			unlink(sessionspath.$user.'.madeline.ipc');
+		} catch (Exception $e) {
+		}
+		try {
+			unlink(sessionspath.$user.'.madeline.lightState.php');
+		} catch (Exception $e) {
+		}
+		try {
+			unlink(sessionspath.$user.'.madeline.safe.php');
+		} catch (Exception $e) {
+		}
+		try {
+			unlink(sessionspath.$user.'.madeline');
+		} catch (Exception $e) {
+		}
+	}
 
 	public static function init() {
 		static::$enc = static::getEncoding();
