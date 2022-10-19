@@ -19,14 +19,15 @@ Fully supported:
 - Nokia Browser for Symbian (Symbian 9.2 and above)
 - S40 6th Edition
 - Mozilla Firefox 2.0
+- WebPositive
 - All modern browsers (Chrome, Safari, etc)
 
 Partially supported (Auto update doesn't work and/or no auto scroll)
-- Internet Explorer 4.0
+- Internet Explorer 3.0-5.0
 - Opera Mini (All versions)
 - S40 5th Edition or older
 - Internet Explorer Mobile (?)
 
 Not supported
-- Internet Explorer 3.0 and older
+- Internet Explorer 2 and older
 - ?
