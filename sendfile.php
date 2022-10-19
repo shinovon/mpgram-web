@@ -145,11 +145,11 @@ try {
 	$title .= ' '.MP::dehtml(MP::getNameFromId(MP::getMadelineAPI($user), $id));
 } catch(Exception $e) {
 }
-echo '<head><title>'.($title ? $title : $lng['send_message']).'</title>';
+echo '<head><title>'.($title ? $title : MP::x($lng['send_message'])).'</title>';
 echo Themes::head();
 echo '</head>';
 echo Themes::bodyStart();
-echo '<div><a href="chat.php?c='.$id.'">'.$lng['back'].'</a></div>';
+echo '<div><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div>';
 if($title) {
 	echo '<h3>'.$title.'</h3><br>';
 } else {
@@ -166,13 +166,13 @@ if($reply_to) {
 }
 echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
 echo '<br><input type="file" id="file" name="file"><br>';
-echo '<input type="submit" value="'.$lng['send'].'">';
+echo '<input type="submit" value="'.MP::x($lng['send']).'">';
 echo '</form>';
 echo '<form action="sendsticker.php" style="display: inline;">';
 echo '<input type="hidden" name="c" value="'.$id.'">';
 if($reply_to) {
 	echo '<input type="hidden" name="reply_to" value="'.$reply_to.'">';
 }
-echo '<input type="submit" value="'.$lng['choose_sticker'].'">';
+echo '<input type="submit" value="'.MP::x($lng['choose_sticker']).'">';
 echo '</form>';
 echo Themes::bodyEnd();

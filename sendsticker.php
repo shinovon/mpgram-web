@@ -46,7 +46,7 @@ include 'themes.php';
 Themes::setTheme($theme);
 try {
 	$MP = MP::getMadelineAPI($user);
-	echo '<head><title>'.$lng['send_message'].'</title>';
+	echo '<head><title>'.MP::x($lng['send_message']).'</title>';
 	echo Themes::head();
 	echo '</head>';
 	echo Themes::bodyStart();
@@ -61,7 +61,7 @@ try {
 		header('Location: chat.php?c='.$id);
 		die();
 	} else if(isset($_GET['set'])) {
-		echo '<div><a href="sendsticker.php?c='.$id.($reply_to?'&reply_to='.$reply_to:'').'">'.$lng['back'].'</a></div><br>';
+		echo '<div><a href="sendsticker.php?c='.$id.($reply_to?'&reply_to='.$reply_to:'').'">'.MP::x($lng['back']).'</a></div><br>';
 		$set = $_GET['set'];
 		$sets = $MP->messages->getAllStickers()['sets'];
 		$s2 = null;
@@ -72,15 +72,15 @@ try {
 			}
 		}
 		$documents = $MP->messages->getStickerSet(['stickerset' => ['_' => 'inputStickerSetID', 'id' => $s2['id'], 'access_hash' => $s2['access_hash']]])['documents'];
-		echo '<b>'.$s2['title'].'</b><br>';
+		echo '<b>'.MP::dehtml($s2['title']).'</b><br>';
 		foreach($documents as $k=>$v) {
 			echo '<a href="sendsticker.php?c='.$id.'&id='.$v['id'].'&access_hash='.$v['access_hash'].($reply_to?'&reply_to='.$reply_to:'').'"><img src="file.php?sticker='.$v['id'].'&access_hash='.$v['access_hash'].'&p=rprev"></a>';
 		}
 	} else {
-	echo '<div><a href="chat.php?c='.$id.'">'.$lng['back'].'</a></div><br>';
+	echo '<div><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div><br>';
 		$sets = $MP->messages->getAllStickers()['sets'];
 		foreach($sets as $k=>$v) {
-			echo '<a href="sendsticker.php?c='.$id.'&set='.$v['id'].($reply_to?'&reply_to='.$reply_to:'').'">'.$v['title'].'</a><br>';
+			echo '<a href="sendsticker.php?c='.$id.'&set='.$v['id'].($reply_to?'&reply_to='.$reply_to:'').'">'.MP::x($v['title']).'</a><br>';
 		}
 	}
 	echo Themes::bodyEnd();
