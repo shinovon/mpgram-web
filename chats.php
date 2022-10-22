@@ -40,8 +40,8 @@ try {
 	if(PHP_OS_FAMILY === "Linux") {
 		// Automatically kill madeline sessions
 		$x = file_get_contents('./lastclean');
-		if(!$x || (time() - (int)$x) > 1 * 60 * 60) {
-			try {
+		if(!$x || (time() - (int)$x) > 30 * 60) {
+			/*try {
 				$x = explode("\n", shell_exec('ps -ax | grep -v grep | grep \'MadelineProto worker\' | awk \'{print $1,";",$4}\''));
 				foreach($x as $p) {
 					$p = str_replace(' ', '', $p);
@@ -52,18 +52,15 @@ try {
 					}
 				}
 			} catch (Exception $e) {
-			}
+			}*/
+			exec("kill -9 `ps -ef | grep -v grep | grep 'MadelineProto worker' | awk '{print $2}'` > /dev/null &");
 			file_put_contents('./lastclean', time());
 		}
 	}
 } catch (Exception $e) {
 }
 
-if(MP::$win1251) {
-	header('Content-Type: text/html; charset=windows-1251');
-} else {
-	header('Content-Type: text/html; charset=utf-8');
-}
+header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store, must-revalidate');
 
 include 'themes.php';
@@ -80,21 +77,18 @@ try {
 		$t = new DateTime('now', $dtz);
 		$tof = $dtz->getOffset($t);
 		echo '<script type="text/javascript"><!--
-		function a() {
-			try {
-				document.cookie = "timeoff=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-				var f = '.($tof*1000).';
-				var d = new Date();
-				var t = d.getTime()
-				var o = d.getTimezoneOffset()*60*1000;
-				var c = (t-(t-f)+o)/1000;
-				var e = new Date();
-				e.setTime(e.getTime() + (365*86400*1000));
-				document.cookie = "timeoff="+c+"; expires="+e.toUTCString();
-			} catch (e) {
-			}
-		}
-		window.onload = a();
+try {
+	document.cookie = "timeoff=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+	var f = '.($tof*1000).';
+	var d = new Date();
+	var t = d.getTime()
+	var o = d.getTimezoneOffset()*60*1000;
+	var c = (t-(t-f)+o)/1000;
+	var e = new Date();
+	e.setTime(e.getTime() + (365*86400*1000));
+	document.cookie = "timeoff="+c+"; expires="+e.toUTCString();
+} catch (e) {
+}
 //--></script>';
 	}
 	echo '</head>';
@@ -146,16 +140,22 @@ try {
 		$dialogs = $r['dialogs'];
 		$msgs = $r['messages'];
 		$c = 0;
+		$msglimit = MP::getSettingInt('limit', 20);
 		foreach($dialogs as $k => $d){
 			$id = MP::getId($MP, $d['peer']);
 			$info = $MP->getInfo($d['peer']);
 			try {
 				echo '<div class="c'.($c%2==0 ? '1': '0').'">';
-				echo '<a href="chat.php?c='.$id.'"><b>';
+				$cl = 'chat.php?c='.$id;
+				$unr = $d['unread_count'];
+				if($unr > $msglimit) {
+					$cl .= '&m='.$d['read_inbox_max_id'].'&offset='.(-$msglimit-1);
+				}
+				echo '<a href="'.$cl.'"><b>';
 				$n = MP::dehtml(MP::getNameFromInfo($info, true));
 				echo $n.'</b>';
-				if($d['unread_count']) {
-					echo ' <b>+'.$d['unread_count'].'</b>';
+				if($unr > 0) {
+					echo ' <b>+'.$unr.'</b>';
 				}
 				echo '</a>';
 				try {
@@ -180,7 +180,7 @@ try {
 					}
 					echo '<br><div class="cm">'.$t.' ';
 					if(isset($msg['message']) && strlen($msg['message']) > 0) {
-						echo '<a href="chat.php?c='.$id.'">';
+						echo '<a href="'.$cl.'">';
 						if($mfn !== null && ($id > 0 ? $mfid != $selfid : true))
 							echo $mfn.': ';
 						$txt = str_replace("\n", " ", MP::dehtml($msg['message']));
@@ -188,9 +188,9 @@ try {
 						echo $txt;
 						echo '</a>';
 					} else if(isset($msg['action'])) {
-						echo '<a href="chat.php?c='.$id.'" class="cma">'.MP::parseMessageAction($msg['action'], $mfn, $mfid, $n, $lng, false, $MP).'</a>';
+						echo '<a href="'.$cl.'" class="cma">'.MP::parseMessageAction($msg['action'], $mfn, $mfid, $n, $lng, false, $MP).'</a>';
 					} else if(isset($msg['media'])) {
-						echo '<a href="chat.php?c='.$id.'" class="cma">';
+						echo '<a href="'.$cl.'" class="cma">';
 						if($mfn !== null && ($id > 0 ? $mfid != $selfid : true))
 							echo $mfn.': ';
 						echo MP::x($lng['media_att']);
