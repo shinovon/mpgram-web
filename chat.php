@@ -34,6 +34,8 @@ if(isset($_GET['offset'])) {
 }
 if(isset($_GET['offset_from'])) {
 	$msgoffsetid = (int) $_GET['offset_from'];
+} else if(isset($_GET['m'])) {
+	$msgoffsetid = (int) $_GET['m'];
 }
 if(isset($_GET['max_id'])) {
 	$msgmaxid = (int) $_GET['max_id'];
@@ -45,7 +47,7 @@ if(!$user) {
 	die();
 }
 
-header('Content-Type: text/html; charset=utf-8');
+header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store');
 
 $id = null;

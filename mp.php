@@ -84,7 +84,7 @@ class MP {
 	}
 
 	static function x($s) {
-		if(static::$enc !== null) {
+		if(static::$enc !== null && static::$enc !== 'utf-8') {
 			return mb_convert_encoding($s, static::$enc);
 		}
 		return $s;
@@ -98,7 +98,7 @@ class MP {
 		if($iev != 0 && $iev < 5) {
 			return static::getSetting('lang') == 'ru' ? 'windows-1251' : 'windows-1252';
 		}
-		return null;
+		return 'utf-8';
 	}
 
 	static function parseMessageAction($a, $mfn, $mfid, $n, $lng, $chat=true, $MP) {
@@ -147,6 +147,7 @@ class MP {
 	}
 	
 	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name= null, $un=null, $timeoff=0, $chid=false, $unswer=false) {
+		$lastdate = $today = date('d.m.y', time()-$timeoff);
 		foreach($rm as $m) {
 			try {
 				$mname1 = null;
@@ -179,6 +180,12 @@ class MP {
 						$fwname = MP::getNameFromId($MP, $fwid, true);
 					}
 				}
+				$mtime = $m['date']-$timeoff;
+				$mdate = date('d.m.y', $mtime);
+				if($mdate !== $lastdate) {
+					echo '<div class="ma">'.$mdate.'</div>';
+					$lastdate = $mdate;
+				}
 				if(mb_strlen($fwname, 'UTF-8') > 30)
 					$fwname = mb_substr($fwname, 0, 30, 'UTF-8');
 				if(!isset($m['action'])) {
@@ -188,7 +195,7 @@ class MP {
 					} else {
 						echo '<b class="mn">'.MP::dehtml($mname).'</b>';
 					}
-					echo ' '.date("H:i", $m['date']-$timeoff);
+					echo ' '.date("H:i", $mtime);
 					if($m['media_unread']) {
 						echo ' •';
 					}
@@ -234,7 +241,9 @@ class MP {
 								if(strlen($replytext) > 50)
 									$replytext = mb_substr($replytext, 0, 50, 'UTF-8');
 								echo '<div class="rt">';
+								echo '<a href="chat.php?c='.$id.'&m='.$replyid.'">';
 								echo MP::dehtml($replytext);
+								echo '</a>';
 								echo '</div>';
 							}
 							echo '</div>';
@@ -454,7 +463,6 @@ class MP {
 		$x = $def;
 		if(isset($_GET[$name])) {
 			$x = (int)$_GET[$name];
-			static::cookie($name, $x, time());
 		} else if(isset($_COOKIE[$name])) {
 			$x = (int)$_COOKIE[$name];
 		}
