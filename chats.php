@@ -180,7 +180,7 @@ try {
 					}
 					echo '<br><div class="cm">'.$t.' ';
 					if(isset($msg['message']) && strlen($msg['message']) > 0) {
-						echo '<a href="'.$cl.'">';
+						echo '<a href="'.$cl.'" class="ct">';
 						if($mfn !== null && ($id > 0 ? $mfid != $selfid : true))
 							echo $mfn.': ';
 						$txt = str_replace("\n", " ", MP::dehtml($msg['message']));

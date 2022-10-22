@@ -56,6 +56,12 @@ class Themes {
 		.cm {
 			margin-left: 2px;
 			overflow: hidden;
+			color: '.(static::$theme == 0 ? '#ccc' : '#111').';
+		}
+		.ct {
+			margin-left: 2px;
+			overflow: hidden;
+			color: '.(static::$theme == 0 ? '#aaa' : '#444').';
 		}
 		.m {
 			margin-left: 2px;
@@ -80,7 +86,7 @@ class Themes {
 			text-overflow: ellipsis;
 		}
 		.c0 {
-			background-color: '.(static::$theme == 0 ? '#333' : '#ccc').';
+			background-color: '.(static::$theme == 0 ? '#222' : '#d7d7d7').';
 		}
 		'.(static::$theme == 0 ? '' : '.ml, .mf, .mn {
 			color: #168acd;

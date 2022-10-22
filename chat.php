@@ -36,6 +36,7 @@ if(isset($_GET['offset_from'])) {
 	$msgoffsetid = (int) $_GET['offset_from'];
 } else if(isset($_GET['m'])) {
 	$msgoffsetid = (int) $_GET['m'];
+	$msgoffset = -1;
 }
 if(isset($_GET['max_id'])) {
 	$msgmaxid = (int) $_GET['max_id'];
@@ -119,7 +120,7 @@ try {
 			$chr = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false;
 			echo '<form action="write.php"'.($chr ? ' method="post"' : '').' class="in">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
-			echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
+			echo '<textarea name="msg" value="" style="width: 100%; height: 3em"></textarea><br>';
 			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
 			echo '</form>';
 			echo '<form action="sendfile.php" class="in'.($chr ? 'r' : '').'">';

@@ -147,7 +147,7 @@ class MP {
 	}
 	
 	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name= null, $un=null, $timeoff=0, $chid=false, $unswer=false) {
-		$lastdate = $today = date('d.m.y', time()-$timeoff);
+		$lastdate = date('d.m.y', time()-$timeoff);
 		foreach($rm as $m) {
 			try {
 				$mname1 = null;

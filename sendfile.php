@@ -91,6 +91,7 @@ try {
 						case 'sisx':
 						case 'apk':
 						case 'deb':
+						case 'htm':
 							$type = 'inputMediaUploadedDocument';
 							$attr = true;
 							break;
@@ -164,7 +165,7 @@ echo '<input type="hidden" name="sent" value="1">';
 if($reply_to) {
 	echo '<input type="hidden" name="reply_to" value="'.$reply_to.'">';
 }
-echo '<textarea name="msg" value="" style="width: 100%"></textarea><br>';
+echo '<textarea name="msg" value="" style="width: 100%; height: 3em"></textarea><br>';
 echo '<br><input type="file" id="file" name="file"><br>';
 echo '<input type="submit" value="'.MP::x($lng['send']).'">';
 echo '</form>';
