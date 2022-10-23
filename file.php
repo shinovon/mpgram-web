@@ -121,6 +121,16 @@ try {
 					$h = 90;
 					$img = resize($img, $w, $h);
 				}
+			} else if($p == 'sprev') {
+				if($w > 180) {
+					$h = ($h/$w)*180;
+					$w = 180;
+					$img = resize($img, $w, $h);
+				} else if($h > 90) {
+					$w = ($w/$h)*90;
+					$h = 90;
+					$img = resize($img, $w, $h);
+				}
 			}
 		}
 		header('Content-Type: image/jpeg');

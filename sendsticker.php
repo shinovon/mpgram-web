@@ -65,7 +65,7 @@ try {
 		$set = $_GET['set'];
 		$sets = $MP->messages->getAllStickers()['sets'];
 		$s2 = null;
-		foreach($sets as $k=>$v) {
+		foreach($sets as $v) {
 			if(strval($v['id']) == $set) {
 				$s2 = $v;
 				break;
@@ -73,13 +73,13 @@ try {
 		}
 		$documents = $MP->messages->getStickerSet(['stickerset' => ['_' => 'inputStickerSetID', 'id' => $s2['id'], 'access_hash' => $s2['access_hash']]])['documents'];
 		echo '<b>'.MP::dehtml($s2['title']).'</b><br>';
-		foreach($documents as $k=>$v) {
-			echo '<a href="sendsticker.php?c='.$id.'&id='.$v['id'].'&access_hash='.$v['access_hash'].($reply_to?'&reply_to='.$reply_to:'').'"><img src="file.php?sticker='.$v['id'].'&access_hash='.$v['access_hash'].'&p=rprev"></a>';
+		foreach($documents as $v) {
+			echo '<a href="sendsticker.php?c='.$id.'&id='.$v['id'].'&access_hash='.$v['access_hash'].($reply_to?'&reply_to='.$reply_to:'').'"><img src="file.php?sticker='.$v['id'].'&access_hash='.$v['access_hash'].'&p=rsprev"></a>';
 		}
 	} else {
 	echo '<div><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div><br>';
 		$sets = $MP->messages->getAllStickers()['sets'];
-		foreach($sets as $k=>$v) {
+		foreach($sets as $v) {
 			echo '<a href="sendsticker.php?c='.$id.'&set='.$v['id'].($reply_to?'&reply_to='.$reply_to:'').'">'.MP::x($v['title']).'</a><br>';
 		}
 	}
