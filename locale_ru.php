@@ -47,9 +47,11 @@ class Locale {
 	'set_chat_reverse_mode' => 'Обратный порядок сообщений в чате',
 	'set_chat_autoscroll' => 'Авто-прокрутка до новых сообщений',
 	'set_msgs_limit' => 'Количество сообщений в чате',
-	'archived_chats' => 'Архивные чаты',
+	'archived_chats' => 'Архив',
 	'reply_to' => 'Ответ:',
 	'message_to' => 'Сообщение:',
+	'folders' => 'Папки',
+	'all_chats' => 'Все чаты',
 	);
 }
 $lng = Locale::$lng;

@@ -108,6 +108,9 @@ class Themes {
 			display: inline;
 			float: right;
 		}
+		.unr {
+			color: '.(static::$theme == 0 ? '#f77' : '#700').';
+		}
 		--></style>';
 	}
 }

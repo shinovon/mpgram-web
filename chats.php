@@ -98,26 +98,47 @@ try {
 	$hasArchiveChats = false;
 	echo '<header>';
 	echo '<b>'.MP::x($selfname).'</b><div>';
-	if(!$archived) {
-		$hasArchiveChats = count($MP->messages->getDialogs([
-			'limit' => 1, 
-			'exclude_pinned' => true,
-			'folder_id' => 1
-			])['dialogs']) > 0;;
-		echo '<a href="login.php?logout=1">'.MP::x($lng['logout']).'</a>';
-		echo ' <a href="chats.php?upd">'.MP::x($lng['refresh']).'</a>';
-		echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
-		if($hasArchiveChats) {
-			echo ' <a href="chats.php?archive">'.MP::x($lng['archived_chats']).'</a>';
-		}
-	} else {
-		echo ' <a href="chats.php">'.MP::x($lng['back']).'</a>';
+	echo '<a href="login.php?logout=1">'.MP::x($lng['logout']).'</a>';
+	echo ' <a href="chats.php?upd">'.MP::x($lng['refresh']).'</a>';
+	echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
+	echo '</div>';
+	$folders = $MP->messages->getDialogFilters();
+	$hasArchiveChats = count($MP->messages->getDialogs([
+		'limit' => 1, 
+		'exclude_pinned' => true,
+		'folder_id' => 1
+		])['dialogs']) > 0;
+	$fid = 0;
+	if(isset($_GET['f'])) {
+		$fid = (int)$_GET['f'];
 	}
-	echo '</div><br>';
-	echo '</header>';
+	if(count($folders) > 1 || $hasArchiveChats) {
+		echo '<div>';
+		echo '<b>'.MP::x($lng['folders']).'</b>: ';
+		foreach($folders as $f) {
+			if(!isset($f['id'])) {	
+				echo '<a href="chats.php">'.MP::x($lng['all_chats']).'</a> ';
+			} else {
+				$sel = $fid == $f['id'];
+				if($sel) echo '<u>';
+				echo '<a href="chats.php?f='.$f['id'].'">'.MP::dehtml($f['title']).'</a>';
+				if($sel) echo '</u>';
+				echo ' ';
+			}
+		}
+		if($hasArchiveChats) {
+			$sel = $archived || $fid == 1;
+			if($sel) echo '<u>';
+			echo '<a href="chats.php?archive">'.MP::x($lng['archived_chats']).'</a>';
+			if($sel) echo '</u>';
+		}
+		echo '</div>';
+	}
+	echo '<br></header>';
 	try {
 		$r = null;
-		if($archived) {
+		$dialogs = null;
+		if($archived || $fid == 1) {
 			$r = $MP->messages->getDialogs([
 			'offset_date' => 0,
 			'offset_id' => 0,
@@ -127,21 +148,171 @@ try {
 			'exclude_pinned' => true,
 			'folder_id' => 1
 			]);
+			$dialogs = $r['dialogs'];
 		} else {
-			$r = $MP->messages->getDialogs([
-			'offset_date' => 0,
-			'offset_id' => 0,
-			'add_offset' => 0,
-			'limit' => $count, 
-			'hash' => 0,
-			'folder_id' => 0
-			]);
+			if($fid > 1) {
+				$folder = null;
+				foreach($folders as $f) {
+					if(isset($f['id']) && $f['id'] == $fid) {
+						$folder = $f;
+						break;
+					}
+				}
+				unset($folders);
+				//echo '<xmp>';
+				//var_dump($folder);
+				//echo '</xmp>';
+				$r = $MP->messages->getDialogs(['limit' => 500]);
+				$dialogs = array();
+				$all = $r['dialogs'];
+				if($f['contacts'] || $f['non_contacts']) {
+					$contacts = $MP->contacts->getContacts()['contacts'];
+					foreach($all as $d) {
+						if($d['peer']['_'] !== 'peerUser') continue;
+						$found = false;
+						foreach($contacts as $c) {
+							if(MP::getId($MP, $d['peer']) == MP::getId($MP, $c)) {
+								$found = true;
+								if($f['contacts']) array_push($dialogs, $d);
+								break;
+							}
+						}
+						if(!$found && $f['non_contacts']) {
+							if(!in_array($d, $dialogs)) {
+								array_push($dialogs, $d);
+							}
+						}
+					}
+					unset($contacts);
+				}
+				if($f['groups']) {
+					foreach($all as $d) {
+						if($d['peer']['_'] === 'peerUser') continue;
+						if($d['peer']['_'] === 'peerChannel') {
+							foreach($r['chats'] as $c) {
+								if($c['peer_id'] == $d['peer'] && !$c['broadcast'] && !in_array($d, $dialogs)) {
+									array_push($dialogs, $d);
+								}
+							}
+							continue;
+						}
+						if(!in_array($d, $dialogs)) {
+							array_push($dialogs, $d);
+						}
+					}
+				}
+				if($f['broadcasts']) {
+					foreach($all as $d) {
+						if($d['peer']['_'] !== 'peerChannel') continue;
+						foreach($r['chats'] as $c) {
+							if($c['peer_id'] == $d['peer'] && $c['broadcast'] && !in_array($d, $dialogs)) {
+								array_push($dialogs, $d);
+							}
+						}
+					}
+				}
+				if($f['bots']) {
+					foreach($all as $d) {
+						if($d['peer']['_'] !== 'peerUser') continue;
+						foreach($r['users'] as $u) {
+							if($u['id'] == $d['peer']['user_id'] && $u['bot'] && !in_array($d, $dialogs)) {
+								array_push($dialogs, $d);
+							}
+						}
+						continue;
+					}
+				}
+				if(count($f['include_peers']) > 0) {
+					foreach($f['include_peers'] as $p) {
+						foreach($all as $d) {
+							if(MP::getId($MP, $d['peer']) == MP::getId($MP, $p)) {
+								if(!in_array($d, $dialogs)) {
+									array_push($dialogs, $d);
+								}
+								break;
+							}
+						}
+					}
+				}
+				if(count($f['exclude_peers']) > 0) {
+					foreach($f['exclude_peers'] as $p) {
+						foreach($dialogs as $idx => $d) {
+							if(MP::getId($MP, $d['peer']) == MP::getId($MP, $p)) {
+								unset($dialogs[$idx]);
+								break;
+							}
+						}
+					}
+				}
+				if($f['exclude_archived']) {
+					foreach($dialogs as $idx => $d) {
+						if(isset($d['folder_id']) && $d['folder_id'] == 1) {
+							unset($dialogs[$idx]);
+						}
+					}
+				}
+				if($f['exclude_read']) {
+					foreach($dialogs as $idx => $d) {
+						if(isset($d['unread_count']) && $d['unread_count'] == 0) {
+							unset($dialogs[$idx]);
+						}
+					}
+				}
+				function cmp($a, $b) {
+					global $r;
+					$ma = null;
+					$mb = null;
+					foreach($r['messages'] as $m) {
+						if($m['peer_id'] == $a['peer']) {
+							$ma = $m;
+						}
+						if($m['peer_id'] == $b['peer']) {
+							$mb = $m;
+						}
+						if($ma !== null && $mb !== null) break;
+					}
+					if ($ma === null || $mb === null || $ma['date'] == $mb['date']) {
+						return 0;
+					}
+					if($a['pinned'] && !$b['pinned']) {
+						return -1;
+					}
+					return ($ma['date'] > $mb['date']) ? -1 : 1;
+				}
+				usort($dialogs, 'cmp');
+				$pinned = array();
+				if(count($f['pinned_peers']) > 0) {
+					foreach($f['pinned_peers'] as $p) {
+						foreach($all as $d) {
+							if(MP::getId($MP, $d['peer']) == MP::getId($MP, $p)) {
+								if(in_array($d, $dialogs)) {
+									unset($dialogs[array_search($d, $dialogs)]);
+								}
+								array_push($pinned, $d);
+								break;
+							}
+						}
+					}
+					$dialogs = array_merge($pinned, $dialogs);
+				}
+				unset($all);
+			} else {
+				$r = $MP->messages->getDialogs([
+				'offset_date' => 0,
+				'offset_id' => 0,
+				'add_offset' => 0,
+				'limit' => $count, 
+				'hash' => 0,
+				'folder_id' => 0
+				]);
+				$dialogs = $r['dialogs'];
+			}
 		}
-		$dialogs = $r['dialogs'];
 		$msgs = $r['messages'];
 		$c = 0;
 		$msglimit = MP::getSettingInt('limit', 20);
-		foreach($dialogs as $k => $d){
+		foreach($dialogs as $d){
+			if(!$archived && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
 			$id = MP::getId($MP, $d['peer']);
 			$info = $MP->getInfo($d['peer']);
 			try {
@@ -155,7 +326,7 @@ try {
 				$n = MP::dehtml(MP::getNameFromInfo($info, true));
 				echo $n.'</b>';
 				if($unr > 0) {
-					echo ' <b>+'.$unr.'</b>';
+					echo ' <b class="unr">+'.$unr.'</b>';
 				}
 				echo '</a>';
 				try {

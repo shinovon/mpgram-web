@@ -78,6 +78,7 @@ try {
 	$ch = false;
 	$left = false;
 	$id = MP::getId($MP, $info);
+	$canpost = false;
 	if(isset($info['Chat'])) {
 		$ch = isset($info['type']) && $info['type'] == 'channel';
 		if(isset($info['Chat']['title'])) {
@@ -85,6 +86,9 @@ try {
 		}
 		if(isset($info['Chat']['username'])) {
 			$un = $info['Chat']['username'];
+		}
+		if(isset($info['Chat']['admin_rights']) && isset($info['Chat']['admin_rights']['post_messages'])) {
+			$canpost = $info['Chat']['admin_rights']['post_messages'];
 		}
 		$left = isset($info['Chat']['left']) && $info['Chat']['left'];
 	} else if(isset($info['User'])) {
@@ -109,6 +113,7 @@ try {
 		global $id;
 		global $lng;
 		global $reverse;
+		global $canpost;
 		echo '<div class="in" id="text">';
 		if($left) {
 			echo '<form action="chat.php">';
@@ -116,8 +121,8 @@ try {
 			echo '<input type="hidden" name="join" value="1">';
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
 			echo '</form>';
-		} else if(!$ch) {
-			$chr = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false;
+		} else if(!$ch || $canpost) {
+			$chr = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false;
 			echo '<form action="write.php"'.($chr ? ' method="post"' : '').' class="in">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<textarea name="msg" value="" style="width: 100%; height: 3em"></textarea><br>';

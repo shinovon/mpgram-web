@@ -19,7 +19,7 @@ $iev = MP::getIEVersion();
 if($iev > 0 && $iev < 4) $theme = 1;
 $lang = MP::getSetting('lang', isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? (strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en') : 'ru', true);
 $theme = MP::getSettingInt('theme', $theme);
-$post = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false;
+$post = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false;
 // Save values
 MP::cookie('lang', $lang, time() + (86400 * 365));
 MP::cookie('theme', $theme, time() + (86400 * 365));
@@ -91,17 +91,14 @@ function htmlStart() {
 		$t = new DateTime('now', $dtz);
 		$tof = $dtz->getOffset($t);
 		echo '<script type="text/javascript"><!--
-		function a() {
-			try {
-				var d = new Date();
-				var c = ((d.getTime()+'.($tof*1000).')-(d.getTime()-(d.getTimezoneOffset()*60*1000)))/1000 | 0;
-				var e = new Date();
-				e.setTime(e.getTime() + (365*86400*1000));
-				document.cookie = "timeoff=" + c + "; expires="+e.toUTCString()+"; path=/";
-			} catch (e) {
-			}
-		}
-		window.onload = a();
+try {
+	var d = new Date();
+	var c = ((d.getTime()+'.($tof*1000).')-(d.getTime()-(d.getTimezoneOffset()*60*1000)))/1000 | 0;
+	var e = new Date();
+	e.setTime(e.getTime() + (365*86400*1000));
+	document.cookie = "timeoff=" + c + "; expires="+e.toUTCString()+"; path=/";
+} catch (e) {
+}
 //--></script>';
 	}
 	echo '</head>';
