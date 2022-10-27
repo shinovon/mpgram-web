@@ -186,7 +186,7 @@ class MP {
 					echo '<div class="ma">'.$mdate.'</div>';
 					$lastdate = $mdate;
 				}
-				if(mb_strlen($fwname, 'UTF-8') > 30)
+				if($fwname !== null && mb_strlen($fwname, 'UTF-8') > 30)
 					$fwname = mb_substr($fwname, 0, 30, 'UTF-8');
 				if(!isset($m['action'])) {
 					echo '<div class="m" id="msg_'.$id.'_'.$m['id'].'">';
