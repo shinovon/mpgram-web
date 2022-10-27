@@ -101,7 +101,7 @@ class MP {
 		return 'utf-8';
 	}
 
-	static function parseMessageAction($a, $mfn, $mfid, $n, $lng, $chat=true, $MP) {
+	static function parseMessageAction($a, $mfn, $mfid, $n, $lng, $chat=true, $MP=null) {
 		$fn = $mfn !== null ? $mfn : $n;
 		$txt = '';
 		try {
@@ -160,7 +160,7 @@ class MP {
 					$mname1 = mb_substr($mname1, 0, 30, 'UTF-8');
 				$mname = null;
 				$l = false;
-				if($m['out'] == true && !$ch) {
+				if($m['out'] && !$ch) {
 					$uid = MP::getSelfId($MP);
 					$mname = $lng['you'];
 				} else if(($pm || $ch) && $name) {
@@ -200,7 +200,7 @@ class MP {
 						echo ' •';
 					}
 					if($unswer && !$ch) {
-						echo ' <a href="sendfile.php?c='.$id.'&reply_to='.$m['id'].'" class="u">'.MP::x($lng['reply']).'</a>';
+						echo ' <a href="msg.php?c='.$id.'&m='.$m['id'].($m['out']?'&o':'').'" class="u">'.MP::x($lng['msg_options']).'</a>';
 					}
 				} else {
 					echo '<div class="ma" id="msg_'.$id.'_'.$m['id'].'">';
@@ -520,6 +520,19 @@ class MP {
 			unlink(sessionspath.$user.'.madeline');
 		} catch (Exception $e) {
 		}
+	}
+	
+	public static function initLocale() {
+		$lang = MP::getSetting('lang');
+		if($lang === null) {
+			$lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? (strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en') : 'ru';
+			MP::cookie('lang', $lang, time() + (86400 * 365));
+		} else if(strlen($lang) !== 2 || !file_exists('locale_'.$lang.'.php')) {
+			$lang = 'en';
+			MP::cookie('lang', $lang, time() + (86400 * 365));
+		}
+		include 'locale_'.$lang.'.php';
+		return $lng;
 	}
 
 	public static function init() {

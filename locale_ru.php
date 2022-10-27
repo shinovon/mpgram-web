@@ -1,6 +1,7 @@
 <?php
 class Locale {
 	public static $lng = array(
+	'lang' => 'ru',
 	'refresh' => 'Обновить',
 	'back' => 'Назад',
 	'logout' => 'Выход',
@@ -52,6 +53,11 @@ class Locale {
 	'message_to' => 'Сообщение:',
 	'folders' => 'Папки',
 	'all_chats' => 'Все чаты',
+	'delete' => 'Удалить',
+	'forward' => 'Переслать',
+	'forward_here' => 'Переслать здесь',
+	'actions' => 'Действия',
+	'msg_options' => 'Ответ',
 	);
 }
 $lng = Locale::$lng;

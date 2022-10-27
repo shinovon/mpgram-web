@@ -10,15 +10,8 @@ if(!$user) {
 	die();
 }
 
-$lang = MP::getSetting('lang', 'ru');
 $theme = MP::getSettingInt('theme');
-
-try {
-	include 'locale_'.$lang.'.php';
-} catch (Exception $e) {
-	$lang = 'ru';
-	include 'locale_'.$lang.'.php';
-}
+$lng = MP::initLocale();
 
 $id = null;
 if(isset($_POST['c'])) {

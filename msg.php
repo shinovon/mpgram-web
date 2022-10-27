@@ -10,15 +10,8 @@ if(!$user) {
 	die();
 }
 
-$lang = MP::getSetting('lang', 'ru');
 $theme = MP::getSettingInt('theme');
-
-try {
-	include 'locale_'.$lang.'.php';
-} catch (Exception $e) {
-	$lang = 'ru';
-	include 'locale_'.$lang.'.php';
-}
+$lng = MP::initLocale();
 
 $id = null;
 if(isset($_POST['c'])) {
@@ -28,12 +21,13 @@ if(isset($_POST['c'])) {
 } else {
 	die();
 }
-$reply_to = null;
-if(isset($_POST['reply_to'])) {
-	$reply_to = $_POST['reply_to'];
-} else if(isset($_GET['reply_to'])) {
-	$reply_to = $_GET['reply_to'];
+$msg = null;
+if(isset($_POST['m'])) {
+	$msg = $_POST['m'];
+} else if(isset($_GET['m'])) {
+	$msg = $_GET['m'];
 }
+$out = isset($_POST['o']) || isset($_GET['o']);
 
 header("Content-Type: text/html; charset=utf-8");
 header("Cache-Control: private, no-cache, no-store");
@@ -47,10 +41,28 @@ include 'themes.php';
 Themes::setTheme($theme);
 $reason = false;
 try {
-	if(isset($_POST['sent'])) {
-		$msg = '';
-		if(isset($_POST['msg'])) {
-			$msg = $_POST['msg'];
+	if(isset($_GET['act'])) {
+		$act = $_GET['act'];
+		$MP = MP::getMadelineAPI($user);
+		switch($act) {
+		case 'delete':
+			if(is_numeric($id) && (int)$id > 0) {
+				$MP->messages->deleteMessages(['id' => [(int)$msg]]);
+			} else {
+				$MP->channels->deleteMessages(['channel' => $id, 'id' => [(int)$msg]]);
+			}
+			header('Location: chat.php?c='.$id);
+			break;
+		case 'fwdh':
+			$MP->messages->forwardMessages(['from_peer' => $id, 'to_peer' => $id, 'id' => [(int)$msg]]);
+			header('Location: chat.php?c='.$id);
+			break;
+		}
+		die();
+	} else if(isset($_POST['sent'])) {
+		$text = '';
+		if(isset($_POST['text'])) {
+			$text = $_POST['text'];
 		}
 		$file = false;
 		$filename = null;
@@ -105,11 +117,11 @@ try {
 		if(!$reason) {
 			try {
 				if(!$file) {
-					if(strlen($msg) > 0) {
+					if(strlen($text) > 0) {
 						$MP = MP::getMadelineAPI($user);
-						$params = ['peer' => $id, 'message' => $msg];
-						if($reply_to) {
-							$params['reply_to_msg_id'] = $reply_to;
+						$params = ['peer' => $id, 'message' => $text];
+						if($msg) {
+							$params['reply_to_msg_id'] = $msg;
 						}
 						$MP->messages->sendMessage($params);
 						header('Location: chat.php?c='.$id);
@@ -117,9 +129,9 @@ try {
 					}
 				} else {
 					$MP = MP::getMadelineAPI($user);
-					$params = ['peer' => $id, 'message' => $msg];
-					if($reply_to) {
-						$params['reply_to_msg_id'] = $reply_to;
+					$params = ['peer' => $id, 'message' => $text];
+					if($msg) {
+						$params['reply_to_msg_id'] = $msg;
 					}
 					$attributes = [];
 					if($attr) {
@@ -142,7 +154,7 @@ try {
 }
 $title = null;
 try {
-	$title = MP::x($reply_to ? $lng['reply_to'] : $lng['message_to']);
+	$title = MP::x($msg ? $lng['reply_to'] : $lng['message_to']);
 	$title .= ' '.MP::dehtml(MP::getNameFromId(MP::getMadelineAPI($user), $id));
 } catch(Exception $e) {
 }
@@ -151,28 +163,34 @@ echo Themes::head();
 echo '</head>';
 echo Themes::bodyStart();
 echo '<div><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div>';
-if($title) {
+if($msg) {
+	echo '<p>';
+	echo '<b>'.MP::x($lng['actions']).'</b>:<br>';
+	if($out) echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=delete">'.MP::x($lng['delete']).'</a> ';
+	//echo '<a href="chatchoice.php?c='.$id.'&m='.$msg.'&act=fwd">'.MP::x($lng['forward']).'</a> ';
+	echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=fwdh">'.MP::x($lng['forward_here']).'</a>';
+	echo '</p>';
+	echo '<b>'.MP::x($lng['reply']).'</b>:';
+} else if($title) {
 	echo '<h3>'.$title.'</h3><br>';
-} else {
-	echo '<br>';
 }
 if($reason) {
 	echo '<b>'.$reason.'</b>';
 }
-echo '<form action="sendfile.php" method="post" enctype="multipart/form-data" style="display: inline;">';
+echo '<form action="msg.php" method="post" enctype="multipart/form-data" style="display: inline;">';
 echo '<input type="hidden" name="c" value="'.$id.'">';
 echo '<input type="hidden" name="sent" value="1">';
-if($reply_to) {
-	echo '<input type="hidden" name="reply_to" value="'.$reply_to.'">';
+if($msg) {
+	echo '<input type="hidden" name="m" value="'.$msg.'">';
 }
-echo '<textarea name="msg" value="" style="width: 100%; height: 3em"></textarea><br>';
+echo '<textarea name="text" value="" style="width: 100%; height: 3em"></textarea><br>';
 echo '<br><input type="file" id="file" name="file"><br>';
 echo '<input type="submit" value="'.MP::x($lng['send']).'">';
 echo '</form>';
 echo '<form action="sendsticker.php" style="display: inline;">';
 echo '<input type="hidden" name="c" value="'.$id.'">';
-if($reply_to) {
-	echo '<input type="hidden" name="reply_to" value="'.$reply_to.'">';
+if($msg) {
+	echo '<input type="hidden" name="m" value="'.$msg.'">';
 }
 echo '<input type="submit" value="'.MP::x($lng['choose_sticker']).'">';
 echo '</form>';

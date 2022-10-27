@@ -10,7 +10,6 @@ include 'mp.php';
 
 $iev = MP::getIEVersion();
 $timeoff = MP::getSettingInt('timeoff');
-$lang = MP::getSetting('lang', 'ru');
 $theme = MP::getSettingInt('theme');
 $autoupd = MP::getSettingInt('autoupd', ($iev == 0 || $iev > 4) ? 1 : 0);
 $updint = MP::getSettingInt('updint', 10);
@@ -18,12 +17,7 @@ $dynupd = MP::getSettingInt('dynupd', 1);
 $reverse = MP::getSettingInt('reverse', 0) == 1;
 $autoscroll = MP::getSettingInt('autoscroll', 1) == 1;
 
-try {
-	include 'locale_'.$lang.'.php';
-} catch (Exception $e) {
-	$lang = 'ru';
-	include 'locale_'.$lang.'.php';
-}
+$lng = MP::initLocale();
 
 $msglimit = MP::getSettingInt('limit', 20);
 $msgoffset = 0;
@@ -128,7 +122,7 @@ try {
 			echo '<textarea name="msg" value="" style="width: 100%; height: 3em"></textarea><br>';
 			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
 			echo '</form>';
-			echo '<form action="sendfile.php" class="in'.($chr ? 'r' : '').'">';
+			echo '<form action="msg.php" class="in'.($chr ? 'r' : '').'">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
 			echo '</form>';
@@ -170,7 +164,7 @@ function rr(){if(typeof XMLHttpRequest===\'undefined\'){XMLHttpRequest=function(
 function ee(e){if(e.message !== undefined && e.message !== null){alert(e.message);}else{alert(e.toString());}}
 var r = null;
 function h(){if(r.readyState == 4){try{var e=r.responseText;if(e!=null&&e.length>1){var f=e.indexOf("||");if(f!=-1){b=e.substring(0,f);e=e.substring(f+2);if(e.length>1){var msgs=document.getElementById("msgs");var d=document.createElement("div");d.innerHTML=e;for(var i=d.childNodes.length-1;i>=0;i--){'.($reverse ? 'msgs.appendChild(d.childNodes[i])':'msgs.insertBefore(d.childNodes[i],msgs.firstChild)').';}while(msgs.childNodes.length>'.$msglimit.'){msgs.removeChild(msgs.'.($reverse ? 'first' : 'last').'Child);}}}'.($autoscroll && $reverse ? 'setTimeout("autoScroll()",500);' : '').'}}catch(e){ee(e);}}}
-var b="'.$ii.'";var c=0;function a(){c++;if(c>70)return;try{r=rr();r.onreadystatechange=h;setTimeout("a();",'.$updint.'000);;r.open("GET","'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&i="+b+"&lang='.$lang.'&timeoff='.$timeoff.'");r.send(null);}catch(e){ee(e);}}try{setTimeout("a()",'.$updint.'000);}catch(e){ee(e);}
+var b="'.$ii.'";var c=0;function a(){c++;if(c>70)return;try{r=rr();r.onreadystatechange=h;setTimeout("a();",'.$updint.'000);;r.open("GET","'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&i="+b+"&lang='.$lng['lang'].'&timeoff='.$timeoff.'");r.send(null);}catch(e){ee(e);}}try{setTimeout("a()",'.$updint.'000);}catch(e){ee(e);}
 //--></script>';
 		} else {
 			echo '<script type="text/javascript"><!--
@@ -209,6 +203,7 @@ function autoScroll(){try{document.getElementById("text").scrollIntoView();}catc
 		}
 		$rm = array_reverse($rm);
 	}
+	if(!$reverse) echo '<p></p>';
 	echo '<div id="msgs">';
 	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $un, $timeoff, isset($info['channel_id']), true);
 	echo '</div>';

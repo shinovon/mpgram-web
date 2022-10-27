@@ -17,19 +17,11 @@ $theme = 0;
 $ua = '';
 $iev = MP::getIEVersion();
 if($iev > 0 && $iev < 4) $theme = 1;
-$lang = MP::getSetting('lang', isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? (strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en') : 'ru', true);
 $theme = MP::getSettingInt('theme', $theme);
 $post = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false;
-// Save values
-MP::cookie('lang', $lang, time() + (86400 * 365));
-MP::cookie('theme', $theme, time() + (86400 * 365));
 
-try {
-	include 'locale_'.$lang.'.php';
-} catch (Exception $e) {
-	$lang = 'ru';
-	include 'locale_'.$lang.'.php';
-}
+$lng = MP::initLocale();
+MP::cookie('theme', $theme, time() + (86400 * 365));
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);

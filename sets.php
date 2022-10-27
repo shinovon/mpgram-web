@@ -84,12 +84,7 @@ if($set) {
 	}
 }
 
-try {
-	include 'locale_'.$lang.'.php';
-} catch (Exception $e) {
-	$lang = 'ru';
-	include 'locale_'.$lang.'.php';
-}
+$lng = MP::initLocale();
 
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: private, no-cache, no-store');

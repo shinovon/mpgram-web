@@ -1,6 +1,7 @@
 <?php
 class Locale {
 	public static $lng = array(
+	'lang' => 'en',
 	'refresh' => 'Refresh',
 	'back' => 'Back',
 	'logout' => 'Logout',
@@ -52,6 +53,11 @@ class Locale {
 	'message_to' => 'Message to',
 	'folders' => 'Folders',
 	'all_chats' => 'All chats',
+	'delete' => 'Delete',
+	'forward' => 'Forward',
+	'forward_here' => 'Forward here',
+	'actions' => 'Actions',
+	'msg_options' => 'Reply',
 	);
 }
 $lng = Locale::$lng;

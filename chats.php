@@ -9,14 +9,8 @@ ini_set('display_startup_errors', 1);
 include 'mp.php';
 
 $timeoff = MP::getSettingInt('timeoff');
-$lang = MP::getSetting('lang', 'ru');
 $theme = MP::getSettingInt('theme');
-try {
-	include 'locale_'.$lang.'.php';
-} catch (Exception $e) {
-	$lang = 'ru';
-	include 'locale_'.$lang.'.php';
-}
+$lng = MP::initLocale();
 
 $user = MP::getUser();
 if(!$user) {
@@ -28,8 +22,6 @@ $count = MP::getSettingInt('chats', 15);
 if(isset($_GET['count'])) {
 	$count = (int) $_GET['count'];
 }
-
-$archived = isset($_GET['archive']);
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
@@ -96,10 +88,14 @@ try {
 	$selfid = MP::getSelfId($MP);
 	$selfname = MP::dehtml(MP::getSelfName($MP));
 	$hasArchiveChats = false;
+	$fid = 0;
+	if(isset($_GET['f'])) {
+		$fid = (int)$_GET['f'];
+	}
 	echo '<header>';
 	echo '<b>'.MP::x($selfname).'</b><div>';
 	echo '<a href="login.php?logout=1">'.MP::x($lng['logout']).'</a>';
-	echo ' <a href="chats.php?upd">'.MP::x($lng['refresh']).'</a>';
+	echo ' <a href="chats.php?upd&f="'.$fid.'>'.MP::x($lng['refresh']).'</a>';
 	echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
 	echo '</div>';
 	$folders = $MP->messages->getDialogFilters();
@@ -108,10 +104,6 @@ try {
 		'exclude_pinned' => true,
 		'folder_id' => 1
 		])['dialogs']) > 0;
-	$fid = 0;
-	if(isset($_GET['f'])) {
-		$fid = (int)$_GET['f'];
-	}
 	if(count($folders) > 1 || $hasArchiveChats) {
 		echo '<div>';
 		echo '<b>'.MP::x($lng['folders']).'</b>: ';
@@ -127,9 +119,9 @@ try {
 			}
 		}
 		if($hasArchiveChats) {
-			$sel = $archived || $fid == 1;
+			$sel = $fid == 1;
 			if($sel) echo '<u>';
-			echo '<a href="chats.php?archive">'.MP::x($lng['archived_chats']).'</a>';
+			echo '<a href="chats.php?f=1">'.MP::x($lng['archived_chats']).'</a>';
 			if($sel) echo '</u>';
 		}
 		echo '</div>';
@@ -138,7 +130,7 @@ try {
 	try {
 		$r = null;
 		$dialogs = null;
-		if($archived || $fid == 1) {
+		if($fid == 1) {
 			$r = $MP->messages->getDialogs([
 			'offset_date' => 0,
 			'offset_id' => 0,
@@ -312,7 +304,7 @@ try {
 		$c = 0;
 		$msglimit = MP::getSettingInt('limit', 20);
 		foreach($dialogs as $d){
-			if(!$archived && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
+			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
 			$id = MP::getId($MP, $d['peer']);
 			$info = $MP->getInfo($d['peer']);
 			try {

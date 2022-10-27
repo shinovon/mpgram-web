@@ -11,17 +11,11 @@ $user = MP::getUser();
 if(!$user) die();
 $id = $_GET['id'];
 $timeoff = MP::getSettingInt('timeoff');
-$lang = MP::getSetting('lang', 'ru');
+$lng = MP::initLocale();
 
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: private, no-cache, no-store');
 
-try {
-	include 'locale_'.$lang.'.php';
-} catch (Exception $e) {
-	$lang = 'ru';
-	include 'locale_'.$lang.'.php';
-}
 
 try {
 	$MP = MP::getMadelineAPI($user);
