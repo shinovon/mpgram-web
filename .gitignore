@@ -8,3 +8,5 @@ madeline.php
 vendor
 composer.lock
 lastclean
+api_values.php
+config.php
