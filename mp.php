@@ -156,7 +156,7 @@ class MP {
 					$uid = MP::getId($MP, $m['from_id']);
 					$mname1 = MP::getNameFromId($MP, $uid);
 				}
-				if(mb_strlen($mname1, 'UTF-8') > 30)
+				if($mname1 != null && mb_strlen($mname1, 'UTF-8') > 30)
 					$mname1 = mb_substr($mname1, 0, 30, 'UTF-8');
 				$mname = null;
 				$l = false;
