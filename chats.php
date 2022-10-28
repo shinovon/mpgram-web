@@ -151,10 +151,7 @@ try {
 					}
 				}
 				unset($folders);
-				//echo '<xmp>';
-				//var_dump($folder);
-				//echo '</xmp>';
-				$r = $MP->messages->getDialogs(['limit' => 500]);
+				$r = $MP->messages->getDialogs(['limit' => 300]);
 				$dialogs = array();
 				$all = $r['dialogs'];
 				if($f['contacts'] || $f['non_contacts']) {
