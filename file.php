@@ -21,6 +21,8 @@ class StringStream implements \Amp\ByteStream\OutputStream {
 }
 
 function resize($image, $w, $h) {
+	$w = (int) $w;
+	$h = (int) $h;
     $oldw = imagesx($image);
     $oldh = imagesy($image);
     $temp = imagecreatetruecolor($w, $h);

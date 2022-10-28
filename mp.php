@@ -18,6 +18,7 @@ class MP {
 	static $useragent;
 
 	static function dehtml($s) {
+		if($s === null) return null;
 		return static::x(str_replace('<', '&lt;',
 		str_replace('>', '&gt;',
 		str_replace('&', '&amp;', $s))));
@@ -168,7 +169,11 @@ class MP {
 					$mname = $name;
 				} else {
 					$l = true;
-					$mname = $mname1;
+					if($mname1 === null) {
+						$mname = $name;
+					} else {
+						$mname = $mname1;
+					}
 				}
 				$fwid = null;
 				$fwname = null;
