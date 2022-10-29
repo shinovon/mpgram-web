@@ -13,7 +13,7 @@ $c = getCaptchaText(rand(6, 10));
 $_SESSION["captcha"] = $c; 
 $img = imagecreatetruecolor(150, 50); 
 imagefill($img, 0, 0, -1);
-imagestring($img, rand(4, 10), rand(0, 50),rand(0, 25), $c, rand(0, 0xAAAAAA));
+imagestring($img, rand(4, 10), rand(0, 50),rand(0, 25), $c, 0x000000);
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header('Content-type: image/jpeg');
 imagejpeg($img);
