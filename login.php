@@ -173,22 +173,37 @@ if($user != null
 		} else if(isset($_POST['pass']) || isset($_GET['pass'])) {
 			$MP = MP::getMadelineAPI($user);
 			try {
-				$p = null;
+				$password = null;
 				if(isset($_POST['pass'])) {
 					$p = $_POST['pass'];
 				} else if(isset($_GET['pass'])) {
 					$p = $_GET['pass'];
 				}
-				$a = $MP->complete2falogin($p);
+				$MP->complete2faLogin($password);
 				MP::cookie('code', '1', time() + (86400 * 365));
 				header('Location: chats.php');
 				die();
 			} catch (Exception $e) {
-				echo '<xmp>';
-				echo $e;
-				echo '</xmp>';
+				if(strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
+					htmlStart();
+					echo 'Pass-code:<br>';
+					echo '<form action="login.php"'.($post?' method="post"':'').'>';
+					echo '<input type="text" name="pass">';
+					if($phone !== null)
+						echo '<input type="hidden" name="phone" value="'.$phone.'">';
+					echo '<input type="submit">';
+					echo '</form>';
+					echo '<b>Wrong!</b><br>';
+					echo Themes::bodyEnd();
+					die();
+				} else if(strpos($e->getMessage(), 'AUTH_RESTART') !== false/* || strpos($e->getMessage(), 'I\'m not waiting') !== false*/) {
+				} else {
+					echo '<xmp>';
+					echo $e;
+					echo '</xmp>';
+					die();
+				}
 			}
-			die();
 		} else if(isset($_POST['code']) || isset($_GET['code'])) {
 			$code = null;
 			if(isset($_POST['code'])) {
@@ -199,12 +214,11 @@ if($user != null
 			if(!empty($code) && is_numeric($code)) {
 				try {
 					$MP = MP::getMadelineAPI($user);
-					$a = $MP->complete_phone_login((int)$code);
+					$a = $MP->complete_phone_login($code);
 					$hash = null;
 					if(isset($a['phone_code_hash'])) {
 						$hash = $a['phone_code_hash'];
 					}
-					//TODO: ошибки
 					if(isset($a['_']) && $a['_'] === 'account.noPassword') {
 						htmlStart();
 						echo '<b>No pass-code set!</b>';
@@ -223,17 +237,7 @@ if($user != null
 						die();
 					} else if(isset($a['_']) && $a['_'] === 'account.needSignup') {
 						htmlStart();
-						/*
-						echo 'REGISTER:<br>';
-						echo '<form action="reg.php" method="post">';
-						echo '<b>First name</b><br>';
-						echo '<input type="text" name="first_name">';
-						echo '<b>Last name</b><br>';
-						echo '<input type="text" name="last_name">';
-						echo '<input type="submit">';
-						echo '</form>';
-						*/
-						echo 'account.needSignup';
+						echo 'That phone number is not occupied, register first!';
 						echo Themes::bodyEnd();
 						die();
 					} else {
@@ -273,7 +277,7 @@ if($user != null
 		}
 	} else {
 		try {
-			$MP->phone_login($phone);
+			$MP->phoneLogin($phone);
 		} catch (Exception $e) {
 			if(strpos($e->getMessage(), 'PHONE_NUMBER_INVALID') !== false) {
 				header('Location: login.php?wrong=number');
