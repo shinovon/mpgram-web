@@ -175,9 +175,9 @@ if($user != null
 			try {
 				$password = null;
 				if(isset($_POST['pass'])) {
-					$p = $_POST['pass'];
+					$password = $_POST['pass'];
 				} else if(isset($_GET['pass'])) {
-					$p = $_GET['pass'];
+					$password = $_GET['pass'];
 				}
 				$MP->complete2faLogin($password);
 				MP::cookie('code', '1', time() + (86400 * 365));
