@@ -480,6 +480,7 @@ class MP {
 	static function getIEVersion() {
 		if(!static::$iev)
 		try {
+			$ua = null;
 			if(isset($_SERVER['HTTP_USER_AGENT']))
 				$ua = $_SERVER['HTTP_USER_AGENT'];
 			static::$useragent = $ua;
