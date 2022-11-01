@@ -91,24 +91,9 @@ try {
 								$file = $newfile;
 							}
 							break;
-						case 'mp3':
-						case 'amr':
-						case '3gp':
-						case 'mp4':
-						case 'gif':
-						case 'zip':
-						case 'jar':
-						case 'jad':
-						case 'sis':
-						case 'sisx':
-						case 'apk':
-						case 'deb':
-						case 'htm':
+						default:
 							$type = 'inputMediaUploadedDocument';
 							$attr = true;
-							break;
-						default:
-							$reason = 'This type of file ('.$ext.') is not supported!';
 							break;
 					}
 				}
