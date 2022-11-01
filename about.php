@@ -6,16 +6,9 @@ header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: private, no-cache, no-store');
 include 'mp.php';
 $theme = MP::getSettingInt('theme', 0);
-$lang = MP::getSetting('lang');
 include 'themes.php';
 Themes::setTheme($theme);
-try {
-	include 'locale_'.$lang.'.php';
-} catch (Exception $e) {
-	$lang = 'ru';
-	include 'locale_'.$lang.'.php';
-}
-
+$lng = MP::initLocale();
 echo MP::x('<head><title>'.$lng['about'].'</title>');
 echo Themes::head();
 echo '</head>';
