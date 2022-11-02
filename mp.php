@@ -401,23 +401,72 @@ class MP {
 		$app->setApiHash(api_hash);
 		try {
 			if(ini_get('browscap') && isset($_SERVER['HTTP_USER_AGENT'])) {
-				$b = get_browser($_SERVER['HTTP_USER_AGENT'], true);
+				$ua = $_SERVER['HTTP_USER_AGENT'];
+				$b = get_browser($ua, true);
 				if($b && isset($b['parent'])) {
-					$br = $b['parent'];
+					$info = $br = $b['parent'];
 					if(isset($b['device_name'])) {
-						$br = $b['device_name'];
-						if(isset($b['device_brand_name'])) {
-							$br = $b['device_brand_name'].' '.$br;
+						$d = $b['device_name'];
+						if($d !== 'unknown' && strpos($b['device_name'], 'general') !== 0) {
+							if(isset($b['device_brand_name']) && $b['device_brand_name'] !== 'unknown') {
+								$dbn = $b['device_brand_name'];
+								if(!stripos($dbn, 'desktop')) {
+									$d = $dbn.' '.$d;
+								}
+							}
+							$info = $br . ' on ' . $d;
 						}
 					}
 					$pl = null;
-					if(isset($b['platform_description'])) {
+					if(strpos($ua, 'Opera Mini') !== false) {
+						if(strpos($ua, 'J2ME/MIDP') !== false) {
+							$pl = 'J2ME';
+						} else if(strpos($ua, 'BlackBerry') !== false) {
+							$pl = 'BlackBerry OS';
+						} else if(strpos($ua, 'Android') !== false) {
+							$pl = 'Android';
+						}
+					} else if(strpos($ua, 'Series60/') !== false) {
+						$s60 = substr($ua, strpos($ua, 'Series60/')+strlen('Series60/'), 3);
+						switch($s60) {
+						case '3.0':
+							$pl = 'Symbian 9.1';
+							break;
+						case '3.1':
+							$pl = 'Symbian 9.2';
+							break;
+						case '3.2':
+							$pl = 'Symbian 9.3';
+							break;
+						case '5.0':
+							$pl = 'Symbian 9.4';
+							break;
+						case '5.2':
+							$pl = 'Symbian^3';
+							break;
+						case '5.3':
+							$pl = 'Symbian Belle';
+							break;
+						case '5.4':
+							$pl = 'Symbian Belle FP1';
+							break;
+						case '5.5':
+							$pl = 'Symbian Belle FP2';
+							break;
+						default:
+							if(strpos($ua, 'Symbian/3') !== false) {
+								$pl = 'Symbian^3';
+							} else {
+								$pl = 'Symbian OS';
+							}
+						}
+					} else if(isset($b['platform_description'])) {
 						$pl = $b['platform_description'];
 					} else if(isset($b['platform'])) {
 						$pl = $b['platform'];
 					}
-					if($br) {
-						$app->setDeviceModel($br);
+					if($info) {
+						$app->setDeviceModel($info);
 					}
 					if($pl) {
 						$app->setSystemVersion($pl);
