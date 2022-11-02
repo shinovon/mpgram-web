@@ -58,6 +58,12 @@ class Locale {
 	'forward_here' => 'Forward here',
 	'actions' => 'Actions',
 	'msg_options' => 'Reply',
+	'wrong_captcha' => 'Incorrect captcha!',
+	'no_pass_code' => 'No pass-code set!',
+	'pass_code' => 'Pass-code',
+	'need_signup' => 'That phone number is not occupied, register first!',
+	'password_hash_invalid' => 'Password hash invalid!',
+	'wrong_number_format' => 'Wrong number format',
 	);
 }
 $lng = Locale::$lng;

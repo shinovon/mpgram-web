@@ -58,6 +58,12 @@ class Locale {
 	'forward_here' => 'Переслать здесь',
 	'actions' => 'Действия',
 	'msg_options' => 'Ответ',
+	'wrong_captcha' => 'Капча введена неверно!',
+	'no_pass_code' => 'Пароль не установлен!',
+	'pass_code' => 'Пароль',
+	'need_signup' => 'Этот номер не занят, сначала зарегистрируйте его!',
+	'password_hash_invalid' => 'Неправильный хеш пароля!',
+	'wrong_number_format' => 'Неправильный формат номера',
 	);
 }
 $lng = Locale::$lng;

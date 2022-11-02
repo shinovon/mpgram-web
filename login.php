@@ -153,7 +153,7 @@ if($user != null
 				echo '<input type="text" name="c">';
 				echo '<input type="submit">';
 				echo '</form>';
-				if($b) echo '<b>Wrong!</b>';
+				if($b) echo '<b>'.MP::x($lng['wrong_captcha']).'</b>';
 				echo Themes::bodyEnd();
 				die();
 			}
@@ -171,7 +171,7 @@ if($user != null
 			header('Location: chats.php');
 			die();
 		} else if(isset($_POST['pass']) || isset($_GET['pass'])) {
-			$MP = MP::getMadelineAPI($user);
+			$MP = MP::getMadelineAPI($user, true);
 			try {
 				$password = null;
 				if(isset($_POST['pass'])) {
@@ -186,14 +186,14 @@ if($user != null
 			} catch (Exception $e) {
 				if(strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
 					htmlStart();
-					echo 'Pass-code:<br>';
+					echo MP::x($lng['pass_code']).':<br>';
 					echo '<form action="login.php"'.($post?' method="post"':'').'>';
 					echo '<input type="text" name="pass">';
 					if($phone !== null)
 						echo '<input type="hidden" name="phone" value="'.$phone.'">';
 					echo '<input type="submit">';
 					echo '</form>';
-					echo '<b>Wrong!</b><br>';
+					echo '<b>'.MP::x($lng['password_hash_invalid']).'</b><br>';
 					echo Themes::bodyEnd();
 					die();
 				} else if(strpos($e->getMessage(), 'AUTH_RESTART') !== false/* || strpos($e->getMessage(), 'I\'m not waiting') !== false*/) {
@@ -213,7 +213,7 @@ if($user != null
 			}
 			if(!empty($code) && is_numeric($code)) {
 				try {
-					$MP = MP::getMadelineAPI($user);
+					$MP = MP::getMadelineAPI($user, true);
 					$a = $MP->complete_phone_login($code);
 					$hash = null;
 					if(isset($a['phone_code_hash'])) {
@@ -221,12 +221,12 @@ if($user != null
 					}
 					if(isset($a['_']) && $a['_'] === 'account.noPassword') {
 						htmlStart();
-						echo '<b>No pass-code set!</b>';
+						echo '<b>'.MP::x($lng['no_pass_code']).'</b>';
 						echo Themes::bodyEnd();
 						die();
 					} else if(isset($a['_']) && $a['_'] === 'account.password') {
 						htmlStart();
-						echo 'Pass-code:<br>';
+						echo MP::x($lng['pass_code']).':<br>';
 						echo '<form action="login.php"'.($post?' method="post"':'').'>';
 						echo '<input type="text" name="pass">';
 						if($phone !== null)
@@ -237,7 +237,7 @@ if($user != null
 						die();
 					} else if(isset($a['_']) && $a['_'] === 'account.needSignup') {
 						htmlStart();
-						echo 'That phone number is not occupied, register first!';
+						echo MP::x($lng['need_signup']);
 						echo Themes::bodyEnd();
 						die();
 					} else {
@@ -309,7 +309,7 @@ if($user != null
 	echo '<input type="submit">';
 	echo '</form>';
 	if($wrong) {
-		echo MP::x('<b>Wrong number format</b><br>');
+		echo MP::x('<b>'.MP::x($lng['wrong_number_format']).'</b><br>');
 	}
 	echo '<br><div>';
 	echo MP::x('<a href="about.php">'.$lng['about'].'</a> <a href="login.php?lang=en">English</a> <a href="login.php?lang=ru">Русский</a>');
