@@ -374,7 +374,8 @@ class MP {
 		$len = $entity['length'];
 		$entities = array();
 		foreach($allEntities as $e) {
-			if($e['offset'] >= $off && $e['offset']+$e['length'] < $off+$len) {
+			if($e == $entity) continue;
+			if($e['offset'] >= $off && $e['offset']+$e['length'] <= $off+$len) {
 				$ne = array();
 				foreach($e as $k => $v) {
 					$ne[$k] = $v;
@@ -384,7 +385,7 @@ class MP {
 			}
 		}
 		if(count($entities) > 0) {
-			return static::wrapRichNestedText($text, $entities);
+			return static::wrapRichText($text, $entities);
 		}
 		return static::dehtml($text);
 	}
