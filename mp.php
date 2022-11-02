@@ -394,10 +394,11 @@ class MP {
 		$len = count($entities);
 		$html = array();
 		$lastOffset = 0;
+		$html = '';
 		for ($i = 0; $i < $len; $i++) {
 			$entity = $entities[$i];
 			if($entity['offset'] > $lastOffset) {
-				array_push($html, static::dehtml(mb_substr($text, $lastOffset, $entity['offset'] - $lastOffset, 'UTF-8')));
+				$html .= static::dehtml(mb_substr($text, $lastOffset, $entity['offset'] - $lastOffset, 'UTF-8'));
 			} else if($entity['offset'] < $lastOffset) {
 				continue;
 			}
@@ -415,60 +416,55 @@ class MP {
 					$url = static::wrapUrl($entityText, false);
 					$inner = static::dehtml($entityText);
 				}
-				array_push($html, '<a href="');
-				array_push($html, static::dehtml($url));
-				array_push($html, '" target="_blank" rel="noopener noreferrer">');
-				array_push($html, $inner);
-				array_push($html, '</a>');
+				$html .= '<a href="';
+				$html .= static::dehtml($url);
+				$html .= '" target="_blank" rel="noopener noreferrer">';
+				$html .= $inner;
+				$html .= '</a>';
 				break;
 			case 'messageEntityBold':
-				array_push($html, '<b>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
-				array_push($html, '</b>');
+				$html .= '<b>';
+				$html .= static::wrapRichNestedText($entityText, $entity, $entities);
+				$html .= '</b>';
 				break;
 			case 'messageEntityItalic':
-				array_push($html, '<i>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
-				array_push($html, '</i>');
+				$html .= '<i>';
+				$html .= static::wrapRichNestedText($entityText, $entity, $entities);
+				$html .= '</i>';
 				break;
 			case 'messageEntityCode':
-				array_push($html, '<code>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
-				array_push($html, '</code>');
+				$html .= '<code>';
+				$html .= static::wrapRichNestedText($entityText, $entity, $entities);
+				$html .= '</code>';
 				break;
 			case 'messageEntityPre':
-				array_push($html, '<pre>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
-				array_push($html, '</pre>');
+				$html .= '<pre>';
+				$html .= static::wrapRichNestedText($entityText, $entity, $entities);
+				$html .= '</pre>';
 				break;
 			case 'messageEntityUnderline':
-				array_push($html, '<u>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
-				array_push($html, '</u>');
+				$html .= '<u>';
+				$html .= static::wrapRichNestedText($entityText, $entity, $entities);
+				$html .= '</u>';
 				break;
 			case 'messageEntityStrike':
-				array_push($html, '<s>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
-				array_push($html, '</s>');
+				$html .= '<s>';
+				$html .= static::wrapRichNestedText($entityText, $entity, $entities);
+				$html .= '</s>';
 				break;
 			case 'messageEntitySpoiler':
-				array_push($html, '<span>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
-				array_push($html, '</span>');
+				$html .= '<span>';
+				$html .= static::wrapRichNestedText($entityText, $entity, $entities);
+				$html .= '</span>';
 				break;
 			default:
 				$skipEntity = true;
 			}
 			$lastOffset = $entity['offset'] + ($skipEntity ? 0 : $entity['length']);
 		}
-		array_push($html, static::dehtml(mb_substr($text, $lastOffset, null, 'UTF-8')));
+		$html .= static::dehtml(mb_substr($text, $lastOffset, null, 'UTF-8'));
 		
-		$text = '';
-		$k = count($html);
-		for($j = 0; $j < $k; $j++) {
-			$text .= $html[$j];
-		}
-		return $text;
+		return $html;
 	}
 	
 	static function wrapUrl($url, $unsafe=false) {
