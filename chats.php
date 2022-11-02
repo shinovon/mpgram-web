@@ -31,20 +31,12 @@ set_error_handler('exceptions_error_handler');
 try {
 	if(PHP_OS_FAMILY === "Linux") {
 		// Automatically kill madeline sessions
-		$x = file_get_contents('./lastclean');
+		$x = false;
+		try {
+			$x = file_get_contents('./lastclean');
+		} catch (Exception $e) {
+		}
 		if(!$x || (time() - (int)$x) > 30 * 60) {
-			/*try {
-				$x = explode("\n", shell_exec('ps -ax | grep -v grep | grep \'MadelineProto worker\' | awk \'{print $1,";",$4}\''));
-				foreach($x as $p) {
-					$p = str_replace(' ', '', $p);
-					$a = explode(';', $p);
-					if(count($a) < 2) continue;
-					if((int) substr($a[1], strpos($a[1], ':') + 1) >= 30) {
-						exec('kill '.$a[0]);
-					}
-				}
-			} catch (Exception $e) {
-			}*/
 			exec("kill -9 `ps -ef | grep -v grep | grep 'MadelineProto worker' | awk '{print $2}'` > /dev/null &");
 			file_put_contents('./lastclean', time());
 		}
