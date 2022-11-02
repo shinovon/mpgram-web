@@ -369,8 +369,23 @@ class MP {
 		}
 	}
 	
-	static function wrapRichNestedText($text, $entity) {
-		// TODO
+	static function wrapRichNestedText($text, $entity, $allEntities) {
+		$off = $entity['offset'];
+		$len = $entity['length'];
+		$entities = array();
+		foreach($allEntities as $e) {
+			if($e['offset'] >= $off && $e['offset']+$e['length'] < $off+$len) {
+				$ne = array();
+				foreach($e as $k => $v) {
+					$ne[$k] = $v;
+				}
+				$ne['offset'] = $ne['offset'] - $off;
+				array_push($entities, $ne);
+			}
+		}
+		if(count($entities) > 0) {
+			return static::wrapRichNestedText($text, $entities);
+		}
 		return static::dehtml($text);
 	}
 	
@@ -388,43 +403,58 @@ class MP {
 			$skipEntity = false;
 			$entityText = mb_substr($text, $entity['offset'], $entity['length'], 'UTF-8');
 			switch($entity['_']) {
+			case 'messageEntityUrl':
+			case 'messageEntityTextUrl':
+				$inner = null;
+				if ($entity['_'] == 'messageEntityTextUrl') {
+					$url = $entity['url'];
+					$url = static::wrapUrl($url, true);
+					$inner = static::wrapRichNestedText($entityText, $entity, $entities);
+				} else {
+					$url = static::wrapUrl($entityText, false);
+					$inner = static::dehtml($entityText);
+				}
+				array_push($html, '<a href="');
+				array_push($html, static::dehtml($url));
+				array_push($html, '" target="_blank" rel="noopener noreferrer">');
+				array_push($html, $inner);
+				array_push($html, '</a>');
+				break;
 			case 'messageEntityBold':
 				array_push($html, '<b>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity));
+				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
 				array_push($html, '</b>');
 				break;
 			case 'messageEntityItalic':
 				array_push($html, '<i>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity));
+				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
 				array_push($html, '</i>');
 				break;
 			case 'messageEntityCode':
 				array_push($html, '<code>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity));
+				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
 				array_push($html, '</code>');
 				break;
 			case 'messageEntityPre':
 				array_push($html, '<pre>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity));
+				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
 				array_push($html, '</pre>');
 				break;
 			case 'messageEntityUnderline':
 				array_push($html, '<u>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity));
+				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
 				array_push($html, '</u>');
 				break;
 			case 'messageEntityStrike':
 				array_push($html, '<s>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity));
+				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
 				array_push($html, '</s>');
 				break;
-			/*
 			case 'messageEntitySpoiler':
 				array_push($html, '<span>');
-				array_push($html, static::wrapRichNestedText($entityText, $entity));
+				array_push($html, static::wrapRichNestedText($entityText, $entity, $entities));
 				array_push($html, '</span>');
 				break;
-			*/
 			default:
 				$skipEntity = true;
 			}
@@ -438,6 +468,35 @@ class MP {
 			$text .= $html[$j];
 		}
 		return $text;
+	}
+	
+	static function wrapUrl($url, $unsafe=false) {
+		if(strpos($url, 'http') !== 0) {
+			$url = 'http://'.$url;
+		}
+		if(!$unsafe) {
+			if(preg_match('/^https?:\/\/t(?:elegram)?\.me\/(.+)/', $url, $tgMeMatch)) {
+				$fullPath = $tgMeMatch[1];
+				$path = explode('/', $fullPath);
+				switch($path[0]) {
+				case 'joinchat':
+					$url = static::getURL().'/chat.php?c='.$path[1];
+					break;
+				case 'addstickers':
+					break;
+				default:
+					if(count($path) == 2 && strlen($path[1] > 0)) {
+						$url = static::getURL().'/chat.php?c='.$path[0].'&m='.$path[1];
+					} else if(count($path) == 1) {
+						if(strpos($path[0], 'iv?') !== 0) {
+							$url = static::getURL().'/chat.php?c='.$path[0];
+						}
+					}
+					break;
+				}
+			}
+		}
+		return $url;
 	}
 
 	static function getURL() {
