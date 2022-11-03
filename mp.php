@@ -718,6 +718,7 @@ class MP {
 			$lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? (strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en') : 'ru';
 		}
 		include 'locale.php';
+		Locale::init();
 		if(!Locale::load($lang)) {
 			Locale::load($lang = 'en');
 		}

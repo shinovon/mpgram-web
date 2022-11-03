@@ -67,6 +67,10 @@ class Locale {
 	'html_formatting' => '',
 	);
 	
+	public static function init() {
+		static::load();
+	}
+	
 	public static function load($lang = 'en') {
 		if(!$lang) {
 			return false;
