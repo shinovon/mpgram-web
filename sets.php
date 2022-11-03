@@ -96,8 +96,6 @@ echo Themes::head();
 echo '</head>';
 echo Themes::bodyStart();
 echo '<div><a href="login.php">'.MP::x($lng['back']).'</a></div>';
-//echo '<div><b>Язык</b>:<br>';
-//echo '<a href="sets.php?lang=en">English</a> <a href="sets.php?lang=ru">Русский</a></div>';
 echo '<form action="sets.php">';
 echo '<input type="hidden" name="set" value="1">';
 $langs = json_decode(file_get_contents('./locale/list.json'), true);
@@ -112,8 +110,6 @@ echo '<br><input type="checkbox" id="reverse" name="reverse"'.($reverse ? ' chec
 echo '<label for="reverse">'.MP::x($lng['set_chat_reverse_mode']).'</label>';
 echo '<br><input type="checkbox" id="autoscroll" name="autoscroll"'.($autoscroll ? ' checked' : '').'>';
 echo '<label for="autoscroll">'.MP::x($lng['set_chat_autoscroll']).'</label>';
-//echo '<p><input type="checkbox" id="dynupd" name="dynupd"'.($autoupd ? ' checked' : '').'>';
-//echo '<label for="autoupd">Авто-обновление чата</label><br>';
 echo '<p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
 echo '<input type="text" size="3" id="updint" name="updint" value="'.$updint.'"><br>';
 echo '<label for="limit">'.MP::x($lng['set_msgs_limit']).'</label>:<br>';
