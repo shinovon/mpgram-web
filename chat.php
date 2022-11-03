@@ -116,13 +116,20 @@ try {
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
 			echo '</form>';
 		} else if(!$ch || $canpost) {
-			$chr = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false;
-			echo '<form action="write.php"'.($chr ? ' method="post"' : '').' class="in">';
+			$post = false;
+			$opera = false;
+			if(isset($_SERVER['HTTP_USER_AGENT'])) {
+				$post = strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false;
+				$opera = strpos($_SERVER['HTTP_USER_AGENT'], 'Opera') !== false;
+			}
+			echo '<form action="write.php"'.($post ? ' method="post"' : '').' class="in">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<textarea name="msg" value="" style="width: 100%; height: 3em"></textarea><br>';
 			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
+			echo '<input type="checkbox" id="format" name="format">';
+			echo '<label for="format">'.MP::x($lng['html_formatting']).'</label>';
 			echo '</form>';
-			echo '<form action="msg.php" class="in'.($chr ? 'r' : '').'">';
+			echo '<form action="msg.php" class="in'.((!$opera) ? 'r' : '').'">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
 			echo '</form>';

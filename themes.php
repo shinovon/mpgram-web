@@ -111,6 +111,9 @@ class Themes {
 		.unr {
 			color: '.(static::$theme == 0 ? '#f77' : '#700').';
 		}
+		input[type="file"] {
+			'.(static::$theme == 0 ? 'color: #eee;' : 'color: #111;').';
+		}
 		--></style>';
 	}
 }

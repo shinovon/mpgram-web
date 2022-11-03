@@ -108,6 +108,9 @@ try {
 						if($msg) {
 							$params['reply_to_msg_id'] = $msg;
 						}
+						if(isset($_GET["format"]) || isset($_POST["format"])) {
+							$params['parse_mode'] = 'HTML';
+						}
 						$MP->messages->sendMessage($params);
 						header('Location: chat.php?c='.$id);
 						die();
@@ -123,6 +126,9 @@ try {
 						array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
 					}
 					$params['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes];
+					if(isset($_GET["format"]) || isset($_POST["format"])) {
+						$params['parse_mode'] = 'HTML';
+					}
 					$MP->messages->sendMedia($params);
 					header('Location: chat.php?c='.$id);
 					die();
@@ -169,6 +175,8 @@ if($msg) {
 	echo '<input type="hidden" name="m" value="'.$msg.'">';
 }
 echo '<textarea name="text" value="" style="width: 100%; height: 3em"></textarea><br>';
+echo '<input type="checkbox" id="format" name="format">';
+echo '<label for="format">'.MP::x($lng['html_formatting']).'</label>';
 echo '<br><input type="file" id="file" name="file"><br>';
 echo '<input type="submit" value="'.MP::x($lng['send']).'">';
 echo '</form>';
