@@ -100,10 +100,7 @@ echo '<div><a href="login.php">'.MP::x($lng['back']).'</a></div>';
 //echo '<a href="sets.php?lang=en">English</a> <a href="sets.php?lang=ru">Русский</a></div>';
 echo '<form action="sets.php">';
 echo '<input type="hidden" name="set" value="1">';
-$langs = array(
-'ru' => 'Русский',
-'en' => 'English',
-);
+$langs = json_decode(file_get_contents('./locale/list.json'), true);
 echo '<p><b>'.MP::x($lng['set_language']).'</b></p>';
 foreach($langs as $k=>$v) {
 	echo '<input type="radio" name="lang"'.($lang==$k ? ' checked' : '').' value="'.$k.'">'.MP::x($v).'<br>';
