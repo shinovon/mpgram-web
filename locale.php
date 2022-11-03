@@ -68,7 +68,7 @@ class Locale {
 	);
 	
 	public static function load($lang = 'en') {
-		if($x === null) {
+		if(!$lang) {
 			return false;
 		}
 		$x = './locale/' . $lang . '.json';
