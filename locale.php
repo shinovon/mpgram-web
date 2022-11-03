@@ -68,7 +68,11 @@ class Locale {
 	);
 	
 	public static function load($lang = 'en') {
-		$file = file_get_contents('./locale/' . $lang . '.json');
+		$x = './locale/' . $lang . '.json';
+		if(!file_exists($x)) {
+			return false;
+		}
+		$file = file_get_contents($x);
 		if(!$file) {
 			return false;
 		}
