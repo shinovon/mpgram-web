@@ -713,16 +713,18 @@ class MP {
 	}
 	
 	public static function initLocale() {
-		$lang = MP::getSetting('lang');
+		$xlang = $lang = MP::getSetting('lang');
 		if($lang === null) {
 			$lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? (strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en') : 'ru';
-			MP::cookie('lang', $lang, time() + (86400 * 365));
-		} else if(strlen($lang) !== 2 || !file_exists('locale_'.$lang.'.php')) {
-			$lang = 'en';
+		}
+		include 'locale.php';
+		if(!Locale::load($lang)) {
+			Locale::load($lang = 'en');
+		}
+		if($lang != $xlang) {
 			MP::cookie('lang', $lang, time() + (86400 * 365));
 		}
-		include 'locale_'.$lang.'.php';
-		return $lng;
+		return Locale::$lng;
 	}
 
 	public static function init() {
