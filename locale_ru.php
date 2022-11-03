@@ -64,7 +64,7 @@ class Locale {
 	'need_signup' => 'Этот номер не занят, сначала зарегистрируйте его!',
 	'password_hash_invalid' => 'Неправильный хеш пароля!',
 	'wrong_number_format' => 'Неправильный формат номера',
-	'html_formatting' => 'HTML-Форматирование',
+	'html_formatting' => 'HTML-форматирование',
 	);
 }
 $lng = Locale::$lng;

@@ -64,7 +64,7 @@ class Locale {
 	'need_signup' => 'That phone number is not occupied, register first!',
 	'password_hash_invalid' => 'Password hash invalid!',
 	'wrong_number_format' => 'Wrong number format',
-	'html_formatting' => 'HTML-Formatting',
+	'html_formatting' => 'HTML-formatting',
 	);
 }
 $lng = Locale::$lng;

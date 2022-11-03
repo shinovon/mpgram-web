@@ -335,7 +335,7 @@ try {
 						echo '<a href="'.$cl.'" class="ct">';
 						if($mfn !== null && ($id > 0 ? $mfid != $selfid : true))
 							echo $mfn.': ';
-						$txt = str_replace("\n", " ", MP::dehtml($msg['message']));
+						$txt = MP::dehtml(str_replace("\n", " ", $msg['message']));
 						if(mb_strlen($txt, 'UTF-8') > 70) $txt = mb_substr($txt, 0, 70, 'UTF-8').'..';
 						echo $txt;
 						echo '</a>';

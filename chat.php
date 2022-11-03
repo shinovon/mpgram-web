@@ -126,8 +126,8 @@ try {
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<textarea name="msg" value="" style="width: 100%; height: 3em"></textarea><br>';
 			echo '<input type="submit" value="'.MP::x($lng['send']).'">';
-			echo '<input type="checkbox" id="format" name="format">';
-			echo '<label for="format">'.MP::x($lng['html_formatting']).'</label>';
+			//echo '<input type="checkbox" id="format" name="format">';
+			//echo '<label for="format">'.MP::x($lng['html_formatting']).'</label>';
 			echo '</form>';
 			echo '<form action="msg.php" class="in'.((!$opera) ? 'r' : '').'">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
