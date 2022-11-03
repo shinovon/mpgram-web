@@ -67,7 +67,7 @@ class Locale {
 	'html_formatting' => '',
 	);
 	
-	public static load($lang = 'en') {
+	public static function load($lang = 'en') {
 		$file = file_get_contents('./locale/' . $lang . '.json');
 		if(!$file) {
 			return false;
