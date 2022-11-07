@@ -52,7 +52,10 @@ else if(isset($_SESSION['user']))
 	$user = $_SESSION['user'];
 // Check session existance
 $nouser = $user == null || empty($user) || strlen($user) != 32 || !file_exists(sessionspath.$user.'.madeline');
-if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
+function removeSession() {
+	global $user;
+	global $nouser;
+	global $logout;
 	$nouser = true;
 	$logout = true;
 	MP::delcookie('user');
@@ -71,6 +74,9 @@ if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
 	} catch (Exception $e) {
 		echo $e;
 	}
+}
+if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
+	removeSession();
 }
 function htmlStart() {
 	header("Content-Type: text/html; charset=utf-8");
@@ -99,15 +105,25 @@ try {
 }
 $MP = null;
 if($user != null
-	&& isset($_COOKIE['code'])
-	&& !empty($_COOKIE['code'])
 	&& !$logout
 	&& !$nouser
 	) {
-	// уже авторизован
-	header('Location: chats.php');
-	die();
-} else if($phone !== null) {
+	// Already logged in
+	if(isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {
+		header('Location: chats.php');
+		die();
+	} else {
+		$MP = MP::getMadelineAPI($user, true);
+		if($MP->getAuthorization() === 3) {
+			MP::cookie('code', '1', time() + (86400 * 365));
+			header('Location: chats.php');
+			die();
+		}
+		unset($MP);
+		removeSession();
+	}
+}
+if($phone !== null) {
 	$p = $phone;
 	if(empty($p) || strlen($p) < 10 || !is_numeric(str_replace('-','',str_replace('+','', $p)))) {
 		header('Location: login.php?wrong=number');
