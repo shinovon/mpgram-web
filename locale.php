@@ -70,7 +70,8 @@ class Locale {
 	"action_joinedbylink" => "",
 	"action_joinedbyrequest" => "",
 	"action_historyclear" => "",
-	"action_chatcreate" => ""
+	"action_chatcreate" => "",
+	"compactchats" => ""
 	);
 	
 	public static function init() {

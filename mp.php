@@ -19,9 +19,6 @@ class MP {
 
 	static function dehtml($s) {
 		if($s === null) return null;
-		while(strpos($s, ' ') === 0) {
-			$s = '&nbsp;'.substr($s, 1);
-		}
 		return static::x(str_replace("\n", '<br>', htmlspecialchars($s)));
 	}
 

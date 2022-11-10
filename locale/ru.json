@@ -68,5 +68,6 @@
 	"action_joinedbylink": "вступил(а) в группу по ссылке-приглашению",
 	"action_joinedbyrequest": "принят(а) в группу",
 	"action_historyclear": "История чата была очищена",
-	"action_chatcreate": "Группа создана"
+	"action_chatcreate": "Группа создана",
+	"compactchats": "Компактнее"
 }

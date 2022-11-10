@@ -21,6 +21,7 @@ class Themes {
 	
 	static function head() {
 		static::$iev = MP::getIEVersion();
+		$full = MP::getSetting('full', 0, true);
 		return (MP::$enc == null ? '<meta charset="UTF-8">' : '').
 		'<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style type="text/css"><!--
@@ -31,9 +32,9 @@ class Themes {
 			margin-right: auto;
 		}
 		' : ''). 'body {
-			'.(static::$iev > 0 ? 'text-align: center;' : 'max-width: 500px;
+			'.(static::$iev > 0 ? 'text-align: center;' : ($full ? '' : 'max-width: 500px;
 			margin-left: auto;
-			margin-right: auto;').'
+			margin-right: auto;')).'
 			font-family: system-ui;
 			'.(static::$theme == 0 ?
 			'background: #000;
@@ -87,6 +88,9 @@ class Themes {
 		}
 		.c0 {
 			background-color: '.(static::$theme == 0 ? '#222' : '#d7d7d7').';
+		}
+		.c1 {
+			background-color: '.(static::$theme == 0 ? '#111' : '#eee').';
 		}
 		'.(static::$theme == 0 ? '' : '.ml, .mf, .mn {
 			color: #168acd;

@@ -68,5 +68,6 @@
 	"action_joinedbylink": "joined the group via invite link",
 	"action_joinedbyrequest": "was accepted to the group",
 	"action_historyclear": "Chat history was cleared",
-	"action_chatcreate": "Group created"
+	"action_chatcreate": "Group created",
+	"compactchats": "Compact list"
 }

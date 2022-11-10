@@ -311,7 +311,7 @@ try {
 				if($fwdchat !== null) {
 					$cl = 'msg.php?act=fwd&c='.$fwdchat.'&m='.$fwdmsg.'&c2='.$id;
 				}
-				echo '<a href="'.$cl.'"><b>'.MP::dehtml($name).'</b></a>';
+				echo '<a href="'.$cl.'">'.MP::dehtml($name).'</a>';
 				echo '</div>';
 			} catch (Exception $e) {
 				echo "<xmp>$e</xmp>";
