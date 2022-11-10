@@ -57,6 +57,10 @@ try {
 			$MP->messages->forwardMessages(['from_peer' => $id, 'to_peer' => $id, 'id' => [(int)$msg]]);
 			header('Location: chat.php?c='.$id);
 			break;
+		case 'fwd':
+			$MP->messages->forwardMessages(['from_peer' => $id, 'to_peer' => $_GET['c2'], 'id' => [(int)$msg]]);
+			header('Location: chat.php?c='.$id);
+			break;
 		}
 		die();
 	} else if(isset($_POST['sent'])) {
@@ -158,7 +162,7 @@ if($msg) {
 	echo '<p>';
 	echo '<b>'.MP::x($lng['actions']).'</b>:<br>';
 	if($out) echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=delete">'.MP::x($lng['delete']).'</a> ';
-	//echo '<a href="chatchoice.php?c='.$id.'&m='.$msg.'&act=fwd">'.MP::x($lng['forward']).'</a> ';
+	echo '<a href="chatselect.php?c='.$id.'&m='.$msg.'">'.MP::x($lng['forward']).'</a> ';
 	echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=fwdh">'.MP::x($lng['forward_here']).'</a>';
 	echo '</p>';
 	echo '<b>'.MP::x($lng['reply']).'</b>:';
