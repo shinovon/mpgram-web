@@ -232,7 +232,6 @@ try {
 				}
 				if($f['exclude_archived']) {
 					foreach($dialogs as $idx => $d) {
-						$peer = $d['peer'];
 						if(isset($d['folder_id']) && $d['folder_id'] == 1) {
 							unset($dialogs[$idx]);
 						}
@@ -240,7 +239,6 @@ try {
 				}
 				if($f['exclude_read']) {
 					foreach($dialogs as $idx => $d) {
-						$peer = $d['peer'];
 						if(isset($d['unread_count']) && $d['unread_count'] == 0) {
 							unset($dialogs[$idx]);
 						}
