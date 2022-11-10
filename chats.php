@@ -149,10 +149,10 @@ try {
 				if($f['contacts'] || $f['non_contacts']) {
 					$contacts = $MP->contacts->getContacts()['contacts'];
 					foreach($all as $d) {
-						if($d['peer']['_'] !== 'peerUser') continue;
+						if($peer['_'] !== 'peerUser') continue;
 						$found = false;
 						foreach($contacts as $c) {
-							if(MP::getId($MP, $d['peer']) == MP::getId($MP, $c)) {
+							if(MP::getId($MP, $peer) == MP::getId($MP, $c)) {
 								$found = true;
 								if($f['contacts']) array_push($dialogs, $d);
 								break;
@@ -168,10 +168,11 @@ try {
 				}
 				if($f['groups']) {
 					foreach($all as $d) {
-						if($d['peer']['_'] === 'peerUser') continue;
-						if($d['peer']['_'] === 'peerChannel') {
+						$peer = $d['peer'];
+						if($peer['_'] === 'peerUser') continue;
+						if($peer['_'] === 'peerChannel') {
 							foreach($r['chats'] as $c) {
-								if($c['peer_id'] == $d['peer'] && !$c['broadcast'] && !in_array($d, $dialogs)) {
+								if($c['peer_id'] == $peer && !$c['broadcast'] && !in_array($d, $dialogs)) {
 									array_push($dialogs, $d);
 								}
 							}
@@ -184,9 +185,10 @@ try {
 				}
 				if($f['broadcasts']) {
 					foreach($all as $d) {
-						if($d['peer']['_'] !== 'peerChannel') continue;
+						$peer = $d['peer'];
+						if($peer['_'] !== 'peerChannel') continue;
 						foreach($r['chats'] as $c) {
-							if($c['peer_id'] == $d['peer'] && $c['broadcast'] && !in_array($d, $dialogs)) {
+							if($c['peer_id'] == $peer && $c['broadcast'] && !in_array($d, $dialogs)) {
 								array_push($dialogs, $d);
 							}
 						}
@@ -194,9 +196,10 @@ try {
 				}
 				if($f['bots']) {
 					foreach($all as $d) {
-						if($d['peer']['_'] !== 'peerUser') continue;
+						$peer = $d['peer'];
+						if($peer['_'] !== 'peerUser') continue;
 						foreach($r['users'] as $u) {
-							if($u['id'] == $d['peer']['user_id'] && $u['bot'] && !in_array($d, $dialogs)) {
+							if($u['id'] == $peer['user_id'] && $u['bot'] && !in_array($d, $dialogs)) {
 								array_push($dialogs, $d);
 							}
 						}
@@ -206,7 +209,8 @@ try {
 				if(count($f['include_peers']) > 0) {
 					foreach($f['include_peers'] as $p) {
 						foreach($all as $d) {
-							if(MP::getId($MP, $d['peer']) == MP::getId($MP, $p)) {
+							$peer = $d['peer'];
+							if(MP::getId($MP, $peer) == MP::getId($MP, $p)) {
 								if(!in_array($d, $dialogs)) {
 									array_push($dialogs, $d);
 								}
@@ -218,7 +222,8 @@ try {
 				if(count($f['exclude_peers']) > 0) {
 					foreach($f['exclude_peers'] as $p) {
 						foreach($dialogs as $idx => $d) {
-							if(MP::getId($MP, $d['peer']) == MP::getId($MP, $p)) {
+							$peer = $d['peer'];
+							if(MP::getId($MP, $peer) == MP::getId($MP, $p)) {
 								unset($dialogs[$idx]);
 								break;
 							}
@@ -227,6 +232,7 @@ try {
 				}
 				if($f['exclude_archived']) {
 					foreach($dialogs as $idx => $d) {
+						$peer = $d['peer'];
 						if(isset($d['folder_id']) && $d['folder_id'] == 1) {
 							unset($dialogs[$idx]);
 						}
@@ -234,6 +240,7 @@ try {
 				}
 				if($f['exclude_read']) {
 					foreach($dialogs as $idx => $d) {
+						$peer = $d['peer'];
 						if(isset($d['unread_count']) && $d['unread_count'] == 0) {
 							unset($dialogs[$idx]);
 						}
@@ -265,7 +272,8 @@ try {
 				if(count($f['pinned_peers']) > 0) {
 					foreach($f['pinned_peers'] as $p) {
 						foreach($all as $d) {
-							if(MP::getId($MP, $d['peer']) == MP::getId($MP, $p)) {
+							$peer = $d['peer'];
+							if(MP::getId($MP, $peer) == MP::getId($MP, $p)) {
 								if(in_array($d, $dialogs)) {
 									unset($dialogs[array_search($d, $dialogs)]);
 								}
@@ -295,7 +303,6 @@ try {
 		foreach($dialogs as $d){
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
 			$id = MP::getId($MP, $d['peer']);
-			$info = $MP->getInfo($d['peer']);
 			try {
 				echo '<div class="c'.($c%2==0 ? '1': '0').'">';
 				$cl = 'chat.php?c='.$id;
@@ -304,7 +311,28 @@ try {
 					$cl .= '&m='.$d['read_inbox_max_id'].'&offset='.(-$msglimit-1);
 				}
 				echo '<a href="'.$cl.'"><b>';
-				$n = MP::dehtml(MP::getNameFromInfo($info, true));
+				$peer = $d['peer'];
+				$n = null;
+				$lid = $id;
+				if((int) $lid < 0) {
+					if(isset($peer['chat_id'])) {
+						$lid = $peer['chat_id'];
+					} else if(isset($peer['channel_id'])) {
+						$lid = $peer['channel_id'];
+					}
+				}
+				foreach(($r[$peer['_'] == 'peerUser' ? 'users' : 'chats']) as $p) {
+					if($p['id'] == $lid) {
+						if(isset($p['title'])) {
+							$n = $p['title'];
+						} else if(isset($p['first_name'])) {
+							$n = trim($p['first_name']).(isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
+						} else {
+							$n = 'Deleted Account';
+						}
+						break;
+					}
+				}
 				echo $n.'</b>';
 				if($unr > 0) {
 					echo ' <b class="unr">+'.$unr.'</b>';
@@ -359,11 +387,14 @@ try {
 			}
 			$c += 1;
 		}
+		unset($dialogs);
+		unset($r);
 	} catch (Exception $e) {
 		echo '<b>'.MP::x($lng['error']).'!</b><br>';
 		echo "<xmp>$e</xmp>";
 	}
 	echo Themes::bodyEnd();
+	unset($MP);
 } catch (Exception $e) {
 	if(strpos($e->getMessage(), 'SESSION_REVOKED') !== false || strpos($e->getMessage(), 'session created on newer PHP') !== false) {
 		header('Location: login.php?revoked=1');
