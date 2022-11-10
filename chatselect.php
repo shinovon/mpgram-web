@@ -58,6 +58,14 @@ try {
 		$fid = (int)$_GET['f'];
 	}
 	echo '<div>';
+	$backurl = 'chats.php';
+	if($fwdchat !== null) {
+		$backurl = 'chat.php?c='.$fwdchat;
+		if($fwdmsg !== null) {
+			$backurl = 'msg.php?c='.$fwdchat.'&m='.$fwdmsg;
+		}
+	}
+	echo '<a href="'.$backurl.'">'.MP::x($lng['back']).'</a><br>';
 	$folders = $MP->messages->getDialogFilters();
 	$hasArchiveChats = count($MP->messages->getDialogs([
 		'limit' => 1, 
