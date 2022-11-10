@@ -19,10 +19,10 @@ class MP {
 
 	static function dehtml($s) {
 		if($s === null) return null;
-		return static::x(str_replace("\n", '<br>',
-		str_replace('<', '&lt;',
-		str_replace('>', '&gt;',
-		str_replace('&', '&amp;', $s)))));
+		while(strpos($s, ' ') === 0) {
+			$s = '&nbsp;'.substr($s, 1);
+		}
+		return static::x(str_replace("\n", '<br>', htmlspecialchars($s)));
 	}
 
 	static function getId($MP, $a) {
@@ -109,8 +109,16 @@ class MP {
 		try {
 			$at = substr(strtolower($a['_']), strlen('messageaction'));
 			switch($at) {
+				case 'chatcreate':
+					$txt = static::x($lng['action_channelcreate']);
+					break;
+				case 'chatedittitle':
+					$txt = static::x($lng['action_chatedittitle']).' '.MP::dehtml($a['title']);
+					break;
+				case 'chateditphoto':
+					$txt = static::x($lng['action_chateditphoto']);
+					break;
 				case 'chatadduser':
-				case 'chatjoinedbylink':
 					$u = null;
 					if(isset($a['users'])) {
 						$u = $a['users'][0];
@@ -126,19 +134,41 @@ class MP {
 						$txt .= ' '.static::x($lng['action_add']).' '.MP::dehtml(MP::getNameFromId($MP, $u));
 					}
 					break;
-				case 'pinmessage':
-					$txt = $fn.' '.static::x($lng['action_pin']);
+				case 'chatdeleteuser':
+					$txt = var_export($a, true);
+					$u = null;
+					if(isset($a['user_id'])) {
+						$u = $a['user_id'];
+					}
+					if($u == $mfid || $u === null) {
+						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a>';
+						$txt .= ' '.static::x($lng['action_leave']);
+					} else {
+						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a>';
+						$txt .= ' '.static::x($lng['action_deleteuser']).' ';
+						$txt .= '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml(MP::getNameFromId($MP, $u)).'</a>';
+					}
+					break;
+				case 'chatjoinedbylink':
+					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a> '.static::x($lng['action_joinedbylink']);
 					break;
 				case 'channelcreate':
 					$txt = static::x($lng['action_channelcreate']);
 					break;
-				case 'chateditphoto':
-					$txt = static::x($lng['action_chateditphoto']);
+				case 'pinmessage':
+					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a> '.static::x($lng['action_pin']);
 					break;
-				case 'chatedittitle':
-					$txt = static::x($lng['action_chatedittitle']).' '.MP::dehtml($a['title']);
+				case 'historyclear':
+					$txt = static::x($lng['action_historyclear']);
+					break;
+				case 'chatjoinedbyreqeuset':
+					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a> '.static::x($lng['action_joinedbyrequest']);
 					break;
 				default:
+					if(isset($lng['action_'.$at])) {
+						$txt = static::x($lng['action_'.$at]);
+						break;
+					}
 					$txt = $at;
 					break;
 			}
@@ -211,7 +241,6 @@ class MP {
 				} else {
 					echo '<div class="ma" id="msg_'.$id.'_'.$m['id'].'">';
 				}
-				echo '<br>';
 				if($fwname != null) {
 					echo '<div class="mf">'.static::x($lng['fwd_from']).' <b>'.MP::dehtml($fwname).'</b></div>';
 				}
@@ -248,7 +277,7 @@ class MP {
 									$replytext = mb_substr($replytext, 0, 50, 'UTF-8');
 								echo '<div class="rt">';
 								echo '<a href="chat.php?c='.$id.'&m='.$replyid.'">';
-								echo MP::dehtml($replytext);
+								echo MP::dehtml(str_replace("\n", " ", $replytext));
 								echo '</a>';
 								echo '</div>';
 							}
@@ -433,9 +462,9 @@ class MP {
 				$html .= '</i>';
 				break;
 			case 'messageEntityCode':
-				$html .= '<code>';
+				$html .= '<pre>';
 				$html .= static::wrapRichNestedText($entityText, $entity, $entities);
-				$html .= '</code>';
+				$html .= '</pre>';
 				break;
 			case 'messageEntityPre':
 				$html .= '<pre>';

@@ -62,5 +62,11 @@
 	"need_signup": "Этот номер не занят, сначала зарегистрируйте его!",
 	"password_hash_invalid": "Неправильный хеш пароля!",
 	"wrong_number_format": "Неправильный формат номера",
-	"html_formatting": "HTML-форматирование"
+	"html_formatting": "HTML-форматирование",
+	"action_leave": "прокинул(а) группу",
+	"action_deleteuser": "исключил(а)",
+	"action_joinedbylink": "вступил(а) в группу по ссылке-приглашению",
+	"action_joinedbyrequest": "принят(а) в группу",
+	"action_historyclear": "История чата была очищена",
+	"action_chatcreate": "Группа создана"
 }

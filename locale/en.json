@@ -62,5 +62,11 @@
 	"need_signup": "That phone number is not occupied, register first!",
 	"password_hash_invalid": "Password hash invalid!",
 	"wrong_number_format": "Wrong number format",
-	"html_formatting": "HTML-formatting"
+	"html_formatting": "HTML-formatting",
+	"action_leave": "left the group",
+	"action_deleteuser": "removed",
+	"action_joinedbylink": "joined the group via invite link",
+	"action_joinedbyrequest": "was accepted to the group",
+	"action_historyclear": "Chat history was cleared",
+	"action_chatcreate": "Group created"
 }
