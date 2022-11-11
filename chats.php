@@ -150,7 +150,8 @@ try {
 				if($f['contacts'] || $f['non_contacts']) {
 					$contacts = $MP->contacts->getContacts()['contacts'];
 					foreach($all as $d) {
-						if($peer['_'] !== 'peerUser') continue;
+						if($d['peer']['_'] !== 'peerUser') continue;
+						$peer = $d['peer'];
 						$found = false;
 						foreach($contacts as $c) {
 							if(MP::getId($MP, $peer) == MP::getId($MP, $c)) {
