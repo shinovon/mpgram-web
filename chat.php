@@ -66,20 +66,18 @@ $imgs = true;
 try {
 	$MP = MP::getMadelineAPI($user);
 	$info = $MP->getInfo($id);
-	$un = null;
 	$name = null;
 	$pm = false;
 	$ch = false;
 	$left = false;
-	$id = MP::getId($MP, $info);
+	if(!is_numeric($id)) {
+		$id = MP::getId($MP, $info);
+	}
 	$canpost = false;
 	if(isset($info['Chat'])) {
 		$ch = isset($info['type']) && $info['type'] == 'channel';
 		if(isset($info['Chat']['title'])) {
 			$name = $info['Chat']['title'];
-		}
-		if(isset($info['Chat']['username'])) {
-			$un = $info['Chat']['username'];
 		}
 		if(isset($info['Chat']['admin_rights']) && isset($info['Chat']['admin_rights']['post_messages'])) {
 			$canpost = $info['Chat']['admin_rights']['post_messages'];
@@ -90,10 +88,9 @@ try {
 		if(isset($info['User']['first_name'])) {
 			$name = $info['User']['first_name'];
 		}
-		if(isset($info['User']['username'])) {
-			$un = $info['User']['username'];
-		}
 	}
+	$channel = isset($info['channel_id']);
+	unset($info);
 	if($left && isset($_GET['join'])) {
 		$MP->channels->joinChannel(['channel' => $id]);
 		$left = false;
@@ -140,7 +137,6 @@ try {
 		}
 		echo '</div>';
 	}
-
 	$r = $MP->messages->getHistory([
 	'peer' => $id,
 	'offset_id' => $msgoffsetid,
@@ -150,6 +146,7 @@ try {
 	'max_id' => $msgmaxid,
 	'min_id' => 0,
 	'hash' => 0]);
+	MP::addUsers($r['users'], $r['chats']);
 	$id_offset = null;
 	if(isset($r['offset_id_offset'])) {
 		$id_offset = $r['offset_id_offset'];
@@ -212,7 +209,7 @@ function autoScroll(){try{document.getElementById("text").scrollIntoView();}catc
 	}
 	if(!$reverse) echo '<p></p>';
 	echo '<div id="msgs">';
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $un, $timeoff, isset($info['channel_id']), true);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true);
 	echo '</div>';
 	if(!$reverse) {
 		if(count($rm) >= $msglimit) {
@@ -239,7 +236,10 @@ function autoScroll(){try{document.getElementById("text").scrollIntoView();}catc
 		} catch (Exception $e) {
 		}
 	}
+	unset($rm);
+	unset($r);
 	echo Themes::bodyEnd();
+	MP::gc();
 } catch (Exception $e) {
 	echo '<b>'.MP::x($lng['error']).'!</b><br>';
 	echo '<xmp>'.$e->getMessage()."\n".$e->getTraceAsString().'</xmp>';

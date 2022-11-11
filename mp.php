@@ -16,6 +16,8 @@ class MP {
 	static $enc;
 	static $iev;
 	static $useragent;
+	static $users;
+	static $chats;
 
 	static function dehtml($s) {
 		if($s === null) return null;
@@ -39,6 +41,33 @@ class MP {
 	}
 
 	static function getNameFromId($MP, $id, $full = false) {
+		if((int)$id > 0) {
+			if(static::$users !== null) {
+				$info = null;
+				foreach(static::$users as $p) {
+					if($p['id'] == $id) {
+						$info = $p;
+						break;
+					}
+				}
+				if($info !== null) {
+					return static::getNameFromInfo($info, $full);
+				}
+			}
+		} else {
+			if(static::$chats !== null) {
+				foreach(static::$users as $p) {
+				$info = null;
+					if(('-'.$p['id']) == $id || ('-100'.$p['id']) == $id) {
+						$info = $p;
+						break;
+					}
+				}
+				if($info !== null) {
+					return static::getNameFromInfo($info, $full);
+				}
+			}
+		}
 		return static::getNameFromInfo($MP->getInfo($id), $full);
 	}
 
@@ -50,12 +79,20 @@ class MP {
 			try {
 				return trim($p['User']['first_name']).($full && isset($p['User']['last_name']) ? ' '.trim($p['User']['last_name']) : '');
 			} catch (Exception $e) {
-				return $e->getMessage();
+				return '';
 			}
 		} else if(isset($p['Chat'])) {
 			return $p['Chat']['title'];
+		} else if(isset($p['title'])) {
+			return $p['title'];
+		} else if(isset($p['first_name'])) {
+			try {
+				return trim($p['first_name']).($full && isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
+			} catch (Exception $e) {
+				return '';
+			}
 		} else {
-			return 'Не определен';
+			return 'Deleted Account';
 		}
 	}
 
@@ -175,7 +212,7 @@ class MP {
 		return $txt;
 	}
 	
-	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name= null, $un=null, $timeoff=0, $chid=false, $unswer=false) {
+	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name= null, $timeoff=0, $chid=false, $unswer=false) {
 		$lastdate = date('d.m.y', time()-$timeoff);
 		foreach($rm as $m) {
 			try {
@@ -756,6 +793,17 @@ class MP {
 
 	public static function init() {
 		static::$enc = static::getEncoding();
+	}
+	
+	public static function addUsers($users, $chats) {
+		static::$users = $users;
+		static::$chats = $chats;
+	}
+	
+	public static function gc() {
+		unset(Locale::$lng);
+		unset(static::$users);
+		unset(static::$chats);
 	}
 }
 MP::init();

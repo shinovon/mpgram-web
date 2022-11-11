@@ -284,6 +284,7 @@ try {
 					$dialogs = array_merge($pinned, $dialogs);
 				}
 				unset($all);
+				unset($r['dialogs']);
 			} else {
 				$r = $MP->messages->getDialogs([
 				'offset_date' => 0,
@@ -296,6 +297,7 @@ try {
 				$dialogs = $r['dialogs'];
 			}
 		}
+		MP::addUsers($r['users'], $r['chats']);
 		$msgs = $r['messages'];
 		$c = 0;
 		$msglimit = MP::getSettingInt('limit', 20);
@@ -349,7 +351,9 @@ try {
 					$mfn = null;
 					if(isset($msg['from_id'])) {
 						$mfid = MP::getId($MP, $msg['from_id']);
-						$mfn = MP::dehtml(MP::getNameFromId($MP, $msg['from_id']));
+						if($id < 0) {
+							$mfn = MP::dehtml(MP::getNameFromId($MP, $msg['from_id']));
+						}
 					}
 					$t = null;
 					if(date('d.m.Y', time()-$timeoff) !== date('d.m.Y', $msg['date']-$timeoff)) {
@@ -394,6 +398,7 @@ try {
 	}
 	echo Themes::bodyEnd();
 	unset($MP);
+	MP::gc();
 } catch (Exception $e) {
 	if(strpos($e->getMessage(), 'SESSION_REVOKED') !== false || strpos($e->getMessage(), 'session created on newer PHP') !== false) {
 		header('Location: login.php?revoked=1');

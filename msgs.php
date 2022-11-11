@@ -16,34 +16,8 @@ $lng = MP::initLocale();
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: private, no-cache, no-store');
 
-
 try {
 	$MP = MP::getMadelineAPI($user);
-	$info = $MP->getInfo($id);
-	$un = null;
-	$lid = null;
-	$name = null;
-	$pm = false;
-	$ch = false;
-	if(isset($info['Chat'])) {
-		$ch = isset($info['type']) && $info['type'] == 'channel';
-		if(isset($info['Chat']['title'])) {
-			$name = $info['Chat']['title'];
-		}
-		if(isset($info['Chat']['username'])) {
-			$un = $info['Chat']['username'];
-		}
-	} else if(isset($info['User']) && isset($info['User']['first_name'])) {
-		$name = $info['User']['first_name'];
-		$pm = true;
-		if(isset($info['User']['username'])) {
-			$un = $info['User']['username'];
-		}
-		if(isset($info['User']['id'])) {
-			$lid = $info['User']['id'];
-			$id = (int)$lid;
-		}
-	}
 	$r = $MP->messages->getHistory([
 	'peer' => $id,
 	'offset_id' => 0,
@@ -55,8 +29,23 @@ try {
 	'hash' => 0]);
 	$rm = $r['messages'];
 	if(count($rm) == 0 || !isset($rm[0])) die();
+	$info = $MP->getInfo($id);
+	$name = null;
+	$pm = false;
+	$ch = false;
+	if(isset($info['Chat'])) {
+		$ch = isset($info['type']) && $info['type'] == 'channel';
+		if(isset($info['Chat']['title'])) {
+			$name = $info['Chat']['title'];
+		}
+	} else if(isset($info['User']) && isset($info['User']['first_name'])) {
+		$name = $info['User']['first_name'];
+		$pm = true;
+	}
+	unset($info);
 	echo $rm[0]['id'].'||';
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $un, $timeoff, true, true);
+	MP::addUsers($r['users'], $r['chats']);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, true, true);
 	// Mark as read
 	try {
 		if($ch || (int)$id < 0) {
@@ -66,5 +55,8 @@ try {
 		}
 	} catch (Exception $e) {
 	}
+	unset($rm);
+	unset($r);
+	MP::gc();
 } catch (Exception $e) {
 }
