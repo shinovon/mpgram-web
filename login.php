@@ -119,8 +119,10 @@ if($user != null
 			header('Location: chats.php');
 			die();
 		}
-		unset($MP);
-		removeSession();
+		if($phone === null) {
+			unset($MP);
+			removeSession();
+		}
 	}
 }
 if($phone !== null) {
