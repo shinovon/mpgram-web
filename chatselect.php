@@ -300,6 +300,8 @@ try {
 						$name = $p['title'];
 					} else if(isset($p['first_name'])) {
 						$name = trim($p['first_name']).(isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
+					} else if(isset($p['last_name'])) {
+						$name = trim($p['last_name']);
 					} else {
 						$name = 'Deleted Account';
 					}

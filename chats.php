@@ -329,6 +329,8 @@ try {
 							$n = $p['title'];
 						} else if(isset($p['first_name'])) {
 							$n = trim($p['first_name']).(isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
+						} else if(isset($p['last_name'])) {
+							$n = trim($p['last_name']);
 						} else {
 							$n = 'Deleted Account';
 						}
