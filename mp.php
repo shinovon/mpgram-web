@@ -795,7 +795,6 @@ class MP {
 	}
 	
 	public static function gc() {
-		unset(Locale::$lng);
 		unset(static::$users);
 		unset(static::$chats);
 	}
