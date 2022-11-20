@@ -84,7 +84,7 @@ class MP {
 		return 'Deleted Account';
 	}
 	
-	static function getSelfName($p, $full) {
+	static function getUserName($p, $full) {
 		$tr_first = isset($p['first_name']) ? trim($p['first_name']) : null;
 		$tr_last = isset($p['last_name']) ? trim($p['last_name']) : null;
 		if($tr_first !== null) {
