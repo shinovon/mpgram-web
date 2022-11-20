@@ -73,39 +73,30 @@ class MP {
 
 	static function getNameFromInfo($p, $full = false) {
 		if(isset($p['User'])) {
-			if(!isset($p['User']['first_name']) && !isset($p['User']['last_name'])) {
-				return 'Deleted Account';
-			}
-			try {
-				$tr_first = isset($p['User']['first_name']) ? trim($p['User']['first_name']) : '';
-				$tr_last = $full && isset($p['User']['last_name']) ? ' '.trim($p['User']['last_name']) : '';
-
-				return $tr_first.$tr_last;
-			} catch (Exception $e) {
-				return '';
-			}
+			return static::getUserName($p['User'], $full);
 		} else if(isset($p['Chat'])) {
 			return $p['Chat']['title'];
 		} else if(isset($p['title'])) {
 			return $p['title'];
-		} else if(isset($p['first_name'])) {
-			try {
-				return trim($p['first_name']).($full && isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
-			} catch (Exception $e) {
-				return '';
-			}
-		} else {
-			return 'Deleted Account';
+		} else if(isset($p['first_name']) || isset($p['last_name'])) {
+			return static::getUserName($p, $full);
 		}
+		return 'Deleted Account';
+	}
+	
+	static function getSelfName($p, $full) {
+		$tr_first = isset($p['first_name']) ? trim($p['first_name']) : null;
+		$tr_last = isset($p[['last_name']) ? trim($p['last_name']) : null;
+		if($tr_first !== null) {
+			return $tr_first.($full && $tr_last !== null ? ' '.$tr_last : '');
+		} else if($tr_last !== null) {
+			return $tr_last;
+		}
+		return 'Deleted Account';
 	}
 
 	static function getSelfName($MP, $full = true) {
-		$p = $MP->getSelf();
-		$s = $p['first_name'];
-		if($full && isset($p['last_name'])) {
-			$s .= ' '.$p['last_name'];
-		}
-		return $s;
+		return static::getUserName($MP->getSelf(), $full);
 	}
 
 	static function getSelfId($MP) {
