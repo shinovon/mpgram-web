@@ -86,7 +86,7 @@ class MP {
 	
 	static function getSelfName($p, $full) {
 		$tr_first = isset($p['first_name']) ? trim($p['first_name']) : null;
-		$tr_last = isset($p[['last_name']) ? trim($p['last_name']) : null;
+		$tr_last = isset($p['last_name']) ? trim($p['last_name']) : null;
 		if($tr_first !== null) {
 			return $tr_first.($full && $tr_last !== null ? ' '.$tr_last : '');
 		} else if($tr_last !== null) {
