@@ -73,11 +73,14 @@ class MP {
 
 	static function getNameFromInfo($p, $full = false) {
 		if(isset($p['User'])) {
-			if(!isset($p['User']['first_name'])) {
+			if(!isset($p['User']['first_name']) && !isset($p['User']['last_name'])) {
 				return 'Deleted Account';
 			}
 			try {
-				return trim($p['User']['first_name']).($full && isset($p['User']['last_name']) ? ' '.trim($p['User']['last_name']) : '');
+				$tr_first = isset($p['User']['first_name']) ? trim($p['User']['first_name']) : '';
+				$tr_last = $full && isset($p['User']['last_name']) ? ' '.trim($p['User']['last_name']) : '';
+
+				return $tr_first.$tr_last;
 			} catch (Exception $e) {
 				return '';
 			}

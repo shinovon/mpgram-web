@@ -87,6 +87,8 @@ try {
 		$pm = true;
 		if(isset($info['User']['first_name'])) {
 			$name = $info['User']['first_name'];
+		} else if(isset($info['User']['last_name'])) {
+			$name = $info['User']['last_name'];
 		}
 	}
 	$channel = isset($info['channel_id']);
