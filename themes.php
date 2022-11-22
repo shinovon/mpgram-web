@@ -69,6 +69,7 @@ class Themes {
 			margin-bottom: 7px;
 		}
 		.r, .mw {
+			text-align: left;
 			border-left: 2px solid '.(static::$theme == 0 ? 'white' : '#168acd').';
 			padding-left: 4px;
 			margin-bottom: 2px;
@@ -81,7 +82,6 @@ class Themes {
 			text-overflow: ellipsis;
 		}
 		.rt {
-			text-align: left;
 			overflow: hidden;
 			max-width: 300px;
 			white-space: nowrap;
@@ -118,6 +118,9 @@ class Themes {
 		}
 		input[type="file"] {
 			'.(static::$theme == 0 ? 'color: #eee;' : 'color: #111;').';
+		}
+		.ml {
+			color: #37a1de;
 		}
 		--></style>';
 	}

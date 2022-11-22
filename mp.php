@@ -475,7 +475,7 @@ class MP {
 				}
 				$html .= '<a href="';
 				$html .= static::dehtml($url);
-				$html .= '" target="_blank" rel="noopener noreferrer">';
+				$html .= '" class="ml" target="_blank" rel="noopener noreferrer">';
 				$html .= $inner;
 				$html .= '</a>';
 				break;
