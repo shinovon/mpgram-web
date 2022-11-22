@@ -174,8 +174,11 @@ try {
 						if($peer['_'] === 'peerUser') continue;
 						if($peer['_'] === 'peerChannel') {
 							foreach($r['chats'] as $c) {
-								if($c['peer_id'] == $peer && !$c['broadcast'] && !in_array($d, $dialogs)) {
+								if($c['id'] == $peer['channel_id'] && !$c['broadcast']) {
+								if(!in_array($d, $dialogs)) {
 									array_push($dialogs, $d);
+								}
+									break;
 								}
 							}
 							continue;
@@ -190,8 +193,11 @@ try {
 						$peer = $d['peer'];
 						if($peer['_'] !== 'peerChannel') continue;
 						foreach($r['chats'] as $c) {
-							if($c['peer_id'] == $peer && $c['broadcast'] && !in_array($d, $dialogs)) {
-								array_push($dialogs, $d);
+							if($c['peer_id'] == $peer && $c['broadcast']) {
+								if(!in_array($d, $dialogs)) {
+									array_push($dialogs, $d);
+								}
+								break;
 							}
 						}
 					}
@@ -201,8 +207,11 @@ try {
 						$peer = $d['peer'];
 						if($peer['_'] !== 'peerUser') continue;
 						foreach($r['users'] as $u) {
-							if($u['id'] == $peer['user_id'] && $u['bot'] && !in_array($d, $dialogs)) {
-								array_push($dialogs, $d);
+							if($u['id'] == $peer['user_id'] && $u['bot']) {
+								if(!in_array($d, $dialogs)) {
+									array_push($dialogs, $d);
+								}
+								break;
 							}
 						}
 						continue;
