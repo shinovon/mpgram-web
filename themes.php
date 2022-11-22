@@ -81,6 +81,7 @@ class Themes {
 			text-overflow: ellipsis;
 		}
 		.rt {
+			text-align: left;
 			overflow: hidden;
 			max-width: 300px;
 			white-space: nowrap;
