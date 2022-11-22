@@ -1,4 +1,5 @@
 <?php
+use Amp\Success;
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
 	throw new ErrorException($message, 0, $severity, $filename, $lineno);
 }
@@ -124,13 +125,14 @@ try {
 					$img = resize($img, $w, $h);
 				}
 			} else if($p == 'sprev') {
-				if($w > 180) {
-					$h = ($h/$w)*180;
-					$w = 180;
+				$q = 29;//2
+				if($w > 100) {
+					$h = ($h/$w)*100;
+					$w = 100;
 					$img = resize($img, $w, $h);
-				} else if($h > 90) {
-					$w = ($w/$h)*90;
-					$h = 90;
+				} else if($h > 80) {
+					$w = ($w/$h)*80;
+					$h = 80;
 					$img = resize($img, $w, $h);
 				}
 			}
