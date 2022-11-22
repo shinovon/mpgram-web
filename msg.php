@@ -187,7 +187,7 @@ echo '</form>';
 echo '<form action="sendsticker.php" style="display: inline;">';
 echo '<input type="hidden" name="c" value="'.$id.'">';
 if($msg) {
-	echo '<input type="hidden" name="m" value="'.$msg.'">';
+	echo '<input type="hidden" name="reply_to" value="'.$msg.'">';
 }
 echo '<input type="submit" value="'.MP::x($lng['choose_sticker']).'">';
 echo '</form>';
