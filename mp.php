@@ -264,7 +264,7 @@ class MP {
 						echo ' •';
 					}
 					if($unswer && !$ch) {
-						echo ' <a href="msg.php?c='.$id.'&m='.$m['id'].($m['out']?'&o':'').'" class="u">'.MP::x($lng['msg_options']).'</a>';
+						echo ' <small><a href="msg.php?c='.$id.'&m='.$m['id'].($m['out']?'&o':'').'" class="u">'.MP::x($lng['msg_options']).'</a></small>';
 					}
 				} else {
 					echo '<div class="ma" id="msg_'.$id.'_'.$m['id'].'">';
