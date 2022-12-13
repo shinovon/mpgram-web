@@ -42,10 +42,11 @@ try {
 		$name = $info['User']['first_name'];
 		$pm = true;
 	}
+	$channel = isset($info['channel_id']);
 	unset($info);
 	echo $rm[0]['id'].'||';
 	MP::addUsers($r['users'], $r['chats']);
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, true, true);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true);
 	// Mark as read
 	try {
 		if($ch || (int)$id < 0) {
