@@ -798,6 +798,59 @@ class MP {
 		unset(static::$users);
 		unset(static::$chats);
 	}
+	
+	public static function getAllDialogs($MP, $limit = 0, $folder_id = -1) {
+		$p = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];
+		if($folder_id != -1) {
+			$p['folder_id'] = $folder_id;
+		}
+		$t = ['dialogs' => [0], 'count' => 1];
+		$r = ['dialogs' => [], 'messages' => [], 'users' => [], 'chats' => []];
+		$d = [];
+		while($p['count'] < $t['count']) {
+			$t = $MP->messages->getDialogs($p);
+			$r['users'] = array_merge($r['users'], $t['users']);
+			$r['chats'] = array_merge($r['chats'], $t['chats']);
+			$r['messages'] = array_merge($r['messages'], $t['messages']);
+			$last_peer = 0;
+			$last_date = 0;
+			$last_id = 0;
+			$t['messages'] = array_reverse($t['messages'] ?? []);
+			foreach(array_reverse($t['dialogs'] ?? []) as $dialog) {
+				$id = static::getId($MP, $dialog['peer']);
+				if(!isset($d[$id])) {
+					$d[$id] = $dialog;
+					array_push($r['dialogs'], $dialog);
+				}
+				if(!$last_date) {
+					if(!$last_peer) {
+						$last_peer = $id;
+					}
+					if(!$last_id) {
+						$last_id = $dialog['top_message'];
+					}
+					foreach($t['messages'] as $message) {
+						if($message['_'] !== 'messageEmpty' && static::getId($MP, $message['peer_id']) === $last_peer && $last_id === $message['id']) {
+							$last_date = $message['date'];
+							break;
+						}
+					}
+				}
+			}
+			if($last_date) {
+				$p['offset_date'] = $last_date;
+				$p['offset_peer'] = $last_peer;
+				$p['offset_id'] = $last_id;
+				$p['count'] = count($d);
+			} else {
+				break;
+			}
+			if(!isset($t['count'])) {
+				break;
+			}
+		}
+		return $r;
+	}
 }
 MP::init();
 ?>

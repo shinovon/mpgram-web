@@ -126,7 +126,7 @@ try {
 					}
 				}
 				unset($folders);
-				$r = $MP->messages->getDialogs(['limit' => 300]);
+				$r = MP::getAllDialogs($MP);
 				$dialogs = array();
 				$all = $r['dialogs'];
 				if($f['contacts'] || $f['non_contacts']) {
@@ -156,7 +156,7 @@ try {
 						if($peer['_'] === 'peerUser') continue;
 						if($peer['_'] === 'peerChannel') {
 							foreach($r['chats'] as $c) {
-								if($c['peer_id'] == $peer && !$c['broadcast'] && !in_array($d, $dialogs)) {
+								if($c['id'] == $peer && !$c['broadcast'] && !in_array($d, $dialogs)) {
 									array_push($dialogs, $d);
 								}
 							}
@@ -172,7 +172,7 @@ try {
 						$peer = $d['peer'];
 						if($peer['_'] !== 'peerChannel') continue;
 						foreach($r['chats'] as $c) {
-							if($c['peer_id'] == $peer && $c['broadcast'] && !in_array($d, $dialogs)) {
+							if($c['id'] == $peer && $c['broadcast'] && !in_array($d, $dialogs)) {
 								array_push($dialogs, $d);
 							}
 						}
@@ -268,14 +268,7 @@ try {
 				}
 				unset($all);
 			} else {
-				$r = $MP->messages->getDialogs([
-				'offset_date' => 0,
-				'offset_id' => 0,
-				'add_offset' => 0,
-				'limit' => $count, 
-				'hash' => 0,
-				'folder_id' => 0
-				]);
+				$r = MP::getAllDialogs($MP, 0, 0);
 				$dialogs = $r['dialogs'];
 				unset($r['messages']);
 			}
