@@ -32,7 +32,7 @@ class Themes {
 			margin-right: auto;
 		}
 		' : ''). 'body {
-			'.(static::$iev > 0 ? 'text-align: center;' : ($full ? '' : 'max-width: 500px;
+			'.(static::$iev > 0 ? 'text-align: center;' : ($full ? '' : 'max-width: 540px;
 			margin-left: auto;
 			margin-right: auto;')).'
 			font-family: system-ui;
@@ -121,6 +121,23 @@ class Themes {
 		}
 		.ml {
 			color: #37a1de;
+		}
+		.ch {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			z-index: 1;
+			background: '.(static::$theme == 0?'#000':'#fff').';
+		}
+		.chc {
+			margin-left: auto;
+			margin-right: auto;
+			max-width: 540px;
+		}
+		.chr {
+			float: right;
+			text-align: right;
 		}
 		--></style>';
 	}

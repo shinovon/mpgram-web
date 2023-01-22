@@ -191,11 +191,16 @@ function autoScroll(force){try{text=document.getElementById("text");if(force){te
 	} else {
 		echo Themes::bodyStart();
 	}
-	echo '<div><a href="chats.php">'.MP::x($lng['back']).'</a>';
-	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></div>';
+	echo '<header class="ch">';
+	echo '<div class="chc"><div class="chr"><small><a href="chats.php">'.MP::x($lng['back']).'</a>';
+	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></small></div>';
+	echo '<div>';
+	echo MP::dehtml($name);
+	echo '</div></div>';
+	echo '</header>';
+	echo '<div>&nbsp;</div>';
 	$sname = $name;
 	if(mb_strlen($sname, 'UTF-8') > 30) $sname = mb_substr($sname, 0, 30, 'UTF-8');
-	echo '<h3>'.MP::dehtml($name).'</h3>';
 	if(!$reverse) {
 		printInputField();
 		if($hasOffset && !$endReached) {
@@ -211,6 +216,7 @@ function autoScroll(force){try{text=document.getElementById("text");if(force){te
 		}
 		$rm = array_reverse($rm);
 	}
+	
 	if(!$reverse) echo '<p></p>';
 	echo '<div id="msgs">';
 	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true);
