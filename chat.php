@@ -191,14 +191,22 @@ function autoScroll(force){try{text=document.getElementById("text");if(force){te
 	} else {
 		echo Themes::bodyStart();
 	}
+	$avas = MP::getSettingInt('avas', 0);
 	echo '<header class="ch">';
 	echo '<div class="chc"><div class="chr"><small><a href="chats.php">'.MP::x($lng['back']).'</a>';
 	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></small></div>';
+	if($avas) {
+		echo '<div class="cava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></div>';
+	}
 	echo '<div>';
 	echo MP::dehtml($name);
 	echo '</div></div>';
 	echo '</header>';
-	echo '<div>&nbsp;</div>';
+	if($avas) {
+		echo '<div style="height: 36px;">&nbsp;</div>';
+	} else {
+		echo '<div>&nbsp;</div>';
+	}
 	$sname = $name;
 	if(mb_strlen($sname, 'UTF-8') > 30) $sname = mb_substr($sname, 0, 30, 'UTF-8');
 	if(!$reverse) {

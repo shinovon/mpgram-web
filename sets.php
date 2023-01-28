@@ -8,12 +8,14 @@ $chats = 15;
 $reverse = 0;
 $autoscroll = 0;
 $limit = 20;
+$avas = 0;
 $set = isset($_GET['set']);
 include 'mp.php';
 if($set) {
 	$autoupd = isset($_GET['autoupd']) ? 1 : 0;
 	$reverse = isset($_GET['reverse']) ? 1 : 0;
 	$autoscroll = isset($_GET['autoscroll']) ? 1 : 0;
+	$avas = isset($_GET['avas']) ? 1 : 0;
 	$idf = $dynupd == 1 ? 10 : 25;
 	if(isset($_GET['lang'])) {
 		$lang = $_GET['lang'];
@@ -57,6 +59,7 @@ if($set) {
 	MP::cookie('reverse', $reverse, time() + (86400 * 365));
 	MP::cookie('autoscroll', $autoscroll, time() + (86400 * 365));
 	MP::cookie('limit', $limit, time() + (86400 * 365));
+	MP::cookie('avas', $avas, time() + (86400 * 365));
 } else {
 	if(isset($_COOKIE['lang'])) {
 		$lang = $_COOKIE['lang'];
@@ -81,6 +84,9 @@ if($set) {
 	}
 	if(isset($_COOKIE['limit'])) {
 		$limit = (int)$_COOKIE['limit'];
+	}
+	if(isset($_COOKIE['avas'])) {
+		$avas = (int)$_COOKIE['avas'];
 	}
 }
 
@@ -110,7 +116,9 @@ echo '<br><input type="checkbox" id="reverse" name="reverse"'.($reverse ? ' chec
 echo '<label for="reverse">'.MP::x($lng['set_chat_reverse_mode']).'</label>';
 echo '<br><input type="checkbox" id="autoscroll" name="autoscroll"'.($autoscroll ? ' checked' : '').'>';
 echo '<label for="autoscroll">'.MP::x($lng['set_chat_autoscroll']).'</label>';
-echo '<p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
+echo '<br><input type="checkbox" id="avas" name="avas"'.($avas ? ' checked' : '').'>';
+echo '<label for="avas">'MP::x($lng['set_chat_avas']).'</label>';
+echo '</p><p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
 echo '<input type="text" size="3" id="updint" name="updint" value="'.$updint.'"><br>';
 echo '<label for="limit">'.MP::x($lng['set_msgs_limit']).'</label>:<br>';
 echo '<input type="text" size="3" id="limit" name="limit" value="'.$limit.'"><br>';

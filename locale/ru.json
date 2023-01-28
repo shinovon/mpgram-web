@@ -69,5 +69,6 @@
 	"action_joinedbyrequest": "принят(а) в группу",
 	"action_historyclear": "История чата была очищена",
 	"action_chatcreate": "Группа создана",
-	"compactchats": "Компактнее"
+	"compactchats": "Компактнее",
+	"set_chat_avas": "Аватарки чатов"
 }

@@ -69,5 +69,6 @@
 	"action_joinedbyrequest": "was accepted to the group",
 	"action_historyclear": "Chat history was cleared",
 	"action_chatcreate": "Group created",
-	"compactchats": "Compact list"
+	"compactchats": "Compact list",
+	"set_chat_avas": "Chat photos"
 }

@@ -23,6 +23,8 @@ if(isset($_GET['count'])) {
 	$count = (int) $_GET['count'];
 }
 
+$avas = MP::getSettingInt('avas', 0);
+
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
 }
@@ -50,7 +52,6 @@ header('Cache-Control: private, no-cache, no-store, must-revalidate');
 include 'themes.php';
 Themes::setTheme($theme);
 
-$avas = false;
 try {
 	$MP = MP::getMadelineAPI($user);
 	echo '<head><title>'.MP::x($lng['chats']).'</title>';
@@ -321,6 +322,9 @@ try {
 				if($unr > $msglimit) {
 					$cl .= '&m='.$d['read_inbox_max_id'].'&offset='.(-$msglimit-1);
 				}
+				if($avas) {
+					echo '<div class="cava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></div>';
+				}
 				echo '<a href="'.$cl.'"><b>';
 				$peer = $d['peer'];
 				$n = null;
@@ -379,7 +383,7 @@ try {
 						if($mfn !== null && ($id > 0 ? $mfid != $selfid : true))
 							echo $mfn.': ';
 						$txt = MP::dehtml(str_replace("\n", " ", $msg['message']));
-						if(mb_strlen($txt, 'UTF-8') > 70) $txt = mb_substr($txt, 0, 70, 'UTF-8').'..';
+						if(mb_strlen($txt, 'UTF-8') > 250) $txt = mb_substr($txt, 0, 250, 'UTF-8').'..';
 						echo $txt;
 						echo '</a>';
 					} else if(isset($msg['action'])) {

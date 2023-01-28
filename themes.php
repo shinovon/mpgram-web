@@ -56,8 +56,12 @@ class Themes {
 		}
 		.cm {
 			margin-left: 2px;
-			overflow: hidden;
 			color: '.(static::$theme == 0 ? '#ccc' : '#111').';
+			display: -webkit-box;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
 		}
 		.ct {
 			margin-left: 2px;
@@ -73,6 +77,7 @@ class Themes {
 			border-left: 2px solid '.(static::$theme == 0 ? 'white' : '#168acd').';
 			padding-left: 4px;
 			margin-bottom: 2px;
+			margin-top: 2px;
 		}
 		.rn, .mwt {
 			'.(static::$theme == 0 ? '' : 'color: #37a1de;').
@@ -88,10 +93,12 @@ class Themes {
 			text-overflow: ellipsis;
 		}
 		.c0 {
-			background-color: '.(static::$theme == 0 ? '#222' : '#d7d7d7').';
+			border-bottom: 1px solid '.(static::$theme == 0 ? '#222' : '#eee').';
+			min-height: 42px;
 		}
 		.c1 {
-			background-color: '.(static::$theme == 0 ? '#111' : '#eee').';
+			border-bottom: 1px solid '.(static::$theme == 0 ? '#222' : '#eee').';
+			min-height: 42px;
 		}
 		'.(static::$theme == 0 ? '' : '.ml, .mf, .mn {
 			color: #168acd;
@@ -138,6 +145,17 @@ class Themes {
 		.chr {
 			float: right;
 			text-align: right;
+		}
+		.cava {
+			float: left;
+			margin-left: 2px;
+			margin-top: 4px;
+			margin-right: 4px;
+		}
+		.ri {
+			border-radius: 50%;
+			height: 36px;
+			width: 36px;
 		}
 		--></style>';
 	}
