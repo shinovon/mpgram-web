@@ -117,7 +117,7 @@ echo '<label for="reverse">'.MP::x($lng['set_chat_reverse_mode']).'</label>';
 echo '<br><input type="checkbox" id="autoscroll" name="autoscroll"'.($autoscroll ? ' checked' : '').'>';
 echo '<label for="autoscroll">'.MP::x($lng['set_chat_autoscroll']).'</label>';
 echo '<br><input type="checkbox" id="avas" name="avas"'.($avas ? ' checked' : '').'>';
-echo '<label for="avas">'MP::x($lng['set_chat_avas']).'</label>';
+echo '<label for="avas">'.MP::x($lng['set_chat_avas']).'</label>';
 echo '</p><p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
 echo '<input type="text" size="3" id="updint" name="updint" value="'.$updint.'"><br>';
 echo '<label for="limit">'.MP::x($lng['set_msgs_limit']).'</label>:<br>';
