@@ -99,5 +99,50 @@ class Locale {
 		}
 		return true;
 	}
+	
+	public static function number($key, $number) {
+		$value = null;
+		$arr = static::$lng[$key];
+		foreach($arr as $a) {
+			$tmp = $number;
+			for($i = 0; $i < count($a); $i++) {
+				$b = $a[$i];
+				switch($b) {
+				case "%":
+					$tmp %= $a[$i += 1];
+					break;
+				case "=":
+					$c = $a[$i += 1];
+					$i += 1;
+					if($tmp == $c) {
+						$value = $a[$i];
+						goto end;
+					}
+					break;
+				case "<":
+					$c = $a[$i += 1];
+					$i += 1;
+					if($tmp < $c) {
+						$value = $a[$i];
+						goto end;
+					}
+					break;
+				case ">":
+					$c = $a[$i += 1];
+					$i += 1;
+					if($tmp > $c) {
+						$value = $a[$i];
+						goto end;
+					}
+					break;
+				default:
+					$value = $a[$i];
+					goto end;
+				}
+			}
+		}
+		end:
+		return str_replace('$', strval($number), $value);
+	}
 }
 ?>

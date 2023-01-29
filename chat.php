@@ -194,7 +194,9 @@ function autoScroll(force){try{text=document.getElementById("text");if(force){te
 	$avas = MP::getSettingInt('avas', 0);
 	echo '<header class="ch">';
 	echo '<div class="chc"><div class="chr"><small><a href="chats.php">'.MP::x($lng['back']).'</a>';
-	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></small></div>';
+	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a>';
+	echo ' <a href="chatinfo.php?c='.$id.'">'.MP::x($lng['chat_info']??null).'</a>';
+	echo '</small></div>';
 	if($avas) {
 		echo '<div class="cava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></div>';
 	}

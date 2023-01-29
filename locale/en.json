@@ -70,5 +70,18 @@
 	"action_historyclear": "Chat history was cleared",
 	"action_chatcreate": "Group created",
 	"compactchats": "Compact list",
-	"set_chat_avas": "Chat photos"
+	"set_chat_avas": "Chat photos",
+	"chat_info": "Info",
+	"chat_about": "About",
+	"chat_members": "Members",
+	"online": "online",
+	"offline": "offline",
+	"owner": "owner",
+	"admin": "admin",
+	"members": [
+		[ "=", 1, "$ member", "$ members" ]
+	],
+	"subscribers": [
+		[ "=", 1, "$ subsciber", "$ subscribers" ]
+	]
 }
