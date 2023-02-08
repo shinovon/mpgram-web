@@ -82,6 +82,6 @@
 		[ "=", 1, "$ member", "$ members" ]
 	],
 	"subscribers": [
-		[ "=", 1, "$ subsciber", "$ subscribers" ]
+		[ "=", 1, "$ subscriber", "$ subscribers" ]
 	]
 }
