@@ -2,6 +2,7 @@
     "name": "shinovon/mpgram-web",
     "type": "project",
     "require": {
-        "danog/madelineproto": "^7"
-    }
+        "danog/madelineproto": "^8"
+    },
+    "minimum-stability": "dev"
 }
