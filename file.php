@@ -6,19 +6,25 @@ function exceptions_error_handler($severity, $message, $filename, $lineno) {
 set_error_handler('exceptions_error_handler');
 require_once 'vendor/autoload.php';
 use Amp\ByteStream;
-class StringStream implements \Amp\ByteStream\OutputStream {
-	public $d;
-	public function write(string $data): Amp\Promise {
-		$this->d .= $data;
-		return new Success(\strlen($data));
-	}
-	public function end(string $finalData = ""): Amp\Promise {
-		$this->d .= $finalData;
-		return new Success(\strlen($finalData));
-	}
-	public function get() {
-		return $this->d;
-	}
+class StringStream implements \Amp\ByteStream\WritableStream {
+        public $d;
+        public $closed;                                                                                 public function write(string $data): void {
+                $this->d .= $data;
+        }
+        public function end(): void {                                                                   }                                                                                               public function get() {
+                return $this->d;                                                                        }
+        public function isWritable(): bool {
+                                                                    return true;
+        }
+        public function close(): void {
+                $this->closed = true;
+        }
+
+        public function isClosed(): bool {
+                return $this->closed;
+        }
+        public function onClose(\Closure $onClose): void {
+        }
 }
 
 function resize($image, $w, $h) {
