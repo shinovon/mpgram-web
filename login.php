@@ -232,7 +232,7 @@ if($phone !== null) {
 			if(!empty($code) && is_numeric($code)) {
 				try {
 					$MP = MP::getMadelineAPI($user, true);
-					$a = $MP->complete_phone_login($code);
+					$a = $MP->completePhoneLogin($code);
 					$hash = null;
 					if(isset($a['phone_code_hash'])) {
 						$hash = $a['phone_code_hash'];
