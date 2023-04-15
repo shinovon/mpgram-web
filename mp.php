@@ -583,7 +583,10 @@ class MP {
 			$user = $_COOKIE['user'];
 		else if(isset($_SESSION) && isset($_SESSION['user']))
 			$user = $_SESSION['user'];
-		if(empty($user) || strlen($user) != 32) {
+		if(strpos(strval($user), '/') !== false || strpos(strval($user), '.') !== false) {
+			$user = null;
+		}
+		if(empty($user) || strlen($user) < 32 || strlen($user) > 200) {
 			return false;
 		}
 		if(!file_exists(sessionspath.$user.'.madeline')) {

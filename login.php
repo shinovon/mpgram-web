@@ -50,8 +50,11 @@ if(isset($_COOKIE['user']))
 	$user = $_COOKIE['user'];
 else if(isset($_SESSION['user']))
 	$user = $_SESSION['user'];
+if(strpos(strval($user), '/') !== false || strpos(strval($user), '.') !== false) {
+	$user = null;
+}
 // Check session existance
-$nouser = $user == null || empty($user) || strlen($user) != 32 || !file_exists(sessionspath.$user.'.madeline');
+$nouser = $user == null || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
 function removeSession() {
 	global $user;
 	global $nouser;
@@ -180,7 +183,7 @@ if($phone !== null) {
 		}
 	}
 	if(!isset($user) || $nouser) {
-		$user = md5($phone.rand(0,1000));
+		$user = hash('sha384', sha1(md5($phone.rand(0,1000).random_bytes(6))).random_bytes(30));
 		MP::cookie('user', $user, time() + (86400 * 365));
 		$MP = MP::getMadelineAPI($user, true);
 		htmlStart();
