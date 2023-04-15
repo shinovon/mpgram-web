@@ -79,6 +79,7 @@ if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
 	removeSession();
 }
 function htmlStart() {
+	global $lng;
 	header("Content-Type: text/html; charset=utf-8");
 	echo '<head><title>'.MP::x($lng['login']).'</title>';
 	echo Themes::head();
