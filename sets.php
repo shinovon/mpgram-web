@@ -8,7 +8,8 @@ $chats = 15;
 $reverse = 0;
 $autoscroll = 0;
 $limit = 20;
-$avas = 0;
+$useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+$avas = strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
 $set = isset($_GET['set']);
 include 'mp.php';
 if($set) {

@@ -191,7 +191,9 @@ function autoScroll(force){try{text=document.getElementById("text");if(force){te
 	} else {
 		echo Themes::bodyStart();
 	}
-	$avas = MP::getSettingInt('avas', 0);
+	$useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+	$avas = strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
+	$avas = MP::getSettingInt('avas', $avas);
 	echo '<header class="ch">';
 	echo '<div class="chc"><div class="chr"><small><a href="chats.php">'.MP::x($lng['back']).'</a>';
 	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a>';

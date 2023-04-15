@@ -22,8 +22,9 @@ $count = MP::getSettingInt('chats', 15);
 if(isset($_GET['count'])) {
 	$count = (int) $_GET['count'];
 }
-
-$avas = MP::getSettingInt('avas', 0);
+$useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+$avas = strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
+$avas = MP::getSettingInt('avas', $avas);
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
