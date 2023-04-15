@@ -426,6 +426,12 @@ class MP {
 		}
 	}
 	
+	static function utf16substr($s, $offset, $length = null) {
+		$s = iconv('utf-8', 'utf-16le', $s);
+		$s = $length !== null ? substr($s, $offset*2, $length*2) : substr($s, $offset*2);
+		return iconv('utf-16le', 'utf-8', $s);
+	}
+	
 	static function wrapRichNestedText($text, $entity, $allEntities) {
 		$off = $entity['offset'];
 		$len = $entity['length'];
@@ -455,12 +461,12 @@ class MP {
 		for ($i = 0; $i < $len; $i++) {
 			$entity = $entities[$i];
 			if($entity['offset'] > $lastOffset) {
-				$html .= static::dehtml(mb_substr($text, $lastOffset, $entity['offset'] - $lastOffset, 'UTF-8'));
+				$html .= static::dehtml(static::utf16substr($text, $lastOffset, $entity['offset'] - $lastOffset));
 			} else if($entity['offset'] < $lastOffset) {
 				continue;
 			}
 			$skipEntity = false;
-			$entityText = mb_substr($text, $entity['offset'], $entity['length'], 'UTF-8');
+			$entityText = static::utf16substr($text, $entity['offset'], $entity['length']);
 			switch($entity['_']) {
 			case 'messageEntityUrl':
 			case 'messageEntityTextUrl':
@@ -519,7 +525,7 @@ class MP {
 			}
 			$lastOffset = $entity['offset'] + ($skipEntity ? 0 : $entity['length']);
 		}
-		$html .= static::dehtml(mb_substr($text, $lastOffset, null, 'UTF-8'));
+		$html .= static::dehtml(static::utf16substr($text, $lastOffset, null));
 		
 		return $html;
 	}
