@@ -263,8 +263,8 @@ class MP {
 					if($m['media_unread']) {
 						echo ' •';
 					}
-					if($unswer && !$ch) {
-						echo ' <small><a href="msg.php?c='.$id.'&m='.$m['id'].($m['out']?'&o':'').'" class="u">'.MP::x($lng['msg_options']).'</a></small>';
+					if($unswer) {
+						echo ' <small><a href="msg.php?c='.$id.'&m='.$m['id'].($m['out']?'&o':'').($ch?'&ch':'').'" class="u">'.MP::x($lng['msg_options']).'</a></small>';
 					}
 				} else {
 					echo '<div class="ma" id="msg_'.$id.'_'.$m['id'].'">';

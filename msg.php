@@ -28,6 +28,7 @@ if(isset($_POST['m'])) {
 	$msg = $_GET['m'];
 }
 $out = isset($_POST['o']) || isset($_GET['o']);
+$ch = isset($_POST['ch']) || isset($_GET['ch']);
 
 header("Content-Type: text/html; charset=utf-8");
 header("Cache-Control: private, no-cache, no-store");
@@ -59,6 +60,10 @@ try {
 			break;
 		case 'fwd':
 			$MP->messages->forwardMessages(['from_peer' => $id, 'to_peer' => $_GET['c2'], 'id' => [(int)$msg]]);
+			header('Location: chat.php?c='.$id);
+			break;
+		case 'save':
+			$MP->messages->forwardMessages(['from_peer' => $id, 'to_peer' => 'me', 'id' => [(int)$msg]]);
 			header('Location: chat.php?c='.$id);
 			break;
 		}
@@ -130,6 +135,7 @@ try {
 						array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
 					}
 					$params['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes];
+					//$params['media'] = $MP->messages->uploadMedia(['media' => ['_' => $type, 'file' => $file, 'attributes' => $attributes]]);
 					if(isset($_GET["format"]) || isset($_POST["format"])) {
 						$params['parse_mode'] = 'HTML';
 					}
@@ -163,32 +169,35 @@ if($msg) {
 	echo '<b>'.MP::x($lng['actions']).'</b>:<br>';
 	if($out) echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=delete">'.MP::x($lng['delete']).'</a> ';
 	echo '<a href="chatselect.php?c='.$id.'&m='.$msg.'">'.MP::x($lng['forward']).'</a> ';
-	echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=fwdh">'.MP::x($lng['forward_here']).'</a>';
+	if(!$ch) echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=fwdh">'.MP::x($lng['forward_here']).'</a> ';
+	echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=save">'.MP::x($lng['forward_save']).'</a>';
 	echo '</p>';
-	echo '<b>'.MP::x($lng['reply']).'</b>:';
+	if(!$ch) echo '<b>'.MP::x($lng['reply']).'</b>:';
 } else if($title) {
 	echo '<h3>'.$title.'</h3><br>';
 }
 if($reason) {
 	echo '<b>'.$reason.'</b>';
 }
-echo '<form action="msg.php" method="post" enctype="multipart/form-data" style="display: inline;">';
-echo '<input type="hidden" name="c" value="'.$id.'">';
-echo '<input type="hidden" name="sent" value="1">';
-if($msg) {
-	echo '<input type="hidden" name="m" value="'.$msg.'">';
+if(!$ch) {
+	echo '<form action="msg.php" method="post" enctype="multipart/form-data" style="display: inline;">';
+	echo '<input type="hidden" name="c" value="'.$id.'">';
+	echo '<input type="hidden" name="sent" value="1">';
+	if($msg) {
+		echo '<input type="hidden" name="m" value="'.$msg.'">';
+	}
+	echo '<textarea name="text" value="" style="width: 100%; height: 3em"></textarea><br>';
+	echo '<input type="checkbox" id="format" name="format">';
+	echo '<label for="format">'.MP::x($lng['html_formatting']).'</label>';
+	echo '<br><input type="file" id="file" name="file"><br>';
+	echo '<input type="submit" value="'.MP::x($lng['send']).'">';
+	echo '</form>';
+	echo '<form action="sendsticker.php" style="display: inline;">';
+	echo '<input type="hidden" name="c" value="'.$id.'">';
+	if($msg) {
+		echo '<input type="hidden" name="reply_to" value="'.$msg.'">';
+	}
+	echo '<input type="submit" value="'.MP::x($lng['choose_sticker']).'">';
+	echo '</form>';
 }
-echo '<textarea name="text" value="" style="width: 100%; height: 3em"></textarea><br>';
-echo '<input type="checkbox" id="format" name="format">';
-echo '<label for="format">'.MP::x($lng['html_formatting']).'</label>';
-echo '<br><input type="file" id="file" name="file"><br>';
-echo '<input type="submit" value="'.MP::x($lng['send']).'">';
-echo '</form>';
-echo '<form action="sendsticker.php" style="display: inline;">';
-echo '<input type="hidden" name="c" value="'.$id.'">';
-if($msg) {
-	echo '<input type="hidden" name="reply_to" value="'.$msg.'">';
-}
-echo '<input type="submit" value="'.MP::x($lng['choose_sticker']).'">';
-echo '</form>';
 echo Themes::bodyEnd();

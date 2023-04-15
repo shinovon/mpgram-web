@@ -55,7 +55,7 @@
 	"forward": "Reenviar",
 	"forward_here": "Reenviar aquí",
 	"actions": "Acciones",
-	"msg_options": "Responder",
+	"msg_options": "...",
 	"wrong_captcha": "Captcha incorrecto!",
 	"no_pass_code": "Sin código de acceso establecido!",
 	"pass_code": "código de acceso",

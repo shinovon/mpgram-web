@@ -55,7 +55,7 @@
 	"forward": "Переслати",
 	"forward_here": "Переслати сюди",
 	"actions": "Дії",
-	"msg_options": "відповідь",
+	"msg_options": "...",
 	"wrong_captcha": "CAPTCHA введена невірно!",
 	"no_pass_code": "Пароль не встановлено!",
 	"pass_code": "Пароль",

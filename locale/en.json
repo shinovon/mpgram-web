@@ -55,7 +55,7 @@
 	"forward": "Forward",
 	"forward_here": "Forward here",
 	"actions": "Actions",
-	"msg_options": "Reply",
+	"msg_options": "...",
 	"wrong_captcha": "Incorrect captcha!",
 	"no_pass_code": "No pass-code set!",
 	"pass_code": "Pass-code",
@@ -83,5 +83,6 @@
 	],
 	"subscribers": [
 		[ "=", 1, "$ subscriber", "$ subscribers" ]
-	]
+	],
+	"forward_save": "Save to favorites"
 }
