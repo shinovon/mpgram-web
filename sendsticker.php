@@ -49,7 +49,7 @@ try {
 		if($reply_to) {
 			$params['reply_to_msg_id'] = $reply_to;
 		}
-		$params['media'] = ['_' => 'document', 'id' => $_GET['id'], 'access_hash' => $_GET['access_hash'], 'attributes' => []];
+		$params['media'] = ['_' => 'document', 'id' => (int) $_GET['id'], 'access_hash' => (int) $_GET['access_hash']];
 		$MP->messages->sendMedia($params);
 		header('Location: chat.php?c='.$id);
 		die();

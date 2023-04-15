@@ -4,5 +4,5 @@
     "require": {
         "danog/madelineproto": "^8"
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "beta"
 }
