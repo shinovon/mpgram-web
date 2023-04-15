@@ -775,14 +775,14 @@ class MP {
 			$lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? (strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en') : 'ru';
 		}
 		include 'locale.php';
-		Locale::init();
-		if(!Locale::load($lang)) {
-			Locale::load($lang = 'en');
+		MPLocale::init();
+		if(!MPLocale::load($lang)) {
+			MPLocale::load($lang = 'en');
 		}
 		if($lang != $xlang) {
 			MP::cookie('lang', $lang, time() + (86400 * 365));
 		}
-		return Locale::$lng;
+		return MPLocale::$lng;
 	}
 
 	public static function init() {

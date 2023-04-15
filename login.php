@@ -80,7 +80,7 @@ if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
 }
 function htmlStart() {
 	header("Content-Type: text/html; charset=utf-8");
-	echo '<head><title>'.MP::x(Locale::$lng['login']).'</title>';
+	echo '<head><title>'.MP::x($lng['login']).'</title>';
 	echo Themes::head();
 	// определение часового пояса
 	$iev = MP::getIEVersion();

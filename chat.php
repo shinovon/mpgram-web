@@ -200,7 +200,7 @@ function autoScroll(force){try{text=document.getElementById("text");if(force){te
 	if($avas) {
 		echo '<div class="cava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></div>';
 	}
-	echo '<div>';
+	echo '<div class="chn">';
 	echo MP::dehtml($name);
 	echo '</div></div>';
 	echo '</header>';

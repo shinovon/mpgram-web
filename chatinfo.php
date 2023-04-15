@@ -75,7 +75,7 @@ try {
 	echo '</div>';
 	echo '<div>';
 	if($type != 'user') {
-		echo MP::x(Locale::number($type == 'chat' ? 'members' : 'subscribers', count($members)));
+		echo MP::x(MPLocale::number($type == 'chat' ? 'members' : 'subscribers', count($members)));
 		if($onlines > 0) {
 			echo ', ' . strval($onlines) . ' ' . MP::x($lng['online']);
 		}

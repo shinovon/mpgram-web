@@ -1,5 +1,5 @@
 <?php
-class Locale {
+class MPLocale {
 	public static $lng = array(
 	"lang" => "",
 	"refresh" => "",

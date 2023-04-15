@@ -157,6 +157,11 @@ class Themes {
 			height: 36px;
 			width: 36px;
 		}
+		.chn {
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: nowrap;
+		}
 		--></style>';
 	}
 }
