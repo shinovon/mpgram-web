@@ -12,7 +12,6 @@ if(!file_exists(sessionspath)) {
 	mkdir(sessionspath, 0777);
 }
 class MP {
-	static $win1251;
 	static $enc;
 	static $iev;
 	static $useragent;
@@ -105,14 +104,6 @@ class MP {
 		return $self['id'];
 	}
 
-	static function win1251() {
-		$h = getallheaders();
-		return isset($_SERVER['HTTP_USER_AGENT'])
-			&& strpos($_SERVER['HTTP_USER_AGENT'], 'PSP (PlayStation Portable)') !== false
-			&& isset($h['Accept-Language'])
-			&& strtolower($h['Accept-Language']) == 'ru';
-	}
-
 	static function x($s) {
 		if(static::$enc !== null && static::$enc !== 'utf-8') {
 			return mb_convert_encoding($s, static::$enc);
@@ -121,9 +112,6 @@ class MP {
 	}
 
 	static function getEncoding() {
-		if(static::win1251()) {
-			return 'windows-1251';
-		}
 		$iev = static::getIEVersion();
 		if($iev != 0 && $iev < 5) {
 			return static::getSetting('lang') == 'ru' ? 'windows-1251' : 'windows-1252';
@@ -330,7 +318,7 @@ class MP {
 					$reason = null;
 					if(isset($media['photo'])) {
 						if($imgs) {
-							echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=rprev"></img></a></div>';
+							echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig"><img class="mi" src="file.php?m='.$m['id'].'&c='.$id.'&p=rprev"></img></a></div>';
 						}
 					} else if(isset($media['document'])) {
 						$d = $MP->getDownloadInfo($m);
@@ -804,8 +792,8 @@ class MP {
 	}
 	
 	public static function gc() {
-		unset(static::$users);
-		unset(static::$chats);
+		static::$users = array();
+		static::$chats = array();
 	}
 	
 	public static function getAllDialogs($MP, $limit = 0, $folder_id = -1) {

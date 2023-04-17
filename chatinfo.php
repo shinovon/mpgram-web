@@ -85,19 +85,24 @@ try {
 	if($desc) {
 		echo '<p>'.MP::x($lng['chat_about']).':<br>'.MP::dehtml($desc).'</p>';
 	}
-	if($members) {
+	if($type != 'user' && $members) {
 		$avas = MP::getSettingInt('avas', 0);
 		echo MP::x($lng['chat_members']).':';
-		echo '<div>';
+		echo '<table class="cl">';
 		$i = 0;
 		foreach($members as $m) {
 			$i ++;
 			if($i > 100) {
-				echo '<div>...</div>';
+				echo '<tr>...</tr>';
 				break;
 			}
-			echo '<div class="c0">';
+			echo '<tr class="c">';
 			$u = $m['user'] ?? $m['chat'] ?? $m['channel'];
+			$id = $u['id'];
+			if($u['type'] != 'user') {
+				$id = '-100'.$id;
+			}
+			
 			$un = $u['title'] ?? (isset($u['first_name']) ? $u['first_name'] . (isset($u['last_name']) ? ' '.$u['last_name'] : '') : null) ?? 'Deleted Account';
 			$status = null;
 			if(isset($u['status'])) {
@@ -115,17 +120,19 @@ try {
 					$rank = MP::x($lng['admin']);
 				}
 			}
+			if($avas) {
+				echo '<td class="cava"><img class="ri" src="ava.php?c='.$u['id'].'&p=r36"></td>';
+			}
+			echo '<td class="ctext">';
 			if($rank) {
 				echo '<div class="chr ml">'.MP::dehtml($rank).'</div>';
 			}
-			if($avas) {
-				echo '<div class="cava"><img class="ri" src="ava.php?c='.$u['id'].'&p=r36"></div>';
-			}
-			echo '<div>'.MP::dehtml($un).'</div>';
+			echo '<a href="chat.php?c='.$id.'">'.MP::dehtml($un).'</a>';
 			echo '<div class="ml">'. ($status !== null ? ($status ? MP::x($lng['online']) : '') : '&nbsp;').'</div>';
-			echo '</div>';
+			echo '</td>';
+			echo '</tr>';
 		}
-		echo '</div>';
+		echo '</table>';
 	}
 
 	echo Themes::bodyEnd();

@@ -150,6 +150,7 @@ if($phone !== null) {
 			echo '<input type="text" name="c">';
 			echo '<input type="submit">';
 			echo '</form>';
+			echo MP::x('<a href="login.php?logout=1">'.$lng['logout'].'</a>');
 			echo Themes::bodyEnd();
 			die();
 		} else {
@@ -270,13 +271,13 @@ if($phone !== null) {
 				} catch (Exception $e) {
 					htmlStart();
 					if(strpos($e->getMessage(), 'PHONE_CODE_INVALID') !== false) {
-						echo MP::x('<b>'.MP::x($lng['phone_code_invalid']).'</b><br>');
+						echo MP::x('<b>'.$lng['phone_code_invalid'].'</b><br>');
 					} else if(strpos($e->getMessage(), 'PHONE_CODE_EXPIRED') !== false) {
-						echo MP::x('<b>'.MP::x($lng['phone_code_expired']).'</b><br>');
+						echo MP::x('<b>'.$lng['phone_code_expired'].'</b><br>');
 					} else if(strpos($e->getMessage(), 'AUTH_RESTART') !== false) {
 						unset($hash);
 					} else {
-						echo MP::x('<b>'.MP::x($lng['error']).'</b><br>');
+						echo MP::x('<b>'.$lng['error'].'</b><br>');
 						echo $e->getMessage();
 						echo Themes::bodyEnd();
 						die();

@@ -55,7 +55,6 @@ class Themes {
 			' : '').'border-style: solid;
 		}
 		.cm {
-			margin-left: 2px;
 			color: '.(static::$theme == 0 ? '#ccc' : '#111').';
 			display: -webkit-box;
 			text-overflow: ellipsis;
@@ -92,13 +91,28 @@ class Themes {
 			white-space: nowrap;
 			text-overflow: ellipsis;
 		}
-		.c0 {
-			border-bottom: 1px solid '.(static::$theme == 0 ? '#222' : '#eee').';
+		.cl {
+			border-spacing: 0;
+			border-color: '.(static::$theme == 0 ? '#222' : '#eee').';
+			border-collapse: collapse;
+			width: 100%;
+		}
+		.c {
 			min-height: 42px;
 		}
-		.c1 {
+		.cava {
+			vertical-align: top;
+			padding-left: 2px;
+			padding-top: 4px;
+			padding-bottom: 4px;
+			padding-right: 4px;
+		}
+		.ctext {
+			vertical-align: top;
+			width: 100%;  
+		}
+		td {
 			border-bottom: 1px solid '.(static::$theme == 0 ? '#222' : '#eee').';
-			min-height: 42px;
 		}
 		'.(static::$theme == 0 ? '' : '.ml, .mf, .mn {
 			color: #168acd;
@@ -141,16 +155,11 @@ class Themes {
 			margin-left: auto;
 			margin-right: auto;
 			max-width: 540px;
+			padding-top: 2px;
 		}
 		.chr {
 			float: right;
 			text-align: right;
-		}
-		.cava {
-			float: left;
-			margin-left: 2px;
-			margin-top: 4px;
-			margin-right: 4px;
 		}
 		.ri {
 			border-radius: 50%;
@@ -158,9 +167,20 @@ class Themes {
 			width: 36px;
 		}
 		.chn {
+			display: inline;
 			text-overflow: ellipsis;
 			overflow: hidden;
 			white-space: nowrap;
+			vertical-align: top;
+		}
+		.chava {
+			display: inline;
+			padding-left: 2px;
+			margin-top: 4px;
+			padding-right: 4px;
+		}
+		.mi {
+			max-width: 50vw;
 		}
 		--></style>';
 	}

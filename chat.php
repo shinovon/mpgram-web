@@ -167,7 +167,7 @@ try {
 			echo '<script type="text/javascript">
 <!--
 function rr(){if(typeof XMLHttpRequest===\'undefined\'){XMLHttpRequest=function(){try{return new ActiveXObject("Msxml2.XMLHTTP.6.0");}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP.3.0");}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP");}catch(e){}try{return new ActiveXObject("Microsoft.XMLHTTP");}catch(e){}throw new Error("NO XMLHttpRequest Support!");};}return new XMLHttpRequest();}
-function ee(e){if(e.message !== undefined && e.message !== null){alert(e.message);}else{alert(e.toString());}}
+function ee(e){if(e.message !== undefined && e.message !== null){}else{}}
 var r = null;
 function h(){if(r.readyState == 4){try{var e=r.responseText;if(e!=null&&e.length>1){var f=e.indexOf("||");if(f!=-1){b=e.substring(0,f);e=e.substring(f+2);if(e.length>1){var msgs=document.getElementById("msgs");var d=document.createElement("div");d.innerHTML=e;for(var i=d.childNodes.length-1;i>=0;i--){'.($reverse ? 'msgs.appendChild(d.childNodes[i])':'msgs.insertBefore(d.childNodes[i],msgs.firstChild)').';}while(msgs.childNodes.length>'.$msglimit.'){msgs.removeChild(msgs.'.($reverse ? 'first' : 'last').'Child);}}}'.($autoscroll && $reverse ? 'setTimeout("autoScroll(false)",500);' : '').'}}catch(e){ee(e);}}}
 var b="'.$ii.'";var c=0;function a(){c++;if(c>70)return;try{r=rr();r.onreadystatechange=h;setTimeout("a();",'.$updint.'000);;r.open("GET","'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&i="+b+"&lang='.$lng['lang'].'&timeoff='.$timeoff.'");r.send(null);}catch(e){ee(e);}}try{setTimeout("a()",'.$updint.'000);}catch(e){ee(e);}
@@ -192,15 +192,15 @@ function autoScroll(force){try{text=document.getElementById("text");if(force){te
 		echo Themes::bodyStart();
 	}
 	$useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-	$avas = strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
-	$avas = MP::getSettingInt('avas', $avas);
+	$avas = strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
+	$avas = MP::getSettingInt('avas', $avas) && strpos($useragent, 'SymbianOS/9') === false;
 	echo '<header class="ch">';
 	echo '<div class="chc"><div class="chr"><small><a href="chats.php">'.MP::x($lng['back']).'</a>';
 	echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a>';
 	echo ' <a href="chatinfo.php?c='.$id.'">'.MP::x($lng['chat_info']??null).'</a>';
 	echo '</small></div>';
 	if($avas) {
-		echo '<div class="cava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></div>';
+		echo '<div class="chava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></div>';
 	}
 	echo '<div class="chn">';
 	echo MP::dehtml($name);

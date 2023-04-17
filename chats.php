@@ -23,7 +23,7 @@ if(isset($_GET['count'])) {
 	$count = (int) $_GET['count'];
 }
 $useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-$avas = strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
+$avas = strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
 $avas = MP::getSettingInt('avas', $avas);
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
@@ -313,19 +313,21 @@ try {
 		$msgs = $r['messages'];
 		$c = 0;
 		$msglimit = MP::getSettingInt('limit', 20);
+		echo '<table class="cl">';
 		foreach($dialogs as $d){
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
 			$id = MP::getId($MP, $d['peer']);
 			try {
-				echo '<div class="c'.($c%2==0 ? '1': '0').'">';
+				echo '<tr class="c">';
 				$cl = 'chat.php?c='.$id;
 				$unr = $d['unread_count'];
 				if($unr > $msglimit) {
 					$cl .= '&m='.$d['read_inbox_max_id'].'&offset='.(-$msglimit-1);
 				}
 				if($avas) {
-					echo '<div class="cava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></div>';
+					echo '<td class="cava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></td>';
 				}
+				echo '<td class="ctext">';
 				echo '<a href="'.$cl.'"><b>';
 				$peer = $d['peer'];
 				$n = null;
@@ -401,12 +403,14 @@ try {
 					echo '</div>';
 				} catch (Exception $e) {
 				}
-				echo '</div>';
+				echo '</td>';
+				echo '</tr>';
 			} catch (Exception $e) {
 				echo "<xmp>$e</xmp>";
 			}
 			$c += 1;
 		}
+		echo '</table>';
 		unset($dialogs);
 		unset($r);
 	} catch (Exception $e) {
