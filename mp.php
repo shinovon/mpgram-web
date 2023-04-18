@@ -414,7 +414,7 @@ class MP {
 							if(isset($button['data'])) {
 								$s = 'href="botcallback.php?m='.$m['id'].'&c='.$id.'&d='.urlencode(base64_encode($button['data'])).'"';
 							} else if(isset($button['url'])) {
-								$s = 'href="'.wrapUrl($button['url']).'"';
+								$s = 'href="'.static::wrapUrl($button['url']).'"';
 							}
 							echo '<td class="btd"><a class="btn" '.$s.'>'.$button['text'].'</a></td>';
 						}
@@ -555,7 +555,12 @@ class MP {
 						$url = static::getURL().'/chat.php?c='.$path[0].'&m='.$path[1];
 					} else if(count($path) == 1) {
 						if(strpos($path[0], 'iv?') !== 0) {
-							$url = static::getURL().'/chat.php?c='.$path[0];
+							$s = $path[0];
+							if(strpos($s, '?start=') !== false) {
+								$s = str_replace('?start=', "&start=", $s);
+								$s .= '&rnd='.rand(0, 100000);
+							}
+							$url = static::getURL().'/chat.php?c='.$s;
 						}
 					}
 					break;

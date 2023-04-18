@@ -35,7 +35,6 @@ if(isset($_GET['offset_from'])) {
 if(isset($_GET['max_id'])) {
 	$msgmaxid = (int) $_GET['max_id'];
 }
-
 $user = MP::getUser();
 if(!$user) {
 	header('Location: login.php?logout=1');
@@ -52,6 +51,11 @@ if(isset($_GET['peer'])) {
 	die();
 } else {
 	$id = $_GET['c'];
+}
+
+$start = null;
+if(isset($_GET['start'])) {
+	$start = $_GET['start'];
 }
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
@@ -99,6 +103,9 @@ try {
 	} else if(!$left && isset($_GET['leave'])) {
 		$MP->channels->leaveChannel(['channel' => $id]);
 		$left = true;
+	}
+	if($start !== null) {
+		$MP->messages->startBot(['start_param' => $start, 'bot' => $id, 'random_id' => $_GET['rnd']]);
 	}
 	function printInputField() {
 		global $full;
