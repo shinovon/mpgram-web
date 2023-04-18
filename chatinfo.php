@@ -121,9 +121,9 @@ try {
 				}
 			}
 			if($avas) {
-				echo '<td class="cava"><img class="ri" src="ava.php?c='.$u['id'].'&p=r36"></td>';
+				echo '<td class="cava cbd"><img class="ri" src="ava.php?c='.$u['id'].'&p=r36"></td>';
 			}
-			echo '<td class="ctext">';
+			echo '<td class="ctext cbd">';
 			if($rank) {
 				echo '<div class="chr ml">'.MP::dehtml($rank).'</div>';
 			}

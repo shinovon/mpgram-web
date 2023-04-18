@@ -404,6 +404,24 @@ class MP {
 						echo '<div><i>'.$lng['media_att'].'</i></div>';
 					}
 				}
+				if(isset($m['reply_markup'])) {
+					$rows = $m['reply_markup']['rows'] ?? [];
+					echo '<table>';
+					foreach($rows as $row) {
+						echo '<tr><table class="rt rc"><tr>';
+						foreach($row['buttons'] ?? [] as $button) {
+							$s = '';
+							if(isset($button['data'])) {
+								$s = 'href="botcallback.php?m='.$m['id'].'&c='.$id.'&d='.urlencode(base64_encode($button['data'])).'"';
+							} else if(isset($button['url'])) {
+								$s = 'href="'.wrapUrl($button['url']).'"';
+							}
+							echo '<td class="btd"><a class="btn" '..'>'.$button['text'].'</a></td>';
+						}
+						echo '</tr></table></tr>';
+					}
+					echo '</table>';
+				}
 				if(isset($m['action'])) {
 					echo MP::parseMessageAction($m['action'], $mname1, $uid, $name, $lng, true, $MP);
 				}

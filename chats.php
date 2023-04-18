@@ -325,9 +325,9 @@ try {
 					$cl .= '&m='.$d['read_inbox_max_id'].'&offset='.(-$msglimit-1);
 				}
 				if($avas) {
-					echo '<td class="cava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></td>';
+					echo '<td class="cava cbd"><img class="ri" src="ava.php?c='.$id.'&p=r36"></td>';
 				}
-				echo '<td class="ctext">';
+				echo '<td class="ctext cbd">';
 				echo '<a href="'.$cl.'"><b>';
 				$peer = $d['peer'];
 				$n = null;

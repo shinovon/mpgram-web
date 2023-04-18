@@ -111,7 +111,7 @@ class Themes {
 			vertical-align: top;
 			width: 100%;  
 		}
-		td {
+		.cbd {
 			border-bottom: 1px solid '.(static::$theme == 0 ? '#222' : '#eee').';
 		}
 		'.(static::$theme == 0 ? '' : '.ml, .mf, .mn {
@@ -152,10 +152,10 @@ class Themes {
 			background: '.(static::$theme == 0?'#000':'#fff').';
 		}
 		.chc {
+			'.($full ? '' : 'max-width: 540px;
 			margin-left: auto;
 			margin-right: auto;
-			max-width: 540px;
-			padding-top: 2px;
+			') . 'padding-top: 2px;
 		}
 		.chr {
 			float: right;
@@ -181,6 +181,35 @@ class Themes {
 		}
 		.mi {
 			max-width: 50vw;
+		}
+		textarea {
+			resize: none;
+		}
+		.t {
+		'.($full ?
+	'		display: inline;
+			z-index: 1;
+			position: fixed;
+			left: 0;
+			width: 100%;
+			bottom: 0;
+			background: #000;
+			height: 4em;
+		' : '').'}
+		.rc {
+			width: 100%;
+		}
+		.btn {
+			background-color: grey;
+			color: white;
+			padding: 1px;
+			border: solid 1px white;
+			width: 100%;
+			display: block;
+			text-align: center;
+		}
+		.btd {
+			padding: 2px;
 		}
 		--></style>';
 	}

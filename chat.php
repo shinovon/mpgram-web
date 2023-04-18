@@ -101,13 +101,14 @@ try {
 		$left = true;
 	}
 	function printInputField() {
+		global $full;
 		global $left;
 		global $ch;
 		global $id;
 		global $lng;
 		global $reverse;
 		global $canpost;
-		echo '<div class="in" id="text">';
+		echo '<div class="in'.($reverse?' t':'').'" id="text">';
 		if($left) {
 			echo '<form action="chat.php">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
@@ -133,10 +134,12 @@ try {
 			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
 			echo '</form>';
 		}
+		/*
 		if($reverse) {
 			echo '<div><a href="chats.php">'.MP::x($lng['back']).'</a>';
 			echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a></div>';
 		}
+		*/
 		echo '</div>';
 	}
 	$r = $MP->messages->getHistory([
@@ -159,6 +162,7 @@ try {
 	$endReached = $id_offset === 0 || ($id_offset === null && $msgoffset <= 0);
 	$hasOffset = $msgoffset > 0 || $msgoffsetid > 0;
 	$rm = $r['messages'];
+	$full = MP::getSetting('full', 0);
 	echo '<head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
 	if((!$hasOffset || $endReached) && $autoupd == 1 && count($rm) > 0) {
