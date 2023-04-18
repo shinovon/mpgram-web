@@ -416,7 +416,7 @@ class MP {
 							} else if(isset($button['url'])) {
 								$s = 'href="'.wrapUrl($button['url']).'"';
 							}
-							echo '<td class="btd"><a class="btn" '..'>'.$button['text'].'</a></td>';
+							echo '<td class="btd"><a class="btn" '.$s.'>'.$button['text'].'</a></td>';
 						}
 						echo '</tr></table></tr>';
 					}
