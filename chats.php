@@ -353,7 +353,7 @@ try {
 						break;
 					}
 				}
-				echo $n.'</b>';
+				echo MP::dehtml($n).'</b>';
 				if($unr > 0) {
 					echo ' <b class="unr">+'.$unr.'</b>';
 				}

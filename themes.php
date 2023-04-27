@@ -61,6 +61,7 @@ class Themes {
 			overflow: hidden;
 			-webkit-box-orient: vertical;
 			-webkit-line-clamp: 2;
+			max-height: 2.5em;
 		}
 		.ct {
 			margin-left: 2px;
@@ -109,7 +110,7 @@ class Themes {
 		}
 		.ctext {
 			vertical-align: top;
-			width: 100%;  
+			width: 100%;
 		}
 		.cbd {
 			border-bottom: 1px solid '.(static::$theme == 0 ? '#222' : '#eee').';
@@ -210,6 +211,10 @@ class Themes {
 		}
 		.btd {
 			padding: 2px;
+		}
+		.cta {
+			width: 100%;
+			'.(static::$iev > 0 && static::$iev < 5 ? 'height: 48px;' : 'height: 3em;').'
 		}
 		--></style>';
 	}

@@ -48,7 +48,6 @@ try {
 
 	if($type != 'user') {
 		$desc = $MP->getFullInfo($id)['full']['about'] ?? null;
-		
 		$members = $chat['participants'] ?? null;
 		$onlines = 0;
 
@@ -74,7 +73,7 @@ try {
 	echo MP::dehtml($name);
 	echo '</div>';
 	echo '<div>';
-	if($type != 'user') {
+	if($type != 'user' && !empty($members)) {
 		echo MP::x(MPLocale::number($type == 'chat' ? 'members' : 'subscribers', count($members)));
 		if($onlines > 0) {
 			echo ', ' . strval($onlines) . ' ' . MP::x($lng['online']);

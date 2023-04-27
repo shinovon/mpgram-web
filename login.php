@@ -18,7 +18,7 @@ $ua = '';
 $iev = MP::getIEVersion();
 if($iev > 0 && $iev < 4) $theme = 1;
 $theme = MP::getSettingInt('theme', $theme);
-$post = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false;
+$post = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false) || ($iev < 4 && $iev == 0);
 
 $lng = MP::initLocale();
 MP::cookie('theme', $theme, time() + (86400 * 365));
@@ -332,7 +332,7 @@ if($phone !== null) {
 	echo '<input type="submit">';
 	echo '</form>';
 	if($wrong) {
-		echo MP::x('<b>'.MP::x($lng['wrong_number_format']).'</b><br>');
+		echo MP::x('<b>'.$lng['wrong_number_format'].'</b><br>');
 	}
 	echo '<br><div>';
 	echo MP::x('<a href="about.php">'.$lng['about'].'</a> <a href="login.php?lang=en">English</a> <a href="login.php?lang=ru">Русский</a>');
