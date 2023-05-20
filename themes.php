@@ -62,6 +62,7 @@ class Themes {
 			-webkit-box-orient: vertical;
 			-webkit-line-clamp: 2;
 			max-height: 2.5em;
+			line-height: 1.25em;
 		}
 		.ct {
 			margin-left: 2px;
