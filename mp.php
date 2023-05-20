@@ -321,6 +321,7 @@ class MP {
 							echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig"><img class="mi" src="file.php?m='.$m['id'].'&c='.$id.'&p=rprev"></img></a></div>';
 						}
 					} else if(isset($media['document'])) {
+						$thumb = isset($media['document']['thumbs']);
 						$d = $MP->getDownloadInfo($m);
 						$fn = $d['name'];
 						$fext = $d['ext'];
@@ -378,6 +379,9 @@ class MP {
 								}
 							} else {
 								echo '<div class="mw"><b><a href="file.php?m='.$m['id'].'&c='.$id.'">'.MP::dehtml($n).'</a></b><br>';
+								if($thumb) {
+									echo '<a href="file.php?m='.$m['id'].'&c='.$id.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'"></img></a><br>';
+								}
 								echo round($d['size']/1024.0/1024.0, 2).' MB';
 								echo '</div>';
 							}

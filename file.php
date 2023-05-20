@@ -70,6 +70,19 @@ try {
 	if(isset($_GET['p'])) {
 		$p = $_GET['p'];
 	}
+	if(strpos($p, 'thumb') === 0) {
+		$p = substr($p, 5);
+		$t = str_replace('messagemedia', '', strtolower($msg['media']['_']));
+		$m = $msg['media'][$t];
+		$d = array();
+		$d['InputFileLocation']['_'] = 'inputDocumentFileLocation';
+		$d['InputFileLocation']['id'] = $m['id'];
+		$d['InputFileLocation']['access_hash'] = $m['access_hash'];
+		$d['InputFileLocation']['thumb_size'] = 'm';
+		$d['InputFileLocation']['file_reference'] = $m['file_reference'];
+		$d['InputFileLocation']['dc_id'] = $m['dc_id'];
+		$di = $d;
+	}
 	if(strpos($p, 'r') === 0) {
 		header('Cache-Control: private, max-age=86400');
 		$p = substr($p, 1);
