@@ -184,7 +184,7 @@ if($phone !== null) {
 		}
 	}
 	if(!isset($user) || $nouser) {
-		$user = hash('sha384', sha1(md5($phone.rand(0,1000).random_bytes(6))).random_bytes(30));
+		$user = rtrim(strtr(base64_encode(hash('sha384', sha1(md5($phone.rand(0,1000).random_bytes(6))).random_bytes(30), true)), '+/', '-_'), '=');
 		MP::cookie('user', $user, time() + (86400 * 365));
 		$MP = MP::getMadelineAPI($user, true);
 		htmlStart();

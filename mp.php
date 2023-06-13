@@ -737,7 +737,7 @@ class MP {
 			$x = (int)$_COOKIE[$name];
 		}
 		if($x && $write) {
-			static::cookie($name, $x, time());
+			static::cookie($name, $x, time() + (86400 * 365));
 		}
 		return $x;
 	}
@@ -759,11 +759,11 @@ class MP {
 	}
 
 	static function cookie($n, $v) {
-		header('Set-Cookie: '.$n.'='.$v.'; expires='.date('r', time() + (86400 * 365)), false);
+		header('Set-Cookie: '.$n.'='.$v.'; path=/; expires='.date('r', time() + (86400 * 365)), false);
 	}
 
 	static function delCookie($n) {
-		header('Set-Cookie: '.$n.'=; expires='.date('r', time() - 86400), false);
+		header('Set-Cookie: '.$n.'=; path=/; expires='.date('r', time() - 86400), false);
 	}
 	
 	static function deleteSessionFile($user) {
