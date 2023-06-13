@@ -1,5 +1,4 @@
 <?php
-
 include 'redirect.php';
 
 ini_set('error_reporting', E_ALL);
@@ -14,8 +13,12 @@ $theme = MP::getSettingInt('theme');
 $autoupd = MP::getSettingInt('autoupd', ($iev == 0 || $iev > 4) ? 1 : 0);
 $updint = MP::getSettingInt('updint', 10);
 $dynupd = MP::getSettingInt('dynupd', 1);
-$reverse = MP::getSettingInt('reverse', 0) == 1;
+$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+$sym3 = strpos($ua, 'Symbian/3') !== false;
+$reverse = MP::getSettingInt('reverse', $sym3) == 1;
 $autoscroll = MP::getSettingInt('autoscroll', 1) == 1;
+$full = MP::getSettingInt('full', 0) == 1;
+$texttop = MP::getSettingInt('texttop', $sym3) == 1;
 
 $lng = MP::initLocale();
 
@@ -116,7 +119,9 @@ try {
 		global $reverse;
 		global $canpost;
 		global $iev;
-		echo '<div class="in'.($reverse?' t':'').'" id="text">';
+		global $texttop;
+		global $ua;
+		echo '<div class="in'.($reverse?' t':'').($texttop?' cb':'').'" id="text">';
 		if($left) {
 			echo '<form action="chat.php">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
@@ -124,7 +129,6 @@ try {
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
 			echo '</form>';
 		} else if(!$ch || $canpost) {
-			$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
 			$post = strpos($ua, 'Series60/3') === false;
 			$opera = strpos($ua, 'Opera') !== false || ($iev != 0 && $iev <= 7);
 			$watchos = strpos($ua, 'Watch OS') !== false;
@@ -139,7 +143,7 @@ try {
 			//echo '<input type="checkbox" id="format" name="format">';
 			//echo '<label for="format">'.MP::x($lng['html_formatting']).'</label>';
 			echo '</form>';
-			echo '<form action="msg.php" class="in'.((!$opera) ? 'r' : '').'">';
+			echo '<form action="msg.php" style="margin: 0" class="in'.((!$opera) ? 'r' : '').'">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
 			echo '</form>';
@@ -172,7 +176,6 @@ try {
 	$endReached = $id_offset === 0 || ($id_offset === null && $msgoffset <= 0);
 	$hasOffset = $msgoffset > 0 || $msgoffsetid > 0;
 	$rm = $r['messages'];
-	$full = MP::getSetting('full', 0);
 	echo '<head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
 	if((!$hasOffset || $endReached) && $autoupd == 1 && count($rm) > 0) {
@@ -193,15 +196,16 @@ setTimeout("location.reload(true);",'.$updint.'000);
 		}
 	}
 	if($reverse) {
-		echo '<script type="text/javascript"><!--
+echo '<script type="text/javascript"><!--
+var reverse = '.($reverse&&$texttop?'true':'false').';
 function getScrollY(){var a = window.pageXOffset !== undefined;var b = ((document.compatMode || "") === "CSS1Compat");return a?window.pageYOffset:b?document.documentElement.scrollTop:document.body.scrollTop;}
 function getHeight(){var a = window.innerHeight !== undefined;return a?window.innerHeight:document.documentElement.clientHeight||document.body.clientHeight;}
-function autoScroll(force){try{text=document.getElementById("text");if(force){text.scrollIntoView();}else{try{tw=text.clientHeight;sh=getHeight();sy=getScrollY();ph=document.body.scrollHeight;if(sy>ph-tw-sy) {text.scrollIntoView();}}catch(e){text.scrollIntoView();}}}catch(e){}}
+function autoScroll(force){try{text=document.getElementById("text");bottom=document.getElementById("bottom");if(force){if(reverse){bottom.scrollIntoView();}else{text.scrollIntoView();}}else{try{tw=text.clientHeight;sh=getHeight();sy=getScrollY();ph=document.body.scrollHeight;if(sy>ph-tw-sy) {text.scrollIntoView();}}catch(e){text.scrollIntoView();}}}catch(e){}}
 //--></script>';
 	}
 	echo '</head>'."\n";
 	if($reverse && $autoscroll) {
-		echo Themes::bodyStart('class="c" onload="autoScroll(true);"');
+		echo Themes::bodyStart('onload="autoScroll(true);"');
 	} else {
 		echo Themes::bodyStart();
 	}
@@ -257,8 +261,7 @@ function autoScroll(force){try{text=document.getElementById("text");if(force){te
 		}
 		$rm = array_reverse($rm);
 	}
-	
-	if(!$reverse) echo '<p></p>';
+	if(!$texttop && !$reverse) echo '</p><p>';
 	echo '<div id="msgs">';
 	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true);
 	echo '</div>';
@@ -276,6 +279,7 @@ function autoScroll(force){try{text=document.getElementById("text");if(force){te
 		}
 		printInputField();
 	}
+	if($texttop) echo '<div style="height: 5em;" id="bottom"></div>';
 	// Mark as read
 	if($endReached) {
 		try {

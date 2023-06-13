@@ -5,11 +5,13 @@ $dynupd = 1;
 $updint = 10;
 $theme = 0;
 $chats = 15;
-$reverse = 0;
-$autoscroll = 0;
+$sym3 = strpos($_SERVER['HTTP_USER_AGENT'] ?? '', 'Symbian/3') !== false;
+$reverse = $sym3 ? 1 : 0;
+$autoscroll = 1;
 $limit = 20;
 $useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $avas = strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
+$texttop = $sym3 ? 1 : 0;
 $set = isset($_GET['set']);
 include 'mp.php';
 if($set) {
@@ -61,6 +63,7 @@ if($set) {
 	MP::cookie('autoscroll', $autoscroll, time() + (86400 * 365));
 	MP::cookie('limit', $limit, time() + (86400 * 365));
 	MP::cookie('avas', $avas, time() + (86400 * 365));
+	MP::cookie('texttop', $texttop, time() + (86400 * 365));
 } else {
 	if(isset($_COOKIE['lang'])) {
 		$lang = $_COOKIE['lang'];
@@ -88,6 +91,9 @@ if($set) {
 	}
 	if(isset($_COOKIE['avas'])) {
 		$avas = (int)$_COOKIE['avas'];
+	}
+	if(isset($_COOKIE['texttop'])) {
+		$texttop = (int)$_COOKIE['texttop'];
 	}
 }
 
@@ -118,6 +124,8 @@ echo '<label for="reverse">'.MP::x($lng['set_chat_reverse_mode']).'</label>';
 echo '<br><input type="checkbox" id="autoscroll" name="autoscroll"'.($autoscroll ? ' checked' : '').'>';
 echo '<label for="autoscroll">'.MP::x($lng['set_chat_autoscroll']).'</label>';
 echo '<br><input type="checkbox" id="avas" name="avas"'.($avas ? ' checked' : '').'>';
+echo '<label for="texttop">'.MP::x($lng['set_chat_texttop']).'</label>';
+echo '<br><input type="checkbox" id="textxtop" name="texttop"'.($texttop ? ' checked' : '').'>';
 echo '<label for="avas">'.MP::x($lng['set_chat_avas']).'</label>';
 echo '</p><p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
 echo '<input type="text" size="3" id="updint" name="updint" value="'.$updint.'"><br>';

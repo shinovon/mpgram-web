@@ -10,9 +10,9 @@ class Themes {
 	}
 	static function bodyStart($a = null) {
 		if($a) {
-			return '<body '.$a.'>';
+			return '<body '.$a.'>'.(static::$iev > 0 ? '<div class="bc">' : '');
 		}
-		return '<body>'.(static::$iev > 0 ? '<div class="c">' : '');
+		return '<body>'.(static::$iev > 0 ? '<div class="bc">' : '');
 	}
 	
 	static function bodyEnd() {
@@ -21,11 +21,11 @@ class Themes {
 	
 	static function head() {
 		static::$iev = MP::getIEVersion();
-		$full = MP::getSetting('full', 0, true);
+		$full = MP::getSettingInt('full', 0) == 1;
 		return (MP::$enc == null ? '<meta charset="UTF-8">' : '').
 		'<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style type="text/css"><!--
-		'.(static::$iev > 0 ? '.c {
+		'.(static::$iev > 0 ? '.bc {
 			text-align: left;
 			width: 420;
 			margin-left: auto;
@@ -53,16 +53,6 @@ class Themes {
 			color: #eee;
 			border-color: #eee;
 			' : '').'border-style: solid;
-		}
-		.cm {
-			color: '.(static::$theme == 0 ? '#ccc' : '#111').';
-			display: -webkit-box;
-			text-overflow: ellipsis;
-			overflow: hidden;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 2;
-			max-height: 2.5em;
-			line-height: 1.25em;
 		}
 		.ct {
 			margin-left: 2px;
@@ -101,6 +91,17 @@ class Themes {
 		}
 		.c {
 			min-height: 42px;
+			margin: 0px;
+		}
+		.cm {
+			color: '.(static::$theme == 0 ? '#ccc' : '#111').';
+			display: -webkit-box;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+			max-height: 2.5em;
+			line-height: 1.25em;
 		}
 		.cava {
 			vertical-align: top;
@@ -153,11 +154,19 @@ class Themes {
 			z-index: 1;
 			background: '.(static::$theme == 0?'#000':'#fff').';
 		}
+		.cb {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			z-index: 1;
+			background: '.(static::$theme == 0?'#000':'#fff').';
+		}
 		.chc {
-			'.($full ? '' : 'max-width: 540px;
+			'./*($full ? '' : 'max-width: 540px;
 			margin-left: auto;
 			margin-right: auto;
-			') . 'padding-top: 2px;
+			') .*/'padding-top: 2px;
 		}
 		.chr {
 			float: right;
@@ -188,8 +197,8 @@ class Themes {
 			resize: none;
 		}
 		.t {
-		'.($full ?
-	'		display: inline;
+			'.($full ?
+			'display: inline;
 			z-index: 1;
 			position: fixed;
 			left: 0;
