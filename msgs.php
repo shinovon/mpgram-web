@@ -23,7 +23,7 @@ function printMsgs($MP, $msg, $update_id) {
 	'offset_date' => 0,
 	'add_offset' => 0,
 	'limit' => 1,
-	'max_id' => 0,
+	'max_id' => $msg['id']+1,
 	'min_id' => $msg['id']-1,
 	'hash' => 0]);
 	$rm = $r['messages'];
