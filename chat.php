@@ -14,11 +14,12 @@ $autoupd = MP::getSettingInt('autoupd', ($iev == 0 || $iev > 4) ? 1 : 0);
 $updint = MP::getSettingInt('updint', 10);
 $dynupd = MP::getSettingInt('dynupd', 1);
 $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-$sym3 = strpos($ua, 'Symbian/3') !== false;
+$sym3 = strpos($ua, 'Symbian/3') !== false ? 1 : 0;
 $reverse = MP::getSettingInt('reverse', $sym3) == 1;
 $autoscroll = MP::getSettingInt('autoscroll', 1) == 1;
 $full = MP::getSettingInt('full', 0) == 1;
 $texttop = MP::getSettingInt('texttop', $sym3) == 1;
+$longpoll = MP::getSettingInt('longpoll', strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android')) == 1;
 
 $lng = MP::initLocale();
 
@@ -184,8 +185,16 @@ try {
 function rr(){if(typeof XMLHttpRequest===\'undefined\'){XMLHttpRequest=function(){try{return new ActiveXObject("Msxml2.XMLHTTP.6.0");}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP.3.0");}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP");}catch(e){}try{return new ActiveXObject("Microsoft.XMLHTTP");}catch(e){}return null;};}return new XMLHttpRequest();}
 function ee(e){if(e.message !== undefined && e.message !== null){alert(e.message);}else{alert(e);}}
 var r = null;
-function h(){if(r.readyState == 4){try{var e=r.responseText;if(e!=null&&e.length>1){var f=e.indexOf("||");if(f!=-1){b=e.substring(0,f);e=e.substring(f+2);if(e.length>1){var msgs=document.getElementById("msgs");var d=document.createElement("div");d.innerHTML=e;for(var i=d.childNodes.length-1;i>=0;i--){'.($reverse ? 'msgs.appendChild(d.childNodes[i])':'msgs.insertBefore(d.childNodes[i],msgs.firstChild)').';}while(msgs.childNodes.length>'.$msglimit.'){msgs.removeChild(msgs.'.($reverse ? 'first' : 'last').'Child);}}}'.($autoscroll && $reverse ? 'setTimeout("autoScroll(false)",500);' : '').'}}catch(e){ee(e);}}}
-var b="'.$ii.'";var c=0;function a(){c++;if(c>70)return;try{r=rr();if(r==null)return;r.onreadystatechange=h;setTimeout("a();",'.$updint.'000);;r.open("GET","'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&i="+b+"&lang='.$lng['lang'].'&timeoff='.$timeoff.'");r.send(null);}catch(e){ee(e);}}try{setTimeout("a()",'.$updint.'000);}catch(e){ee(e);}
+var reverse = '.($reverse?'true':'false').';
+var autoscroll = '.($autoscroll?'true':'false').';
+var longpoll = '.($longpoll?'true':'false').';
+var updint = '.($longpoll?'1000':$updint.'000').';
+var url = "'.MP::getUrl().'msgst.php?user='.$user.'&id='.$id.'&lang='.$lng['lang'].'&t='.$timeoff.($longpoll?'&l':'').'";
+var msglimit = '.$msglimit.';
+var msg = "'.$ii.'";
+var o = "0";
+function h(){if(r.readyState == 4){try{var e=r.responseText;if(e!=null&&e.length>1){var f=e.indexOf("||");if(f!=-1){if(longpoll){o=e.substring(0,f);}else{msg=e.substring(0,f);}e=e.substring(f+2);if(e.length>0){var msgs=document.getElementById("msgs");var d=document.createElement("div");d.innerHTML=e;for(var i=d.childNodes.length-1;i>=0;i--){if(reverse){msgs.appendChild(d.childNodes[i]);}else{msgs.insertBefore(d.childNodes[i],msgs.firstChild);}}while(msgs.childNodes.length>msglimit){msgs.removeChild(reverse ? msgs.firstChild :msgs.lastChild);}}}if(autoscroll && reverse){setTimeout("autoScroll(false)",500);}}}catch(e){ee(e);}setTimeout("a();",updint);}}
+var c=0;function a(){c++;if(c>70)return;try{r=rr();if(r==null)return;r.onreadystatechange=h;r.open("GET",url+"&m="+msg+"&o="+o);r.send(null);}catch(e){ee(e);}}try{setTimeout("a()",updint);}catch(e){ee(e);}
 //--></script>';
 		} else {
 			echo '<script type="text/javascript"><!--

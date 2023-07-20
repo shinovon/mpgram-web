@@ -12,6 +12,7 @@ $limit = 20;
 $useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $avas = strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
 $texttop = $sym3 ? 1 : 0;
+$longpoll = strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') ? 1 : 0;
 $set = isset($_GET['set']);
 include 'mp.php';
 if($set) {
@@ -53,7 +54,7 @@ if($set) {
 			$limit = 50;
 		}
 	}
-	
+	$texttop = isset($_GET['texttop']) ? 1 : 0;
 	MP::cookie('lang', $lang, time() + (86400 * 365));
 	MP::cookie('autoupd', $autoupd, time() + (86400 * 365));
 	MP::cookie('updint', $updint, time() + (86400 * 365));
@@ -64,6 +65,7 @@ if($set) {
 	MP::cookie('limit', $limit, time() + (86400 * 365));
 	MP::cookie('avas', $avas, time() + (86400 * 365));
 	MP::cookie('texttop', $texttop, time() + (86400 * 365));
+	MP::cookie('longpoll', $longpoll, time() + (86400 * 365));
 } else {
 	if(isset($_COOKIE['lang'])) {
 		$lang = $_COOKIE['lang'];
@@ -95,6 +97,9 @@ if($set) {
 	if(isset($_COOKIE['texttop'])) {
 		$texttop = (int)$_COOKIE['texttop'];
 	}
+	if(isset($_COOKIE['longpoll'])) {
+		$longpoll = (int)$_COOKIE['longpoll'];
+	}
 }
 
 $lng = MP::initLocale();
@@ -124,9 +129,11 @@ echo '<label for="reverse">'.MP::x($lng['set_chat_reverse_mode']).'</label>';
 echo '<br><input type="checkbox" id="autoscroll" name="autoscroll"'.($autoscroll ? ' checked' : '').'>';
 echo '<label for="autoscroll">'.MP::x($lng['set_chat_autoscroll']).'</label>';
 echo '<br><input type="checkbox" id="avas" name="avas"'.($avas ? ' checked' : '').'>';
-echo '<label for="texttop">'.MP::x($lng['set_chat_texttop']).'</label>';
-echo '<br><input type="checkbox" id="textxtop" name="texttop"'.($texttop ? ' checked' : '').'>';
 echo '<label for="avas">'.MP::x($lng['set_chat_avas']).'</label>';
+echo '<br><input type="checkbox" id="texttop" name="texttop"'.($texttop ? ' checked' : '').'>';
+echo '<label for="texttop">'.MP::x($lng['set_chat_texttop']).'</label>';
+echo '<br><input type="checkbox" id="longpoll" name="longpoll"'.($longpoll ? ' checked' : '').'>';
+echo '<label for="longpoll">Longpoll</label>';
 echo '</p><p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
 echo '<input type="text" size="3" id="updint" name="updint" value="'.$updint.'"><br>';
 echo '<label for="limit">'.MP::x($lng['set_msgs_limit']).'</label>:<br>';
