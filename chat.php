@@ -52,14 +52,11 @@ if(isset($_GET['peer'])) {
 	$id = $_GET['peer'];
 } else if(!isset($_GET['c'])) {
 	die();
-} else {
-	$id = $_GET['c'];
 }
+$id = $_GET['c'];
 
-$start = null;
-if(isset($_GET['start'])) {
-	$start = $_GET['start'];
-}
+$start = $_GET['start'] ?? null;
+$file = htmlentities($_SERVER['PHP_SELF']);
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
 	throw new ErrorException($message, 0, $severity, $filename, $lineno);
@@ -123,7 +120,7 @@ try {
 		global $ua;
 		echo '<div class="in'.($reverse?' t':'').($texttop?' cb':'').'" id="text">';
 		if($left) {
-			echo '<form action="chat.php">';
+			echo '<form action="'.$file.'">';
 			echo '<input type="hidden" name="c" value="'.$id.'">';
 			echo '<input type="hidden" name="join" value="1">';
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
@@ -175,6 +172,7 @@ try {
 	}
 	$endReached = $id_offset === 0 || ($id_offset === null && $msgoffset <= 0);
 	$hasOffset = $msgoffset > 0 || $msgoffsetid > 0;
+	$dir = $_GET['d'] ?? null;
 	$rm = $r['messages'];
 	echo '<head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
@@ -195,7 +193,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 //--></script>';
 		}
 	}
-	if($reverse) {
+	if($reverse && ($dir != 'd' || $endReached)) {
 echo '<script type="text/javascript"><!--
 var reverse = '.($reverse&&$texttop?'true':'false').';
 function getScrollY(){var a = window.pageXOffset !== undefined;var b = ((document.compatMode || "") === "CSS1Compat");return a?window.pageYOffset:b?document.documentElement.scrollTop:document.body.scrollTop;}
@@ -221,14 +219,14 @@ function autoScroll(force){try{text=document.getElementById("text");bottom=docum
 		echo MP::dehtml($name);
 		echo '</div>';
 		echo '<div><small><a href="chats.php">'.MP::x($lng['back']).'</a>';
-		echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a>';
+		echo ' <a href="'.$file.'?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a>';
 		echo ' <a href="chatinfo.php?c='.$id.'">'.MP::x($lng['chat_info']??null).'</a>';
 		echo '</small></div>';
 		echo '</header>';
 	} else {
 		echo '<header class="ch">';
 		echo '<div class="chc"><div class="chr"><small><a href="chats.php">'.MP::x($lng['back']).'</a>';
-		echo ' <a href="chat.php?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a>';
+		echo ' <a href="'.$file.'?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a>';
 		echo ' <a href="chatinfo.php?c='.$id.'">'.MP::x($lng['chat_info']??null).'</a>';
 		echo '</small></div>';
 		if($avas) {
@@ -250,14 +248,14 @@ function autoScroll(force){try{text=document.getElementById("text");bottom=docum
 		printInputField();
 		if($hasOffset && !$endReached) {
 			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
-				echo '<p><a href="chat.php?c='.$id.'">'.MP::x($lng['history_up']).'</a></p>';
+				echo '<p><a href="'.$file.'?c='.$id.'&d=u">'.MP::x($lng['history_up']).'</a></p>';
 			} else {
-				echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[0]['id'].'&offset='.(-$msglimit-1).'">'.MP::x($lng['history_up']).'</a></p>';
+				echo '<p><a href="'.$file.'?c='.$id.'&d=u&offset_from='.$rm[0]['id'].'&offset='.(-$msglimit-1).'">'.MP::x($lng['history_up']).'</a></p>';
 			}
 		}
 	} else {
 		if(count($rm) >= $msglimit) {
-			echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[count($rm)-1]['id'].'&reverse=1">'.MP::x($lng['history_up']).'</a></p>';
+			echo '<p><a href="'.$file.'?c='.$id.'&d=u&offset_from='.$rm[count($rm)-1]['id'].'&reverse=1">'.MP::x($lng['history_up']).'</a></p>';
 		}
 		$rm = array_reverse($rm);
 	}
@@ -267,14 +265,14 @@ function autoScroll(force){try{text=document.getElementById("text");bottom=docum
 	echo '</div>';
 	if(!$reverse) {
 		if(count($rm) >= $msglimit) {
-			echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[count($rm)-1]['id'].'">'.MP::x($lng['history_down']).'</a></p>';
+			echo '<p><a href="'.$file.'?c='.$id.'&d=d&offset_from='.$rm[count($rm)-1]['id'].'">'.MP::x($lng['history_down']).'</a></p>';
 		}
 	} else {
 		if($hasOffset && !$endReached) {
 			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
-				echo '<p><a href="chat.php?c='.$id.'">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="'.$file.'?c='.$id.'&d=d">'.MP::x($lng['history_down']).'</a></p>';
 			} else {
-				echo '<p><a href="chat.php?c='.$id.'&offset_from='.$rm[count($rm)-1]['id'].'&offset='.(-$msglimit-1).'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="'.$file.'?c='.$id.'&d=d&offset_from='.$rm[count($rm)-1]['id'].'&offset='.(-$msglimit-1).'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
 			}
 		}
 		printInputField();
