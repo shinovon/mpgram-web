@@ -189,7 +189,7 @@ var reverse = '.($reverse?'true':'false').';
 var autoscroll = '.($autoscroll?'true':'false').';
 var longpoll = '.($longpoll?'true':'false').';
 var updint = '.($longpoll?'1000':$updint.'000').';
-var url = "'.MP::getUrl().'msgst.php?user='.$user.'&id='.$id.'&lang='.$lng['lang'].'&t='.$timeoff.($longpoll?'&l':'').'";
+var url = "'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&lang='.$lng['lang'].'&t='.$timeoff.($longpoll?'&l':'').'";
 var msglimit = '.$msglimit.';
 var msg = "'.$ii.'";
 var o = "0";
