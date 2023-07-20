@@ -19,7 +19,7 @@ $reverse = MP::getSettingInt('reverse', $sym3) == 1;
 $autoscroll = MP::getSettingInt('autoscroll', 1) == 1;
 $full = MP::getSettingInt('full', 0) == 1;
 $texttop = MP::getSettingInt('texttop', $sym3) == 1;
-$longpoll = MP::getSettingInt('longpoll', strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android')) == 1;
+$longpoll = MP::getSettingInt('longpoll', strpos($ua, 'AppleWebKit') || strpos($ua, 'Chrome') || strpos($ua, 'Symbian') || strpos($ua, 'SymbOS') || strpos($ua, 'Android')) == 1;
 
 $lng = MP::initLocale();
 
