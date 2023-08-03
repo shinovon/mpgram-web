@@ -69,7 +69,7 @@
 	"action_joinedbyrequest": "was accepted to the group",
 	"action_historyclear": "Chat history was cleared",
 	"action_chatcreate": "Group created",
-	"compactchats": "Compact list",
+	"compactchats": "Compact",
 	"set_chat_avas": "Chat photos",
 	"chat_info": "Info",
 	"chat_about": "About",
@@ -84,5 +84,7 @@
 	"subscribers": [
 		[ "=", 1, "$ subscriber", "$ subscribers" ]
 	],
-	"forward_save": "Save to favorites"
+	"forward_save": "Save to favorites",
+	"set_chat_texttop": "Textbox on bottom of screen",
+	"contacts": "Contacts"
 }

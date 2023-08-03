@@ -286,7 +286,7 @@ function autoScroll(force){try{text=document.getElementById("text");bottom=docum
 		}
 		printInputField();
 	}
-	if($texttop) echo '<div style="height: 5em;" id="bottom"></div>';
+	if($texttop) echo '<div style="height: 3.5em;" id="bottom"></div>';
 	// Mark as read
 	if($endReached) {
 		try {
