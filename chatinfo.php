@@ -43,7 +43,7 @@ try {
 	$chat = $MP->getPwrChat($id);
 	$name = $chat['title'] ?? (isset($chat['first_name']) ? $chat['first_name'] . (isset($chat['last_name']) ? ' '.$chat['last_name'] : '') : null) ?? 'Deleted Account';
 	$type = $chat['type'];
-	
+
 	$desc = null;
 
 	if($type != 'user') {
@@ -84,6 +84,18 @@ try {
 	if($desc) {
 		echo '<p>'.MP::x($lng['chat_about']).':<br>'.MP::dehtml($desc).'</p>';
 	}
+	if($type == 'user') {
+		$desc = $MP->getFullInfo($id)['full']['about'] ?? null;
+		if(isset($chat['phone'])) {
+			echo '<p>'.MP::x($lng['chat_phone']).':<br>+'.MP::dehtml($chat['phone']).'</p>';
+		}
+		if($desc) {
+			echo '<p>'.MP::x($lng['chat_bio']).':<br>'.MP::dehtml($desc).'</p>';
+		}
+		if(isset($chat['username'])) {
+			echo '<p>'.MP::x($lng['chat_username']).':<br>'.MP::dehtml($chat['username']).'</p>';
+		}
+	}
 	if($type != 'user' && $members) {
 		$avas = MP::getSettingInt('avas', 0);
 		echo MP::x($lng['chat_members']).':';
@@ -101,7 +113,7 @@ try {
 			if($u['type'] != 'user') {
 				$id = '-100'.$id;
 			}
-			
+
 			$un = $u['title'] ?? (isset($u['first_name']) ? $u['first_name'] . (isset($u['last_name']) ? ' '.$u['last_name'] : '') : null) ?? 'Deleted Account';
 			$status = null;
 			if(isset($u['status'])) {

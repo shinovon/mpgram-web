@@ -86,5 +86,8 @@
 	],
 	"forward_save": "Save to favorites",
 	"set_chat_texttop": "Textbox on bottom of screen",
-	"contacts": "Contacts"
+	"contacts": "Contacts",
+	"chat_phone": "Mobile",
+	"chat_bio": "Bio",
+	"chat_username": "Username"
 }

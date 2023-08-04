@@ -86,5 +86,8 @@
 	],
 	"forward_save": "Сохранить в избранные",
 	"set_chat_texttop": "Текстбокс внизу экрана",
-	"contacts": "Контакты"
+	"contacts": "Контакты",
+	"chat_phone": "Телефон",
+	"chat_bio": "О себе",
+	"chat_username": "Имя пользователя"
 }
