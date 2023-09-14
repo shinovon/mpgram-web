@@ -97,7 +97,6 @@ try {
 		}
 	}
 	$channel = isset($info['channel_id']);
-	unset($info);
 	if($left && isset($_GET['join'])) {
 		$MP->channels->joinChannel(['channel' => $id]);
 		$left = false;
@@ -300,6 +299,7 @@ function autoScroll(force){try{text=document.getElementById("text");bottom=docum
 			echo '<div>&nbsp;</div>';
 		}
 	}
+	unset($info);
 	$sname = $name;
 	if(mb_strlen($sname, 'UTF-8') > 30) $sname = mb_substr($sname, 0, 30, 'UTF-8');
 	if(!$reverse) {
