@@ -37,20 +37,5 @@ echo '<b>twsparkle</b> <a href="https://github.com/diller444">github</a>';
 echo ' <a href="https://t.me/twsparkle">t.me</a>';
 echo '</p>';
 echo '<p><small>';
-try {
-	$date = exec("git log -1 --format=%ci");
-	$commit = exec("git rev-list HEAD --max-count=1 --abbrev-commit");
-	$branch = exec("git branch | sed '/* /s///p'");
-	if(strpos($date, ' ') !== false) {
-		$date = substr($date,0, strpos($date, ' '));
-	}
-	$date = str_replace('-', '.', $date);
-	echo 'Date: '.$date.'<br>';
-	echo 'Commit: '.$commit.'<br>';
-	echo 'Branch: '.$branch;
-} catch (Exception $e) {
-	echo 'Error getting version:<br>';
-	echo '<xmp>'.$e->getMessage()."\n".$e->getTraceAsString().'</xmp>';
-}
 echo '</small></p>';
 echo Themes::bodyEnd();
