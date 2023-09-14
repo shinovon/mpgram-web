@@ -18,28 +18,22 @@ class MP {
 	static $users;
 	static $chats;
 
+	// Removes html special characters and converts to browser encoding
 	static function dehtml($s) {
 		if($s === null) return null;
 		return static::x(str_replace("\n", '<br>', htmlspecialchars($s)));
 	}
 
-	static function getId($MP, $a) {
-		if(isset($a['user_id'])) {
-			return $a['user_id'];
-		} else if(isset($a['chat_id'])) {
-			return '-'.$a['chat_id'];
-		} else if(isset($a['channel_id'])) {
-			return '-100'.$a['channel_id'];
-		} else {
-			throw new Exception("");
-		}
+	static function getId($a) {
+		return $a['user_id'] ?? (isset($a['chat_id']) ? '-'.$a['chat_id'] : (isset($a['channel_id']) ? '-100'.$a['channel_id'] : null));
 	}
 
 	static function getName($MP, $a, $full = false) {
-		return static::getNameFromId($MP, static::getId($MP, $a));
+		return static::getNameFromId($MP, static::getId($a));
 	}
 
 	static function getNameFromId($MP, $id, $full = false) {
+		// Try to get name from cache
 		if((int)$id > 0) {
 			if(static::$users !== null) {
 				$info = null;
@@ -71,27 +65,12 @@ class MP {
 	}
 
 	static function getNameFromInfo($p, $full = false) {
-		if(isset($p['User'])) {
-			return static::getUserName($p['User'], $full);
-		} else if(isset($p['Chat'])) {
-			return $p['Chat']['title'];
-		} else if(isset($p['title'])) {
-			return $p['title'];
-		} else if(isset($p['first_name']) || isset($p['last_name'])) {
-			return static::getUserName($p, $full);
-		}
-		return 'Deleted Account';
+		return isset($p['User']) ? static::getUserName($p['User'], $full) : ($p['Chat']['title'] ?? $p['title'] ?? static::getUserName($p, $full));
 	}
 	
-	static function getUserName($p, $full) {
-		$tr_first = isset($p['first_name']) ? trim($p['first_name']) : null;
-		$tr_last = isset($p['last_name']) ? trim($p['last_name']) : null;
-		if($tr_first !== null) {
-			return $tr_first.($full && $tr_last !== null ? ' '.$tr_last : '');
-		} else if($tr_last !== null) {
-			return $tr_last;
-		}
-		return 'Deleted Account';
+	static function getUserName($p, $full = false) {
+		$last = isset($p['last_name']) ? trim($p['last_name']) : null;
+		return isset($p['first_name']) ? trim($p['first_name']).($full && $last !== null ? ' '.$last : '') : ($last ? $last : 'Deleted Account');
 	}
 
 	static function getSelfName($MP, $full = true) {
@@ -104,6 +83,7 @@ class MP {
 		return $self['id'];
 	}
 
+	// Converts string to browser encoding
 	static function x($s) {
 		if(static::$enc !== null && static::$enc !== 'utf-8') {
 			return mb_convert_encoding($s, static::$enc);
@@ -201,11 +181,11 @@ class MP {
 				$mname1 = null;
 				$uid = null;
 				if(isset($m['from_id'])) {
-					$uid = MP::getId($MP, $m['from_id']);
+					$uid = MP::getId($m['from_id']);
 					$mname1 = MP::getNameFromId($MP, $uid);
 				}
 				if($mname1 != null && mb_strlen($mname1, 'UTF-8') > 30)
-					$mname1 = mb_substr($mname1, 0, 30, 'UTF-8');
+					$mname1 = static::utf16substr($mname1, 0, 30);
 				$mname = null;
 				$l = false;
 				if($m['out'] && !$ch) {
@@ -216,11 +196,7 @@ class MP {
 					$mname = $name;
 				} else {
 					$l = true;
-					if($mname1 === null) {
-						$mname = $name;
-					} else {
-						$mname = $mname1;
-					}
+					$mname = $mname1 ? $mname1 : $name;
 				}
 				$fwid = null;
 				$fwname = null;
@@ -228,7 +204,7 @@ class MP {
 					if(isset($m['fwd_from']['from_name'])) {
 						$fwname = $m['fwd_from']['from_name'];
 					} else if(isset($m['fwd_from']['from_id'])){
-						$fwid = MP::getId($MP, $m['fwd_from']['from_id']);
+						$fwid = MP::getId($m['fwd_from']['from_id']);
 						$fwname = MP::getNameFromId($MP, $fwid, true);
 					}
 				}
@@ -239,7 +215,7 @@ class MP {
 					$lastdate = $mdate;
 				}
 				if($fwname !== null && mb_strlen($fwname, 'UTF-8') > 30)
-					$fwname = mb_substr($fwname, 0, 30, 'UTF-8');
+					$fwname = static::utf16substr($fwname, 0, 30);
 				if(!isset($m['action'])) {
 					echo '<div class="m" id="msg_'.$id.'_'.$m['id'].'">';
 					if(!$pm && $uid != null && $l) {
@@ -277,7 +253,7 @@ class MP {
 								if($replyfromid) {
 									$replyname = MP::getName($MP, $replyfromid, true);
 									if(mb_strlen($replyname, 'UTF-8') > 30)
-										$mname = mb_substr($replyname, 0, 30, 'UTF-8').'...';
+										$mname = static::utf16substr($replyname, 0, 30).'...';
 									echo '<b class="rn">'.MP::dehtml($replyname).'</b>';
 								}
 							}
@@ -290,7 +266,7 @@ class MP {
 							}
 							if(mb_strlen($replytext, 'UTF-8') > 0) {
 								if(strlen($replytext) > 50)
-									$replytext = mb_substr($replytext, 0, 50, 'UTF-8');
+									$replytext = static::utf16substr($replytext, 0, 50);
 								echo '<div class="rt">';
 								echo '<a href="chat.php?c='.$id.'&m='.$replyid.'">';
 								echo MP::dehtml(str_replace("\n", " ", $replytext));
@@ -445,11 +421,11 @@ class MP {
 	static function wrapRichNestedText($text, $entity, $allEntities) {
 		$off = $entity['offset'];
 		$len = $entity['length'];
-		$entities = array();
+		$entities = [];
 		foreach($allEntities as $e) {
 			if($e == $entity) continue;
 			if($e['offset'] >= $off && $e['offset']+$e['length'] <= $off+$len) {
-				$ne = array();
+				$ne = [];
 				foreach($e as $k => $v) {
 					$ne[$k] = $v;
 				}
@@ -465,7 +441,7 @@ class MP {
 	
 	static function wrapRichText($text, $entities) {
 		$len = count($entities);
-		$html = array();
+		$html = [];
 		$lastOffset = 0;
 		$html = '';
 		for ($i = 0; $i < $len; $i++) {
@@ -689,7 +665,7 @@ class MP {
 					}
 				}
 			}
-		} catch (Exception $e) {
+		} catch (Exception) {
 		}
 		$app->setAppVersion('web');
 		$sets->setAppInfo($app);
@@ -745,15 +721,13 @@ class MP {
 	static function getIEVersion() {
 		if(!static::$iev)
 		try {
-			$ua = null;
-			if(isset($_SERVER['HTTP_USER_AGENT']))
-				$ua = $_SERVER['HTTP_USER_AGENT'];
+			$ua = $_SERVER['HTTP_USER_AGENT'] ?? null;
 			static::$useragent = $ua;
 			if(strpos($ua, 'MSIE ') !== false) {
 				$i = strpos($ua, 'MSIE ')+5;
 				static::$iev = (int)substr($ua, $i, $i+1);
 			}
-		} catch (Exception $e) {
+		} catch (Exception) {
 		}
 		return static::$iev;
 	}
@@ -769,35 +743,33 @@ class MP {
 	static function deleteSessionFile($user) {
 		try {
 			unlink(sessionspath.$user.'.madeline.callback.ipc');
-		} catch (Exception $e) {
+		} catch (Exception) {
 		}
 		try {
 			unlink(sessionspath.$user.'.madeline.ipcState');
-		} catch (Exception $e) {
+		} catch (Exception) {
 		}
 		try {
 			unlink(sessionspath.$user.'.madeline.ipc');
-		} catch (Exception $e) {
+		} catch (Exception) {
 		}
 		try {
 			unlink(sessionspath.$user.'.madeline.lightState.php');
-		} catch (Exception $e) {
+		} catch (Exception) {
 		}
 		try {
 			unlink(sessionspath.$user.'.madeline.safe.php');
-		} catch (Exception $e) {
+		} catch (Exception) {
 		}
 		try {
 			unlink(sessionspath.$user.'.madeline');
-		} catch (Exception $e) {
+		} catch (Exception) {
 		}
 	}
 	
 	public static function initLocale() {
 		$xlang = $lang = MP::getSetting('lang');
-		if($lang === null) {
-			$lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? (strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en') : 'ru';
-		}
+		$lang ??= isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? (strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en') : 'ru';
 		include 'locale.php';
 		MPLocale::init();
 		if(!MPLocale::load($lang)) {
@@ -819,8 +791,8 @@ class MP {
 	}
 	
 	public static function gc() {
-		static::$users = array();
-		static::$chats = array();
+		static::$users = [];
+		static::$chats = [];
 	}
 	
 	public static function getAllDialogs($MP, $limit = 0, $folder_id = -1) {
@@ -841,7 +813,7 @@ class MP {
 			$last_id = 0;
 			$t['messages'] = array_reverse($t['messages'] ?? []);
 			foreach(array_reverse($t['dialogs'] ?? []) as $dialog) {
-				$id = static::getId($MP, $dialog['peer']);
+				$id = static::getId($dialog['peer']);
 				if(!isset($d[$id])) {
 					$d[$id] = $dialog;
 					array_push($r['dialogs'], $dialog);
@@ -854,7 +826,7 @@ class MP {
 						$last_id = $dialog['top_message'];
 					}
 					foreach($t['messages'] as $message) {
-						if($message['_'] !== 'messageEmpty' && static::getId($MP, $message['peer_id']) === $last_peer && $last_id === $message['id']) {
+						if($message['_'] !== 'messageEmpty' && static::getId($message['peer_id']) === $last_peer && $last_id === $message['id']) {
 							$last_date = $message['date'];
 							break;
 						}

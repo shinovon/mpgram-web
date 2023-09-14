@@ -37,14 +37,14 @@ try {
 		$x = false;
 		try {
 			$x = file_get_contents('./lastclean');
-		} catch (Exception $e) {
+		} catch (Exception) {
 		}
 		if(!$x || (time() - (int)$x) > 30 * 60) {
 			exec("kill -9 `ps -ef | grep -v grep | grep 'MadelineProto worker' | awk '{print $2}'` > /dev/null &");
 			file_put_contents('./lastclean', time());
 		}
 	}
-} catch (Exception $e) {
+} catch (Exception) {
 }
 
 header('Content-Type: text/html; charset='.MP::$enc);
@@ -148,7 +148,7 @@ try {
 				}
 				unset($folders);
 				$r = MP::getAllDialogs($MP);
-				$dialogs = array();
+				$dialogs = [];
 				$all = $r['dialogs'];
 				if($f['contacts'] || $f['non_contacts']) {
 					$contacts = $MP->contacts->getContacts()['contacts'];
@@ -157,7 +157,7 @@ try {
 						$peer = $d['peer'];
 						$found = false;
 						foreach($contacts as $c) {
-							if(MP::getId($MP, $peer) == MP::getId($MP, $c)) {
+							if(MP::getId($peer) == MP::getId($c)) {
 								$found = true;
 								if($f['contacts']) array_push($dialogs, $d);
 								break;
@@ -224,7 +224,7 @@ try {
 					foreach($f['include_peers'] as $p) {
 						foreach($all as $d) {
 							$peer = $d['peer'];
-							if(MP::getId($MP, $peer) == MP::getId($MP, $p)) {
+							if(MP::getId($peer) == MP::getId($p)) {
 								if(!in_array($d, $dialogs)) {
 									array_push($dialogs, $d);
 								}
@@ -237,7 +237,7 @@ try {
 					foreach($f['exclude_peers'] as $p) {
 						foreach($dialogs as $idx => $d) {
 							$peer = $d['peer'];
-							if(MP::getId($MP, $peer) == MP::getId($MP, $p)) {
+							if(MP::getId($peer) == MP::getId($p)) {
 								unset($dialogs[$idx]);
 								break;
 							}
@@ -285,7 +285,7 @@ try {
 					foreach($f['pinned_peers'] as $p) {
 						foreach($all as $d) {
 							$peer = $d['peer'];
-							if(MP::getId($MP, $peer) == MP::getId($MP, $p)) {
+							if(MP::getId($peer) == MP::getId($p)) {
 								if(in_array($d, $dialogs)) {
 									unset($dialogs[array_search($d, $dialogs)]);
 								}
@@ -317,7 +317,7 @@ try {
 		echo '<table class="cl">';
 		foreach($dialogs as $d){
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
-			$id = MP::getId($MP, $d['peer']);
+			$id = MP::getId($d['peer']);
 			try {
 				echo '<tr class="c">';
 				$cl = 'chat.php?c='.$id;
@@ -370,7 +370,7 @@ try {
 					$mfid = null;
 					$mfn = null;
 					if(isset($msg['from_id'])) {
-						$mfid = MP::getId($MP, $msg['from_id']);
+						$mfid = MP::getId($msg['from_id']);
 						if($id < 0) {
 							$mfn = MP::dehtml(MP::getNameFromId($MP, $msg['from_id']));
 						}
@@ -402,7 +402,7 @@ try {
 						echo '.';
 					}
 					echo '</div>';
-				} catch (Exception $e) {
+				} catch (Exception) {
 				}
 				echo '</td>';
 				echo '</tr>';

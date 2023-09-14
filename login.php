@@ -7,9 +7,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 session_start();
-if(isset($_GET['logout'])) {
-	$_SESSION = array();
-}
+if(isset($_GET['logout']))
+	$_SESSION = [];
 
 include 'mp.php';
 
@@ -70,7 +69,7 @@ function removeSession() {
 				if(PHP_OS_FAMILY === "Linux") {
 					exec('kill -9 `ps -ef | grep -v grep | grep '.$user.'.madeline | awk \'{print $2}\'`');
 				}
-			} catch (Exception $e) {
+			} catch (Exception) {
 			}
 			MP::deleteSessionFile($user);
 		}

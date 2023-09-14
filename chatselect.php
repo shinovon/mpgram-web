@@ -136,7 +136,7 @@ try {
 						$peer = $d['peer'];
 						$found = false;
 						foreach($contacts as $c) {
-							if(MP::getId($MP, $peer) == MP::getId($MP, $c)) {
+							if(MP::getId($peer) == MP::getId($c)) {
 								$found = true;
 								if($f['contacts']) array_push($dialogs, $d);
 								break;
@@ -194,7 +194,7 @@ try {
 					foreach($f['include_peers'] as $p) {
 						foreach($all as $d) {
 							$peer = $d['peer'];
-							if(MP::getId($MP, $peer) == MP::getId($MP, $p)) {
+							if(MP::getId($peer) == MP::getId($p)) {
 								if(!in_array($d, $dialogs)) {
 									array_push($dialogs, $d);
 								}
@@ -207,7 +207,7 @@ try {
 					foreach($f['exclude_peers'] as $p) {
 						foreach($dialogs as $idx => $d) {
 							$peer = $d['peer'];
-							if(MP::getId($MP, $peer) == MP::getId($MP, $p)) {
+							if(MP::getId($peer) == MP::getId($p)) {
 								unset($dialogs[$idx]);
 								break;
 							}
@@ -255,7 +255,7 @@ try {
 					foreach($f['pinned_peers'] as $p) {
 						foreach($all as $d) {
 							$peer = $d['peer'];
-							if(MP::getId($MP, $peer) == MP::getId($MP, $p)) {
+							if(MP::getId($peer) == MP::getId($p)) {
 								if(in_array($d, $dialogs)) {
 									unset($dialogs[array_search($d, $dialogs)]);
 								}
@@ -277,7 +277,7 @@ try {
 		foreach($dialogs as $d){
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
 			$peer = $d['peer'];
-			$id = MP::getId($MP, $peer);
+			$id = MP::getId($peer);
 			$name = null;
 			$lid = $id;
 			if((int) $lid < 0) {

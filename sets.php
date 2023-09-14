@@ -55,6 +55,7 @@ if($set) {
 		}
 	}
 	$texttop = isset($_GET['texttop']) ? 1 : 0;
+	$longpoll = isset($_GET['longpoll']) ? 1 : 0;
 	MP::cookie('lang', $lang, time() + (86400 * 365));
 	MP::cookie('autoupd', $autoupd, time() + (86400 * 365));
 	MP::cookie('updint', $updint, time() + (86400 * 365));

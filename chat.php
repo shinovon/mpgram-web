@@ -76,7 +76,7 @@ try {
 	$ch = false;
 	$left = false;
 	if(!is_numeric($id)) {
-		$id = MP::getId($MP, $info);
+		$id = MP::getId($info);
 	}
 	$canpost = false;
 	if(isset($info['Chat'])) {
@@ -286,7 +286,7 @@ function autoScroll(force){try{text=document.getElementById("text");bottom=docum
 		}
 		printInputField();
 	}
-	if($texttop) echo '<div style="height: 3.5em;" id="bottom"></div>';
+	if($texttop) echo '<div style="height: 4em;" id="bottom"></div>';
 	// Mark as read
 	if($endReached) {
 		try {

@@ -1,6 +1,6 @@
 <?php
 if(!isset($_GET['id'])) die();
-$i = intval($_GET['m']) ?? 0;
+$i = intval($_GET['m'] ?? 0);
 $limit = $_GET['l'] ?? 0;
 include 'mp.php';
 $user = MP::getUser();
@@ -12,7 +12,7 @@ $timeout = $_GET['timeout'] ?? 30;
 $longpoll = isset($_GET['l']);
 $lng = MP::initLocale();
 
-function printMsgs($MP, $msg, $update_id) {
+function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 	global $id;
 	global $limit;
 	global $lng;
@@ -22,9 +22,9 @@ function printMsgs($MP, $msg, $update_id) {
 	'offset_id' => 0,
 	'offset_date' => 0,
 	'add_offset' => 0,
-	'limit' => 1,
-	'max_id' => $msg['id']+1,
-	'min_id' => $msg['id']-1,
+	'limit' => 20,
+	'max_id' => $maxmsg['id']+1,
+	'min_id' => $minmsg['id']-1,
 	'hash' => 0]);
 	$rm = $r['messages'];
 	$info = $MP->getInfo($id);
@@ -43,15 +43,15 @@ function printMsgs($MP, $msg, $update_id) {
 	$channel = isset($info['channel_id']);
 	unset($info);
 	//echo $rm[0]['id'].'||';
-	echo $update_id.'||';
+	echo $maxoffset.'||';
 	MP::addUsers($r['users'], $r['chats']);
 	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true);
 	// Mark as read
 	try {
 		if($ch || (int)$id < 0) {
-			$MP->channels->readHistory(['channel' => $id, 'max_id' => 0]);
+			$MP->channels->readHistory(['channel' => $id, 'max_id' => $maxmsg['id']]);
 		} else {
-			$MP->messages->readHistory(['peer' => $id, 'max_id' => 0]);
+			$MP->messages->readHistory(['peer' => $id, 'max_id' => $maxmsg['id']]);
 		}
 	} catch (Exception $e) {
 	}
@@ -63,29 +63,38 @@ try {
 	$MP = MP::getMadelineAPI($user);
 	$time = microtime(true);
 	if($longpoll) {
+		$so = $offset;
 		while(true) {
 			if(microtime(true) - $time >= $timeout) die();
 			$updates = $MP->getUpdates(['offset' => $offset+1, 'limit' => 100, 'timeout' => 10]);
+			$minid = 0;
+			$maxid = 0;
+			$minmsg = null;
+			$maxmsg = null;
 			foreach($updates as $update) {
-				if($update['update_id'] == $i) continue;
+				if($update['update_id'] == $so) continue;
 				$type = $update['update']['_'];
+				$offset = $update['update_id'];
 				if($type == 'updateNewMessage' || $type == 'updateNewChannelMessage') {
 					$msg = $update['update']['message'];
-					if(MP::getId($MP, $msg['peer_id']) == $id) {
-						if($msg['id'] < $i) continue;
-						if($msg['id'] == $i) {
-							$offset = $update['update_id'];
-							continue;
-						}
-						printMsgs($MP, $msg, $update['update_id']);
-						die();
+					if(MP::getId($msg['peer_id']) != $id) continue;
+					if($msg['id'] < $i) continue;
+					if($msg['id'] == $i) continue;
+					if($minid == 0) {
+						$minid = $update['update_id'];
+						$minmsg = $msg;
 					}
+					$maxid = $update['update_id'];
+					$maxmsg = $msg;
 				}
 				// TODO
 				/*if($type == 'updateDeleteMessages') {
 					$msgs = $update['update']['messages'];
 				}*/
-				$offset = $update['update_id'];
+			}
+			if($minid != 0) {
+				printMsgs($MP, $minmsg, $maxmsg, $minid, $maxid);
+				die();
 			}
 		}
 		return;
