@@ -184,11 +184,17 @@ class Themes {
 			white-space: nowrap;
 			vertical-align: top;
 		}
+		.cst {
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: nowrap;
+		}
 		.chava {
 			display: inline;
 			padding-left: 2px;
 			margin-top: 4px;
 			padding-right: 4px;
+			float: left;
 		}
 		.mi {
 			max-width: 50vw;
@@ -224,7 +230,7 @@ class Themes {
 		}
 		.cta {
 			width: 100%;
-			'.(static::$iev > 0 && static::$iev < 5 ? 'height: 48px;' : 'height: 3em;').'
+			'.(static::$iev > 0 && static::$iev < 5 ? 'height: 48px;' : 'height: 2.7em;').'
 		}
 		--></style>';
 	}
