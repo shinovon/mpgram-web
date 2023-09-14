@@ -13,6 +13,7 @@ $useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $avas = strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
 $texttop = $sym3 ? 1 : 0;
 $longpoll = strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') ? 1 : 0;
+$status = 0;
 $set = isset($_GET['set']);
 include 'mp.php';
 if($set) {
@@ -56,6 +57,7 @@ if($set) {
 	}
 	$texttop = isset($_GET['texttop']) ? 1 : 0;
 	$longpoll = isset($_GET['longpoll']) ? 1 : 0;
+	$status = isset($_GET['status']) ? 1 : 0;
 	MP::cookie('lang', $lang, time() + (86400 * 365));
 	MP::cookie('autoupd', $autoupd, time() + (86400 * 365));
 	MP::cookie('updint', $updint, time() + (86400 * 365));
@@ -67,6 +69,7 @@ if($set) {
 	MP::cookie('avas', $avas, time() + (86400 * 365));
 	MP::cookie('texttop', $texttop, time() + (86400 * 365));
 	MP::cookie('longpoll', $longpoll, time() + (86400 * 365));
+	MP::cookie('status', $status, time() + (86400 * 365));
 } else {
 	if(isset($_COOKIE['lang'])) {
 		$lang = $_COOKIE['lang'];
@@ -100,6 +103,9 @@ if($set) {
 	}
 	if(isset($_COOKIE['longpoll'])) {
 		$longpoll = (int)$_COOKIE['longpoll'];
+	}
+	if(isset($_COOKIE['status'])) {
+		$status = (int)$_COOKIE['status'];
 	}
 }
 
@@ -135,6 +141,8 @@ echo '<br><input type="checkbox" id="texttop" name="texttop"'.($texttop ? ' chec
 echo '<label for="texttop">'.MP::x($lng['set_chat_texttop']).'</label>';
 echo '<br><input type="checkbox" id="longpoll" name="longpoll"'.($longpoll ? ' checked' : '').'>';
 echo '<label for="longpoll">Longpoll</label>';
+echo '<br><input type="checkbox" id="status" name="status"'.($status ? ' checked' : '').'>';
+echo '<label for="status">Chat status (test)</label>';
 echo '</p><p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
 echo '<input type="text" size="3" id="updint" name="updint" value="'.$updint.'"><br>';
 echo '<label for="limit">'.MP::x($lng['set_msgs_limit']).'</label>:<br>';

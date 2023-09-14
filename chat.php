@@ -243,7 +243,56 @@ function autoScroll(force){try{text=document.getElementById("text");bottom=docum
 		}
 		echo '<div class="chn">';
 		echo MP::dehtml($name);
-		echo '</div></div>';
+		if(MP::getSettingInt('status')) {
+			$status = $info['User']['status'] ?? null;
+			$status_str = '';
+			if($status) {
+				switch($status['_']) {
+				case 'userStatusOnline':
+					$status_str = 'online';
+					break;
+				case 'userStatusOffline':
+					$time = time();
+					$was = $status['was_online'];
+					if($was >= $time - 60) {
+						$status_str = 'last seen just now';
+					} else if($was >= $time - 60*60) {
+						$minutes = intval(($time-$was)/60);
+						if($minutes == 1) {
+							$status_str = 'last seen '.$minutes.' minute ago';
+						} else {
+							$status_str = 'last seen '.$minutes.' minutes ago';
+						}
+					} else if($was >= $time - 24*60*60) {
+						$hours = intval(($time-$was)/60/60);
+						if($hours == 1) {
+							$status_str = 'last seen '.$hours.' hour ago';
+						} else {
+							$status_str = 'last seen '.$hours.' hours ago';
+						}
+					} else {
+						// TODO yestarday at hh:mm & date
+						$status_str = 'last seen ' . date('d.m.y', $status['was_online']);
+					}
+					break;
+				case 'userStatusRecently':
+					$status_str = 'last seen recently';
+					break;
+				case 'userStatusLastWeek':
+					$status_str = 'last seen within a week';
+					break;
+				case 'userStatusLastMonth':
+					$status_str = 'last seen within a month';
+				default:
+				case 'userStatusEmpty':
+					$status_str = '';
+					break;
+				}
+			}
+			echo '</div><br><small id="cst" class="cst">'.$status_str.'</small></div>';
+		} else {
+			echo '</div></div>';
+		}
 		echo '</header>';
 		if($avas) {
 			echo '<div style="height: 36px;">&nbsp;</div>';
