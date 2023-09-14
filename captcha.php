@@ -1,7 +1,7 @@
 <?php
 session_start();
 function getCaptchaText($length) {
-    $c = '0123456789abcdefghjkmnopqrstuvwxyz.#*';
+    $c = '0123456789abcdefghjkmnopqrstuvwxyz';
     $l = strlen($c);
     $s = '';
     for ($i = 0; $i < $length; $i++) {
@@ -9,7 +9,7 @@ function getCaptchaText($length) {
     }
     return $s;
 }
-$c = getCaptchaText(rand(6, 10));
+$c = getCaptchaText(rand(5, 8));
 $_SESSION["captcha"] = $c; 
 $img = imagecreatetruecolor(150, 50); 
 imagefill($img, 0, 0, -1);

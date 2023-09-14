@@ -332,6 +332,8 @@ if($phone !== null) {
 	echo '</form>';
 	if($wrong) {
 		echo MP::x('<b>'.$lng['wrong_number_format'].'</b><br>');
+	} else {
+		echo MP::x('<a href="qrlogin.php">'.$lng['qr_login'].'</a>');
 	}
 	echo '<br><div>';
 	echo MP::x('<a href="about.php">'.$lng['about'].'</a> <a href="login.php?lang=en">English</a> <a href="login.php?lang=ru">Русский</a>');
