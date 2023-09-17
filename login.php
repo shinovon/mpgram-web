@@ -54,7 +54,7 @@ if(strpos(strval($user), '/') !== false || strpos(strval($user), '.') !== false)
 }
 // Check session existance
 $nouser = $user == null || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
-function removeSession() {
+function removeSession($logout=false) {
 	global $user;
 	global $nouser;
 	global $logout;
@@ -65,6 +65,14 @@ function removeSession() {
 	try {
 		// Remove all session files
 		if(file_exists(sessionspath.$user.'.madeline')) {
+			if($logout) {
+				try {
+					$MP = MP::getMadelineAPI($user, true);
+					$MP->logout();
+					unset($MP);
+				} catch (Exception) {
+				}
+			}
 			try {
 				if(PHP_OS_FAMILY === "Linux") {
 					exec('kill -9 `ps -ef | grep -v grep | grep '.$user.'.madeline | awk \'{print $2}\'`');
@@ -78,7 +86,7 @@ function removeSession() {
 	}
 }
 if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
-	removeSession();
+	removeSession(($_GET['logout'] ?? '') == '2');
 }
 function htmlStart() {
 	global $lng;
@@ -149,7 +157,7 @@ if($phone !== null) {
 			echo '<input type="text" name="c">';
 			echo '<input type="submit">';
 			echo '</form>';
-			echo MP::x('<a href="login.php?logout=1">'.$lng['logout'].'</a>');
+			echo MP::x('<a href="login.php?logout=2">'.$lng['logout'].'</a>');
 			echo Themes::bodyEnd();
 			die();
 		} else {

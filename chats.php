@@ -62,17 +62,14 @@ try {
 		$dtz = new DateTimeZone(date_default_timezone_get());
 		$t = new DateTime('now', $dtz);
 		$tof = $dtz->getOffset($t);
-		echo '<script type="text/javascript"><!--
+		echo
+'<script type="text/javascript"><!--
 try {
-	document.cookie = "timeoff=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-	var f = '.($tof*1000).';
 	var d = new Date();
-	var t = d.getTime()
-	var o = d.getTimezoneOffset()*60*1000;
-	var c = (t-(t-f)+o)/1000;
+	var c = ((d.getTime()+'.($tof*1000).')-(d.getTime()-(d.getTimezoneOffset()*60*1000)))/1000 | 0;
 	var e = new Date();
 	e.setTime(e.getTime() + (365*86400*1000));
-	document.cookie = "timeoff="+c+"; expires="+e.toUTCString();
+	document.cookie = "timeoff=" + c + "; expires="+e.toUTCString()+"; path=/";
 } catch (e) {
 }
 //--></script>';
@@ -92,7 +89,7 @@ try {
 	echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
 	echo ' <a href="chatselect.php">'.MP::x($lng['compactchats']).'</a>';
 	echo ' <a href="contacts.php?">'.MP::x($lng['contacts']).'</a>';
-	echo ' <a href="login.php?logout=1">'.MP::x($lng['logout']).'</a>';
+	echo ' <a href="login.php?logout=2">'.MP::x($lng['logout']).'</a>';
 	echo '</div>';
 	$folders = $MP->messages->getDialogFilters();
 	$hasArchiveChats = count($MP->messages->getDialogs([

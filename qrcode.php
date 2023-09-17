@@ -13,9 +13,10 @@ try {
 	$options->outputType = QROutputInterface::GDIMAGE_PNG;
 	$options->scale = 6;
 	$options->imageTransparent = false;
-	$qr = (new QRCode($options))->render(base64_decode($_SESSION['qr_token']));
+	$options->imageBase64 = false;
+	$png = (new QRCode($options))->render(base64_decode($_SESSION['qr_token']));
 	header("Content-Type: image/png");
-	echo base64_decode(substr($qr,22));
+	echo $png;
 } catch (Exception $e) {
 	http_response_code(500);
 }

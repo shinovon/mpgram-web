@@ -741,29 +741,39 @@ class MP {
 	}
 	
 	static function deleteSessionFile($user) {
-		try {
-			unlink(sessionspath.$user.'.madeline.callback.ipc');
-		} catch (Exception) {
-		}
-		try {
-			unlink(sessionspath.$user.'.madeline.ipcState');
-		} catch (Exception) {
-		}
-		try {
-			unlink(sessionspath.$user.'.madeline.ipc');
-		} catch (Exception) {
-		}
-		try {
-			unlink(sessionspath.$user.'.madeline.lightState.php');
-		} catch (Exception) {
-		}
-		try {
-			unlink(sessionspath.$user.'.madeline.safe.php');
-		} catch (Exception) {
-		}
-		try {
-			unlink(sessionspath.$user.'.madeline');
-		} catch (Exception) {
+		$session = sessionspath.$user.'.madeline';
+		if(is_dir($session)) {
+			$files = scandir($session);
+			foreach($files as $file) {
+				unlink($session.DIRECTORY_SEPARATOR.$file);
+			}
+			rmdir($session);
+		} else {
+			// old madeline sessions
+			try {
+				unlink($session.'callback.ipc');
+			} catch (Exception) {
+			}
+			try {
+				unlink($session.'.ipcState');
+			} catch (Exception) {
+			}
+			try {
+				unlink($session.'.ipc');
+			} catch (Exception) {
+			}
+			try {
+				unlink($session.'.lightState.php');
+			} catch (Exception) {
+			}
+			try {
+				unlink($session.'.safe.php');
+			} catch (Exception) {
+			}
+			try {
+				unlink($session);
+			} catch (Exception) {
+			}
 		}
 	}
 	
