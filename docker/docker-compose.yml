@@ -1,0 +1,54 @@
+version: '2'
+
+services:
+    nginx:
+        build:
+            context: nginx
+            args:
+                UID: ${UID}
+                PROTO: ${PROTO}
+        depends_on:
+            - app
+        volumes_from:
+            - app
+        ports:
+            - '${INTERFACE}:${PORT_HTTP}:80'
+            - '${INTERFACE}:${PORT_HTTPS}:443'
+        links:
+            - app
+        networks:
+            - mpgram
+        restart: unless-stopped
+
+    app:
+        build:
+            context: mpgram_web
+            args:
+                UID: ${UID}
+        volumes:
+            - ./logs/nginx:/var/log/nginx
+            - ./logs/php:/var/log/php
+            - /etc/localtime:/etc/localtime/:ro
+            - ../:/var/www/mpgram:rw
+
+        restart: unless-stopped
+        networks:
+            - mpgram
+
+    composer:
+      image: composer/composer
+      networks:
+        - mpgram
+      volumes_from:
+        - app
+      working_dir: /var/www/mpgram
+      command: install
+
+networks:
+    mpgram:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 10.100.0.0/24
+
