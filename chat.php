@@ -300,7 +300,7 @@ function autoScroll(force){try{text=document.getElementById("text");bottom=docum
 		}
 	}
 	unset($info);
-	$sname = $name;
+	$sname = $name ?? '';
 	if(mb_strlen($sname, 'UTF-8') > 30) $sname = mb_substr($sname, 0, 30, 'UTF-8');
 	if(!$reverse) {
 		printInputField();
