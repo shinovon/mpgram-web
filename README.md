@@ -26,7 +26,7 @@ and `php-mbstring` for MadelineProto (`apt-get install php8.1-mbstring`)
 - You need to set [browscap](https://browscap.org/) in `php.ini` to get better logged in device names
 - Install Composer v2+
 - Install MadelineProto and its dependencies with `composer update`
-- For more details on installing MadelineProto <a href="https://docs.madelineproto.xyz/docs/INSTALLATION.html">see here</a>
+- For more details on installing MadelineProto <a href="https://docs.madelineproto.xyz/docs/REQUIREMENTS.html">see here</a>
 
 ## Tested browsers
 
