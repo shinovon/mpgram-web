@@ -89,5 +89,6 @@
 	"contacts": "Контакты",
 	"chat_phone": "Телефон",
 	"chat_bio": "О себе",
-	"chat_username": "Имя пользователя"
+	"chat_username": "Имя пользователя",
+	"qr_login": "Войти с помощью QR-кода"
 }
