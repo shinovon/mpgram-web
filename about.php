@@ -45,4 +45,9 @@ if(MP::getUser()) {
 4400430278594491 Kaspi (KZ)<br>
 <a href="https://boosty.to/nnproject/donate">boosty.to/nnproject/donate</a>
 </p>
-<?php echo Themes::bodyEnd(); ?>
+<?php
+require_once 'vendor/autoload.php';
+echo '<br>Running on MadelineProto ' . \danog\MadelineProto\API::RELEASE;
+echo ' PHP ' . phpversion();
+echo Themes::bodyEnd();
+?>
