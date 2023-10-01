@@ -78,10 +78,10 @@
 	"offline": "desconectado",
 	"owner": "dueño",
 	"admin": "administrador",
-	"miembros": [
+	"members": [
 		[ "=", 1, "$ miembro", "$ miembros" ]
 	],
-	"suscriptores": [
+	"subscribers": [
 		[ "=", 1, "$ subscribir", "$ subscriptores" ]
 	],
 	"forward_save": "Guardar en favoritos",
