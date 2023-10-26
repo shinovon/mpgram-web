@@ -551,16 +551,16 @@ class MP {
 	}
 
 	static function getURL() {
-		$sitepath = '';
-		if(empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
-			$sitepath .= 'http';
+		$sitepath = "";
+		if(($_SERVER["HTTPS"] ?? "") !== "on" || ($_SERVER["HTTP_X_FORWARDED_PROTO"] ?? "") == "https" || strpos($_SERVER["HTTP_CF_VISITOR"] ?? "", "https") !== false) {
+			$sitepath .= "https";
 		} else {
-			$sitepath .= 'https';
+			$sitepath .= "http";
 		}
-		$sitepath .= '://'.$_SERVER['SERVER_NAME'];
-		if(isset($_SERVER['PHP_SELF'])) {
-			$ss = $_SERVER['PHP_SELF'];
-			$ss = substr($ss, 0, strrpos($ss, '/')+1);
+		$sitepath .= "://".$_SERVER["SERVER_NAME"];
+		if(isset($_SERVER["PHP_SELF"])) {
+			$ss = $_SERVER["PHP_SELF"];
+			$ss = substr($ss, 0, strrpos($ss, "/")+1);
 			$sitepath .= $ss;
 		}
 		return $sitepath;
@@ -745,6 +745,7 @@ class MP {
 		if(is_dir($session)) {
 			$files = scandir($session);
 			foreach($files as $file) {
+				if($file != '.' && $file != '..')
 				unlink($session.DIRECTORY_SEPARATOR.$file);
 			}
 			rmdir($session);
