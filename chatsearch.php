@@ -18,6 +18,8 @@ if(!$user) {
 	die();
 }
 
+$c = $_GET['c'] ?? null;
+
 header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store, must-revalidate');
 
@@ -31,11 +33,15 @@ echo Themes::bodyStart();
 
 echo '<div><a href="login.php">'.MP::x($lng['back']).'</a></div>';
 
-echo '<form action="chatselect.php">';
+echo '<form action="chat'.($c ? '' : 'select').'.php">';
 echo '<p><input type="text" name="q" id="q"><br>';
-echo '<input type="checkbox" name="g" id="g">';
-echo '<label for="g">'.MP::x(MP::x($lng['global_search'])).'</label></p>';
-echo '<input type="submit">';
+if($c) {
+	echo '<input type="hidden" name="c" value="'.$c.'">';
+} else {
+	echo '<input type="checkbox" name="g" id="g">';
+	echo '<label for="g">'.MP::x(MP::x($lng['global_search'])).'</label>';
+}
+echo '</p><input type="submit">';
 echo '</form>';
 
 echo Themes::bodyEnd();

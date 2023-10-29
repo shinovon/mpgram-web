@@ -48,16 +48,12 @@ if(!$user) {
 header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store');
 
-$id = null;
-if(isset($_GET['peer'])) {
-	$id = $_GET['peer'];
-} else if(!isset($_GET['c'])) {
-	die();
-}
-$id = $_GET['c'];
+$id = $_GET['c'] ?? $_GET['peer'] ?? die;
 
 $start = $_GET['start'] ?? null;
 $file = htmlentities($_SERVER['PHP_SELF']);
+
+$query = $_GET['q'] ?? null;
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
 	throw new ErrorException($message, 0, $severity, $filename, $lineno);
@@ -153,15 +149,30 @@ try {
 		*/
 		echo '</div>';
 	}
-	$r = $MP->messages->getHistory([
-	'peer' => $id,
-	'offset_id' => $msgoffsetid,
-	'offset_date' => 0,
-	'add_offset' => $msgoffset,
-	'limit' => $msglimit,
-	'max_id' => $msgmaxid,
-	'min_id' => 0,
-	'hash' => 0]);
+	$r = null;
+	if($query !== null) {
+		$r = $MP->messages->search([
+		'peer' => $id,
+		'offset_id' => $msgoffsetid,
+		'offset_date' => 0,
+		'add_offset' => $msgoffset,
+		'limit' => $msglimit,
+		'max_id' => $msgmaxid,
+		'min_id' => 0,
+		'hash' => 0,
+		'q' => $query
+		]);
+	} else {
+		$r = $MP->messages->getHistory([
+		'peer' => $id,
+		'offset_id' => $msgoffsetid,
+		'offset_date' => 0,
+		'add_offset' => $msgoffset,
+		'limit' => $msglimit,
+		'max_id' => $msgmaxid,
+		'min_id' => 0,
+		'hash' => 0]);
+	}
 	MP::addUsers($r['users'], $r['chats']);
 	$id_offset = null;
 	if(isset($r['offset_id_offset'])) {
@@ -176,7 +187,7 @@ try {
 	$rm = $r['messages'];
 	echo '<head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
-	if((!$hasOffset || $endReached) && $autoupd == 1 && count($rm) > 0) {
+	if((!$hasOffset || $endReached) && $autoupd == 1 && count($rm) > 0 && $query === null) {
 		$ii = $rm[0]['id'];
 		if($dynupd == 1) {
 			echo '<script type="text/javascript">
@@ -337,7 +348,7 @@ function autoScroll(force){try{text=document.getElementById("text");bottom=docum
 	}
 	if($texttop) echo '<div style="height: 4em;" id="bottom"></div>';
 	// Mark as read
-	if($endReached) {
+	if($endReached && $query === null) {
 		try {
 			if($ch || (int)$id < 0) {
 				$MP->channels->readHistory(['channel' => $id, 'max_id' => 0]);

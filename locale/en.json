@@ -92,5 +92,6 @@
 	"chat_username": "Username",
 	"qr_login": "Login with QR-code",
 	"search": "Search",
-	"global_search": "Global search"
+	"global_search": "Global search",
+	"search_messages": "Search messages"
 }

@@ -22,18 +22,10 @@ $count = 300;
 if(isset($_GET['count'])) {
 	$count = (int) $_GET['count'];
 }
-$fwdchat = null;
-$fwdmsg = null;
-if(isset($_GET['c'])) {
-	$fwdchat = $_GET['c'];
-}
-if(isset($_GET['m'])) {
-	$fwdmsg = $_GET['m'];
-}
+$fwdchat = $_GET['c'] ?? null;
+$fwdmsg = $_GET['m'] ?? null;
 $query = null;
-if(isset($_GET['q'])) {
-	$query = $_GET['q'];
-}
+$query = $_GET['q'] ?? null;
 $globalsearch = isset($_GET['g']);
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {

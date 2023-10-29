@@ -12,14 +12,7 @@ if(!$user) {
 
 $theme = MP::getSettingInt('theme', 0);
 
-$id = null;
-if(isset($_POST['c'])) {
-	$id = $_POST['c'];
-} else if(isset($_GET['c'])) {
-	$id = $_GET['c'];
-} else {
-	die();
-}
+$id = $_POST['c'] ?? $_GET['c'] ?? die;
 
 header("Content-Type: text/html; charset=utf-8");
 header("Cache-Control: private, no-cache, no-store");
@@ -96,6 +89,7 @@ try {
 			echo '<p>'.MP::x($lng['chat_username']).':<br>'.MP::dehtml($chat['username']).'</p>';
 		}
 	}
+	echo '<p><a href="chatsearch.php?c='.$id.'">'.MP::x($lng['search_messages']).'</a></p>';
 	if($type != 'user' && $members) {
 		$avas = MP::getSettingInt('avas', 0);
 		echo MP::x($lng['chat_members']).':';

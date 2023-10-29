@@ -92,5 +92,6 @@
 	"chat_username": "Имя пользователя",
 	"qr_login": "Войти с помощью QR-кода",
 	"search": "Поиск",
-	"global_search": "Глобальный поиск"
+	"global_search": "Глобальный поиск",
+	"search_messages": "Поиск по чату"
 }
