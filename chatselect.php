@@ -30,6 +30,11 @@ if(isset($_GET['c'])) {
 if(isset($_GET['m'])) {
 	$fwdmsg = $_GET['m'];
 }
+$query = null;
+if(isset($_GET['q'])) {
+	$query = $_GET['q'];
+}
+$globalsearch = isset($_GET['g']);
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
@@ -105,7 +110,11 @@ try {
 	try {
 		$r = null;
 		$dialogs = null;
-		if($fid == 1) {
+		if($query !== null) {
+			$dialogs = [];
+			$r = $MP->contacts->search(['q' => $query]);
+			$dialogs = $r[$globalsearch ? 'results' : 'my_results'];
+		} else if($fid == 1) {
 			$r = $MP->messages->getDialogs([
 			'offset_date' => 0,
 			'offset_id' => 0,
@@ -276,7 +285,7 @@ try {
 		$c = 0;
 		foreach($dialogs as $d){
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
-			$peer = $d['peer'];
+			$peer = $d['peer'] ?? $d;
 			$id = MP::getId($peer);
 			$name = null;
 			$lid = $id;

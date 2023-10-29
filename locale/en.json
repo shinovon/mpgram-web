@@ -90,5 +90,7 @@
 	"chat_phone": "Mobile",
 	"chat_bio": "Bio",
 	"chat_username": "Username",
-	"qr_login": "Login with QR-code"
+	"qr_login": "Login with QR-code",
+	"search": "Search",
+	"global_search": "Global search"
 }
