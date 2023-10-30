@@ -13,20 +13,8 @@ if(!$user) {
 $theme = MP::getSettingInt('theme');
 $lng = MP::initLocale();
 
-$id = null;
-if(isset($_POST['c'])) {
-	$id = $_POST['c'];
-} else if(isset($_GET['c'])) {
-	$id = $_GET['c'];
-} else {
-	die();
-}
-$msg = null;
-if(isset($_POST['m'])) {
-	$msg = $_POST['m'];
-} else if(isset($_GET['m'])) {
-	$msg = $_GET['m'];
-}
+$id = $_POST['c'] ?? $_GET['c'] ?? die;
+$msg = $_POST['m'] ?? $_GET['m'] ?? null;
 $out = isset($_POST['o']) || isset($_GET['o']);
 $ch = isset($_POST['ch']) || isset($_GET['ch']);
 
@@ -77,6 +65,10 @@ try {
 		$filename = null;
 		$type = null;
 		$attr = false;
+		if($_FILES['file']['error'] ?? false) {
+if($_FILES['file']['error'] != 4)
+			$reason = 'PHP Error: ' . $_FILES['file']['error'];
+		}
 		if(isset($_FILES['file']) && $_FILES['file']['size'] != 0) {
 			if($_FILES['file']['size'] > 10 * 1024 * 1024) {
 				$reason = 'File is too large!';
@@ -88,22 +80,27 @@ try {
 					$reason = 'Invalid file';
 				} else {
 					$ext = strtolower(substr($filename, $extidx+1));
-					switch($ext) {
-						case 'jpg':
-						case 'jpeg':
-						case 'png':
-							$newfile = $file.'.'.$ext;
-							if(!move_uploaded_file($file, $newfile)) {
-								$reason = 'Failed to move file';
-							} else {
-								$type = 'inputMediaUploadedPhoto';
-								$file = $newfile;
-							}
-							break;
-						default:
-							$type = 'inputMediaUploadedDocument';
-							$attr = true;
-							break;
+					if(isset($_GET['unc']) || isset($_POST['unc'])) {
+						$type = 'inputMediaUploadedDocument';
+						$attr = true;
+					} else {
+						switch($ext) {
+							case 'jpg':
+							case 'jpeg':
+							case 'png':
+								$newfile = $file.'.'.$ext;
+								if(!move_uploaded_file($file, $newfile)) {
+									$reason = 'Failed to move file';
+								} else {
+									$type = 'inputMediaUploadedPhoto';
+									$file = $newfile;
+								}
+								break;
+							default:
+								$type = 'inputMediaUploadedDocument';
+								$attr = true;
+								break;
+						}
 					}
 				}
 			}
@@ -190,6 +187,8 @@ if(!$ch) {
 	echo '<input type="checkbox" id="format" name="format">';
 	echo '<label for="format">'.MP::x($lng['html_formatting']).'</label>';
 	echo '<br><input type="file" id="file" name="file"><br>';
+	echo '<input type="checkbox" id="unc" name="unc">';
+	echo '<label for="unc">'.MP::x($lng['send_uncompressed']).'</label><br>';
 	echo '<input type="submit" value="'.MP::x($lng['send']).'">';
 	echo '</form>';
 	echo '<form action="sendsticker.php" style="display: inline;">';

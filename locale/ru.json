@@ -93,5 +93,6 @@
 	"qr_login": "Войти с помощью QR-кода",
 	"search": "Поиск",
 	"global_search": "Глобальный поиск",
-	"search_messages": "Поиск по чату"
+	"search_messages": "Поиск по чату",
+	"send_uncompressed": "Отправить без сжатия"
 }

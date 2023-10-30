@@ -93,5 +93,6 @@
 	"qr_login": "Login with QR-code",
 	"search": "Search",
 	"global_search": "Global search",
-	"search_messages": "Search messages"
+	"search_messages": "Search messages",
+	"send_uncompressed": "Send uncompressed"
 }
