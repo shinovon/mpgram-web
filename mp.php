@@ -307,6 +307,8 @@ class MP {
 						&& isset($media['document']['attributes'][0]['file_name'])) {
 							$n = $media['document']['attributes'][0]['file_name'];
 						}
+						$voice = $media['document']['attributes'][0]['voice'] ?? false;
+						$voicedur = $media['document']['attributes'][0]['duration'] ?? false;
 						echo '<div>';
 						try {
 							$img = true;
@@ -347,7 +349,9 @@ class MP {
 									$img = false;
 									break;
 							}
-							if($img) {
+							if($voice && defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES) {
+								echo '<div class="mw"><a href="voice.php?m='.$m['id'].'&c='.$id.'">'.static::x($lng['voice']).' '.MP::durationstr($voicedur).'</a><br><audio controls preload="none" src="voice.php?m='.$m['id'].'&c='.$id.'">'.'</div>';
+							} else if($img) {
 								if($open) {
 									echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p='.$fq.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></a></div>';
 								} else {
@@ -410,6 +414,14 @@ class MP {
 				echo '<xmp>'.$e->getMessage()."\n".$e->getTraceAsString().'</xmp>';
 			}
 		}
+	}
+	
+	static function durationstr($time) {
+		$sec = $time % 60;
+		if($sec < 10) $sec = '0'.$sec;
+		$min = intval($time / 60);
+		if($min < 10) $min = '0'.$min;
+		return $min.':'.$sec;
 	}
 	
 	static function utf16substr($s, $offset, $length = null) {
