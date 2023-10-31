@@ -94,5 +94,6 @@
 	"search": "Поиск",
 	"global_search": "Глобальный поиск",
 	"search_messages": "Поиск по чату",
-	"send_uncompressed": "Отправить без сжатия"
+	"send_uncompressed": "Отправить без сжатия",
+	"voice": "Голосовое сообщение"
 }

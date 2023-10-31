@@ -94,5 +94,6 @@
 	"search": "Search",
 	"global_search": "Global search",
 	"search_messages": "Search messages",
-	"send_uncompressed": "Send uncompressed"
+	"send_uncompressed": "Send uncompressed",
+	"voice": "Voice message"
 }
