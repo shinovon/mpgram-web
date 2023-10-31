@@ -11,8 +11,10 @@ try {
 		die();
 	}
 	$MP = MP::getMadelineAPI($user);
+	if(!isset($_GET['c']) || !isset($_GET['m'])) die;
 	$cid = $_GET['c'];
 	$mid = $_GET['m'];
+	if(!is_numeric($cid) || !is_numeric($mid)) die;
 	if(strpos($cid, '-100') === 0) {
 		$msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
 	} else {
