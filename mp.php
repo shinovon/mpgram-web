@@ -321,7 +321,7 @@ class MP {
 										$dl = true;
 										$open = false;
 										$ie = MP::getIEVersion();
-										if(PNG_STICKERS && $ie == 0 && $ie > 4) {
+										if(PNG_STICKERS && ($ie == 0 || $ie > 4)) {
 											$q = 'rstickerp';
 										} else {
 											$q = 'rsticker';
