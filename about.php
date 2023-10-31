@@ -27,6 +27,7 @@ if(MP::getUser()) {
 	echo '<a href="https://t.me/nnmidletschat">Discussion chat</a>';
 }
 ?>
+<br><a href="https://nnp.nnchan.ru/mp">Page on nnproject</a><br>
 </p>
 <p>Developers:<br>
 <b>Shinovon</b> <a href="https://github.com/shinovon">github</a>
@@ -41,9 +42,9 @@ if(MP::getUser()) {
  <a href="https://t.me/twsparkle">t.me</a>
 </p>
 <p>Donate:<br>
-4377723772807974 Tinkoff (RU)<br>
+<a href="https://ko-fi.com/shinovon">ko.fi.com/shinovon</a><br>
+<a href="https://boosty.to/nnproject/donate">boosty.to/nnproject/donate</a><br>
 4400430278594491 Kaspi (KZ)<br>
-<a href="https://boosty.to/nnproject/donate">boosty.to/nnproject/donate</a>
 </p>
 <?php
 require_once 'vendor/autoload.php';

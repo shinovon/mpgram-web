@@ -187,24 +187,24 @@ try {
 	$rm = $r['messages'];
 	echo '<head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
+	echo '<script type="text/javascript"><!--
+var reverse = '.($reverse&&$texttop?'true':'false').';';
+echo file_get_contents('chatscroll.js');
+echo '
+//--></script>';
 	if((!$hasOffset || $endReached) && $autoupd == 1 && count($rm) > 0 && $query === null) {
 		$ii = $rm[0]['id'];
 		if($dynupd == 1) {
-			echo '<script type="text/javascript">
-<!--
-function rr(){if(typeof XMLHttpRequest===\'undefined\'){XMLHttpRequest=function(){try{return new ActiveXObject("Msxml2.XMLHTTP.6.0");}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP.3.0");}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP");}catch(e){}try{return new ActiveXObject("Microsoft.XMLHTTP");}catch(e){}return null;};}return new XMLHttpRequest();}
-function ee(e){if(e.message !== undefined && e.message !== null){alert(e.message);}else{alert(e);}}
-var r = null;
+			echo '<script type="text/javascript"><!--
 var reverse = '.($reverse?'true':'false').';
 var autoscroll = '.($autoscroll?'true':'false').';
 var longpoll = '.($longpoll?'true':'false').';
 var updint = '.($longpoll?'1000':$updint.'000').';
 var url = "'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&lang='.$lng['lang'].'&t='.$timeoff.($longpoll?'&l':'').'";
 var msglimit = '.$msglimit.';
-var msg = "'.$ii.'";
-var o = "0";
-function h(){if(r.readyState == 4){try{var e=r.responseText;if(e!=null&&e.length>1){var f=e.indexOf("||");if(f!=-1){if(longpoll){o=e.substring(0,f);}else{msg=e.substring(0,f);}e=e.substring(f+2);if(e.length>0){var msgs=document.getElementById("msgs");var d=document.createElement("div");d.innerHTML=e;for(var i=d.childNodes.length-1;i>=0;i--){if(reverse){msgs.appendChild(d.childNodes[i]);}else{msgs.insertBefore(d.childNodes[i],msgs.firstChild);}}while(msgs.childNodes.length>msglimit){msgs.removeChild(reverse ? msgs.firstChild :msgs.lastChild);}}}if(autoscroll && reverse){setTimeout("autoScroll(false)",500);}}}catch(e){ee(e);}setTimeout("a();",updint);}}
-var c=0;function a(){c++;if(c>70)return;try{r=rr();if(r==null)return;r.onreadystatechange=h;r.open("GET",url+"&m="+msg+"&o="+o);r.send(null);}catch(e){ee(e);}}try{setTimeout("a()",updint);}catch(e){ee(e);}
+var msg = "'.$ii.'";';
+echo file_get_contents('chatupdate.js');
+echo '
 //--></script>';
 		} else {
 			echo '<script type="text/javascript"><!--
@@ -212,20 +212,18 @@ setTimeout("location.reload(true);",'.$updint.'000);
 //--></script>';
 		}
 	}
-	if($reverse && ($dir != 'd' || $endReached)) {
-echo '<script type="text/javascript"><!--
-var reverse = '.($reverse&&$texttop?'true':'false').';
-function getScrollY(){var a = window.pageXOffset !== undefined;var b = ((document.compatMode || "") === "CSS1Compat");return a?window.pageYOffset:b?document.documentElement.scrollTop:document.body.scrollTop;}
-function getHeight(){var a = window.innerHeight !== undefined;return a?window.innerHeight:document.documentElement.clientHeight||document.body.clientHeight;}
-function autoScroll(force){try{text=document.getElementById("text");bottom=document.getElementById("bottom");if(force){if(reverse){bottom.scrollIntoView();}else{text.scrollIntoView();}}else{try{tw=text.clientHeight;sh=getHeight();sy=getScrollY();ph=document.body.scrollHeight;if(sy>ph-tw-sy) {text.scrollIntoView();}}catch(e){text.scrollIntoView();}}}catch(e){}}
-//--></script>';
-	}
 	echo '</head>'."\n";
-	if($reverse && $autoscroll) {
-		echo Themes::bodyStart('onload="autoScroll(true);"');
-	} else {
-		echo Themes::bodyStart();
+	$body = false;
+	if($reverse && $dir != 'd') {
+		echo Themes::bodyStart('onload="autoScroll(true, false);"'); $body = true;
+	} else if(!$reverse && $dir == 'u') {
+		echo Themes::bodyStart('onload="autoScroll(true, true);"'); $body = true;
 	}
+	if(!$body)
+		if($msgoffsetid > 0)
+			echo Themes::bodyStart('onload="document.getElementById(\'msg_'.$id.'_'.$msgoffsetid.'\').scrollIntoView();"');
+		else
+			echo Themes::bodyStart();
 	$useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 	$avas = strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
 	$avas = MP::getSettingInt('avas', $avas) && strpos($useragent, 'SymbianOS/9') === false;
@@ -347,6 +345,7 @@ function autoScroll(force){try{text=document.getElementById("text");bottom=docum
 		printInputField();
 	}
 	if($texttop) echo '<div style="height: 4em;" id="bottom"></div>';
+	else echo '<div id="bottom"></div>';
 	// Mark as read
 	if($endReached && $query === null) {
 		try {

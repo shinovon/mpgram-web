@@ -86,10 +86,10 @@ try {
 	echo '<header>';
 	echo '<b>'.MP::x($selfname).'</b><div>';
 	echo '<a href="chats.php?upd&f='.$fid.'">'.MP::x($lng['refresh']).'</a>';
-	echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
 	echo ' <a href="chatselect.php">'.MP::x($lng['compactchats']).'</a>';
-	echo ' <a href="contacts.php?">'.MP::x($lng['contacts']).'</a>';
+	echo ' <a href="contacts.php">'.MP::x($lng['contacts']).'</a>';
 	echo ' <a href="chatsearch.php">'.MP::x($lng['search']).'</a>';
+	echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
 	echo ' <a href="login.php?logout=2">'.MP::x($lng['logout']).'</a>';
 	echo '</div>';
 	$folders = $MP->messages->getDialogFilters();

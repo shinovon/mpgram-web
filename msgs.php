@@ -59,6 +59,8 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: private, no-cache, no-store');
+header("Access-Control-Allow-Origin: *", true);
+
 try {
 	$MP = MP::getMadelineAPI($user);
 	$time = microtime(true);
