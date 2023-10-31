@@ -564,7 +564,7 @@ class MP {
 
 	static function getURL() {
 		$sitepath = "";
-		if(($_SERVER["HTTPS"] ?? "") !== "on" || ($_SERVER["HTTP_X_FORWARDED_PROTO"] ?? "") == "https" || strpos($_SERVER["HTTP_CF_VISITOR"] ?? "", "https") !== false) {
+		if(($_SERVER["HTTPS"] ?? "") === "on" || ($_SERVER["HTTP_X_FORWARDED_PROTO"] ?? "") == "https" || strpos($_SERVER["HTTP_CF_VISITOR"] ?? "", "https") !== false) {
 			$sitepath .= "https";
 		} else {
 			$sitepath .= "http";

@@ -114,6 +114,7 @@ try {
 		global $iev;
 		global $texttop;
 		global $ua;
+		global $file;
 		echo '<div class="in'.($reverse?' t':'').($texttop?' cb':'').'" id="text">';
 		if($left) {
 			echo '<form action="'.$file.'">';
