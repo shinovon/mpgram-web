@@ -25,7 +25,7 @@ try {
 	}
 	$di = $MP->getDownloadInfo($msg['media']);
 	if(!file_exists(VOICE_TMP_DIR)) mkdir(VOICE_TMP_DIR);
-	$inpath = VOICE_TMP_DIR.$cid.'_'.$mid;
+	$inpath = VOICE_TMP_DIR.\hash('crc32',$user).$cid.'_'.$mid;
 	$outpath = $inpath.'.mp3';
 	if(!file_exists($outpath)) {
 		$MP->downloadToFile($di, $inpath);
