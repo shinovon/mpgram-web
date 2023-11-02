@@ -62,14 +62,14 @@
 	"need_signup": "Цей номер не зайнятий, спочатку зареєструйте його!",
 	"password_hash_invalid": "Некоректний хеш пароля!",
 	"wrong_number_format": "Некоректний формат номера",
-	"html_formatting": "HTML-форматування"
+	"html_formatting": "HTML-форматування",
 	"action_leave": "покинув(-ла) групу",
 	"action_deleteuser": "виключив(-ла)",
 	"action_joinedbylink": "приєднується в групу за посиланням-запрошенням",
 	"action_joinedbyrequest": "прийнятий(-та) до групи",
 	"action_historyclear": "Історію чату було очищено",
-	"action_chatcreate": "Група створена"
-	"compactchats": "Компактніше"
+	"action_chatcreate": "Група створена",
+	"compactchats": "Компактніше",
 	"set_chat_avas": "Аватари чатів",
 	"chat_info": "Інфо.",
 	"chat_about": "Опис",
