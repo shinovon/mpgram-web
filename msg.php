@@ -4,10 +4,11 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 include 'mp.php';
+session_start();
 $user = MP::getUser();
 if(!$user) {
 	header('Location: login.php?logout=1');
-	die();
+	die;
 }
 
 $theme = MP::getSettingInt('theme');
@@ -17,6 +18,7 @@ $id = $_POST['c'] ?? $_GET['c'] ?? die;
 $msg = $_POST['m'] ?? $_GET['m'] ?? null;
 $out = isset($_POST['o']) || isset($_GET['o']);
 $ch = isset($_POST['ch']) || isset($_GET['ch']);
+$random = $_POST['r'] ?? $_GET['r'] ?? null;
 
 header("Content-Type: text/html; charset=utf-8");
 header("Cache-Control: private, no-cache, no-store");
@@ -55,8 +57,15 @@ try {
 			header('Location: chat.php?c='.$id);
 			break;
 		}
-		die();
+		die;
 	} else if(isset($_POST['sent'])) {
+		if(isset($random)) {
+			if(isset($_SESSION['random']) && $_SESSION['random'] == $r) {
+				header('Location: chat.php?c='.$id);
+				die;
+			}
+			$_SESSION['random'] = $random;
+		}
 		$text = '';
 		if(isset($_POST['text'])) {
 			$text = $_POST['text'];
@@ -65,8 +74,7 @@ try {
 		$filename = null;
 		$type = null;
 		$attr = false;
-		if($_FILES['file']['error'] ?? false) {
-if($_FILES['file']['error'] != 4)
+		if(($_FILES['file']['error'] ?? false) && $_FILES['file']['error'] != 4) {
 			$reason = 'PHP Error: ' . $_FILES['file']['error'];
 		}
 		if(isset($_FILES['file']) && $_FILES['file']['size'] != 0) {
@@ -119,7 +127,7 @@ if($_FILES['file']['error'] != 4)
 						}
 						$MP->messages->sendMessage($params);
 						header('Location: chat.php?c='.$id);
-						die();
+						die;
 					}
 				} else {
 					$MP = MP::getMadelineAPI($user);
@@ -138,17 +146,17 @@ if($_FILES['file']['error'] != 4)
 					}
 					$MP->messages->sendMedia($params);
 					header('Location: chat.php?c='.$id);
-					die();
+					die;
 				}
 			} catch (Exception $e) {
 				echo $e;
-				die();
+				die;
 			}
 		}
 	}
 } catch (Exception $e) {
 	echo $e;
-	die();
+	die;
 }
 $title = null;
 try {
@@ -196,6 +204,7 @@ if(!$ch) {
 	if($msg) {
 		echo '<input type="hidden" name="reply_to" value="'.$msg.'">';
 	}
+	echo '<input type="hidden" name="r" value="'. \base64_encode(random_bytes(16)).'">';
 	echo '<input type="submit" value="'.MP::x($lng['choose_sticker']).'">';
 	echo '</form>';
 }
