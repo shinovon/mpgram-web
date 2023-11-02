@@ -97,5 +97,6 @@
 	"send_uncompressed": "Send uncompressed",
 	"voice": "Voice message",
 	"chat_link": "Link",
-	"leave_chat": "Leave chat"
+	"leave_chat": "Leave chat",
+	"media_location": "Location"
 }

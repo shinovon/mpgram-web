@@ -384,6 +384,13 @@ class MP {
 							echo '<div class="mwt"><b>'.$media['webpage']['title'].'</b></div>';
 						}
 						echo '</div>';
+					} else if(isset($media['geo'])) {
+						$lat = str_replace(',', '.', strval($media['geo']['lat']));
+						$long = str_replace(',', '.', strval($media['geo']['long']));
+						$lat = substr($lat, 0, 9) ?? $lat;
+						$long = substr($long, 0, 9) ?? $long;
+						
+						echo '<div class="mw"><b>'.$lng['media_location'].'</b><br><a href="https://maps.google.com/maps?q='.$lat.','.$long.'&ll='.$lat.','.$long.'&z=16">'.$lat.', '.$long.'</a></div>';
 					} else {
 						echo '<div><i>'.$lng['media_att'].'</i></div>';
 					}
