@@ -92,6 +92,7 @@ try {
 		if(isset($chat['username'])) {
 			echo '<p>'.MP::x($lng['chat_link']).':<br>t.me/'.MP::dehtml($chat['username']).'</p>';
 		}
+		echo '<p><a href="chat.php?c='.$id.'&leave">'.MP::x($lng['leave_chat']).'</a></p>';
 	}
 	echo '<p><a href="chatsearch.php?c='.$id.'">'.MP::x($lng['search_messages']).'</a></p>';
 	if($type != 'user' && $members) {

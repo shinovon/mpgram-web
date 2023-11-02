@@ -96,5 +96,6 @@
 	"search_messages": "Поиск по чату",
 	"send_uncompressed": "Отправить без сжатия",
 	"voice": "Голосовое сообщение",
-	"chat_link": "Ссылка"
+	"chat_link": "Ссылка",
+	"leave_chat": "Покинуть чат"
 }

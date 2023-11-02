@@ -96,5 +96,6 @@
 	"search_messages": "Search messages",
 	"send_uncompressed": "Send uncompressed",
 	"voice": "Voice message",
-	"chat_link": "Link"
+	"chat_link": "Link",
+	"leave_chat": "Leave chat"
 }
