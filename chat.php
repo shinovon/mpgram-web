@@ -348,15 +348,18 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	if($texttop) echo '<div style="height: 4em;" id="bottom"></div>';
 	else echo '<div id="bottom"></div>';
 	// Mark as read
-	if($endReached && $query === null) {
-		try {
+	try {
+		if($query === null && count($rm) > 0) {
+			$maxid = $endReached ? 0 : ($reverse ? $rm[count($rm)-1]['id'] : $rm[0]['id']);
 			if($ch || (int)$id < 0) {
-				$MP->channels->readHistory(['channel' => $id, 'max_id' => 0]);
+				$MP->channels->readHistory(['channel' => $id, 'max_id' => $maxid]);
 			} else {
-				$MP->messages->readHistory(['peer' => $id, 'max_id' => 0]);
+				$MP->messages->readHistory(['peer' => $id, 'max_id' => $maxid]);
 			}
-		} catch (Exception $e) {
+			$MP->messages->readMentions(['peer' => $id, 'top_msg_id' => $maxid]);
+			//$MP->messages->readReactions(['peer' => $id, 'top_msg_id' => $maxid]);
 		}
+	} catch (Exception $e) {
 	}
 	unset($rm);
 	unset($r);
