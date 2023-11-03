@@ -334,11 +334,13 @@ class MP {
 			$d = $MP->getDownloadInfo($m);
 			$fn = $d['name'];
 			$fext = $d['ext'];
-			$n = $fn.$fext;
-			if(isset($media['document']['attributes'])
-				&& isset($media['document']['attributes'][0])
-			&& isset($media['document']['attributes'][0]['file_name'])) {
-				$n = $media['document']['attributes'][0]['file_name'];
+			$n2 = $n = $fn.$fext;
+			if(isset($media['document']['attributes'])) {
+				foreach($media['document']['attributes'] as $attr) {
+					if($attr['_'] == 'documentAttributeFilename') {
+						$n = $attr['file_name'];
+					}
+				}
 			}
 			$voice = $media['document']['attributes'][0]['voice'] ?? false;
 			$voicedur = $media['document']['attributes'][0]['duration'] ?? false;
@@ -348,6 +350,7 @@ class MP {
 				$open = true;
 				$q = 'rprev';
 				$fq = 'rorig';
+				$audio = false;
 				switch(strtolower(substr($fext, 1))) {
 					case 'webp':
 						if(strpos($d['name'], 'sticker_') === 0) {
@@ -377,6 +380,8 @@ class MP {
 						break;
 					case 'mp3':
 						$img = false;
+						$audio = true;
+						$q = 'raudio';
 						break;
 					default:
 						$img = false;
@@ -391,11 +396,17 @@ class MP {
 						echo '<div><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></div>';
 					}
 				} else {
-					echo '<div class="mw"><b><a href="file.php?m='.$m['id'].'&c='.$id.'">'.MP::dehtml($n).'</a></b><br>';
+					$url = 'file.php?m='.$m['id'].'&c='.$id;
+					//if($audio) $url .= '&audio';
+					echo '<div class="mw"><b><a href="
+					'.$url.'">'.MP::dehtml($n).'</a></b><br>';
 					if($thumb && $imgs) {
-						echo '<a href="file.php?m='.$m['id'].'&c='.$id.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'"></img></a><br>';
+						echo '<a href='.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'"></img></a><br>';
 					}
 					echo round($d['size']/1024.0/1024.0, 2).' MB';
+					/*if($audio) {
+						echo '<br><audio controls preload="none" src="file.php?m='.$m['id'].'&c='.$id.'">';
+					}*/
 					echo '</div>';
 				}
 			} catch (Exception $e) {

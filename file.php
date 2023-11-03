@@ -158,11 +158,24 @@ try {
 					$h = 80;
 					$img = resize($img, $w, $h);
 				}
+			} else if($p == 'audio') {
+				if($w > 48) {
+					$h = ($h/$w)*48;
+					$w = 48;
+					$img = resize($img, $w, $h);
+				} else if($h > 48) {
+					$w = ($w/$h)*48;
+					$h = 48;
+					$img = resize($img, $w, $h);
+				}
 			}
 		}
 		header('Content-Type: image/jpeg');
 		imagejpeg($img, null, $q);
-	} else {
+	} else /*if(isset($_GET['audio'])) {
+		echo '<a href="file.php?m='.$_GET['m'].'&c='.$_GET['c'].'">Download</a><br>';
+		echo '<audio controls preload="none" src="file.php?m='.$_GET['m'].'&c='.$_GET['c'].'">';
+	} else */{
 		$MP->downloadToBrowser($di);
 	}
 } catch (Exception $e) {
