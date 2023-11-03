@@ -290,110 +290,7 @@ class MP {
 					}
 				}
 				if(isset($m['media'])) {
-					$media = $m['media'];
-					$reason = null;
-					if(isset($media['photo'])) {
-						if($imgs) {
-							echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig"><img class="mi" src="file.php?m='.$m['id'].'&c='.$id.'&p=rprev"></img></a></div>';
-						}
-					} else if(isset($media['document'])) {
-						$thumb = isset($media['document']['thumbs']);
-						$d = $MP->getDownloadInfo($m);
-						$fn = $d['name'];
-						$fext = $d['ext'];
-						$n = $fn.$fext;
-						if(isset($media['document']['attributes'])
-							&& isset($media['document']['attributes'][0])
-						&& isset($media['document']['attributes'][0]['file_name'])) {
-							$n = $media['document']['attributes'][0]['file_name'];
-						}
-						$voice = $media['document']['attributes'][0]['voice'] ?? false;
-						$voicedur = $media['document']['attributes'][0]['duration'] ?? false;
-						echo '<div>';
-						try {
-							$img = true;
-							$open = true;
-							$q = 'rprev';
-							$fq = 'rorig';
-							switch(strtolower(substr($fext, 1))) {
-								case 'webp':
-									if(strpos($d['name'], 'sticker_') === 0) {
-										$dl = true;
-										$open = false;
-										$ie = MP::getIEVersion();
-										if(PNG_STICKERS && ($ie == 0 || $ie > 4)) {
-											$q = 'rstickerp';
-										} else {
-											$q = 'rsticker';
-										}
-									}
-									break;
-								case 'jpg':
-								case 'jpeg':
-									$img = true;
-									break;
-								case 'png':
-									$q = 'rprev';
-									$fq = 'rorig';
-									$img = true;
-									break;
-								case 'gif':
-									$img = false;
-									break;
-								case 'tgs':
-									break;
-								case 'mp3':
-									$img = false;
-									break;
-								default:
-									$img = false;
-									break;
-							}
-							if($voice && defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES) {
-								echo '<div class="mw"><a href="voice.php?m='.$m['id'].'&c='.$id.'">'.static::x($lng['voice']).' '.MP::durationstr($voicedur).'</a><br><audio controls preload="none" src="voice.php?m='.$m['id'].'&c='.$id.'">'.'</div>';
-							} else if($img) {
-								if($open) {
-									echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p='.$fq.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></a></div>';
-								} else {
-									echo '<div><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></div>';
-								}
-							} else {
-								echo '<div class="mw"><b><a href="file.php?m='.$m['id'].'&c='.$id.'">'.MP::dehtml($n).'</a></b><br>';
-								if($thumb) {
-									echo '<a href="file.php?m='.$m['id'].'&c='.$id.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'"></img></a><br>';
-								}
-								echo round($d['size']/1024.0/1024.0, 2).' MB';
-								echo '</div>';
-							}
-						} catch (Exception $e) {
-							echo $e;
-						}
-						echo '</div>';
-					} else if(isset($media['webpage'])) {
-						echo '<div class="mw">';
-						if(isset($media['webpage']['site_name'])) {
-							echo '<a href="'.$media['webpage']['url'].'">';
-							echo $media['webpage']['site_name'];
-							echo '</a>';
-						} else if(isset($media['webpage']['url'])) {
-							echo '<a href="'.$media['webpage']['url'].'">';
-							echo $media['webpage']['url'];
-							echo '</a>';
-						}
-						if(isset($media['webpage']['title'])) {
-							echo '<div class="mwt"><b>'.$media['webpage']['title'].'</b></div>';
-						}
-						echo '</div>';
-					} else if(isset($media['geo'])) {
-						$lat = str_replace(',', '.', strval($media['geo']['lat']));
-						$long = str_replace(',', '.', strval($media['geo']['long']));
-						$lat = substr($lat, 0, 9) ?? $lat;
-						$long = substr($long, 0, 9) ?? $long;
-						
-						echo '<div class="mw"><b>'.$lng['media_location'].'</b><br><a href="https://maps.google.com/maps?q='.$lat.','.$long.'&ll='.$lat.','.$long.'&z=16">'.$lat.', '.$long.'</a></div>';
-					} else {
-						echo '<div><i>'.$lng['media_att'].'</i></div>';
-					}
+					echo static::printMessageMedia($MP, $m, $id, $imgs, $lng);
 				}
 				if(isset($m['reply_markup'])) {
 					$rows = $m['reply_markup']['rows'] ?? [];
@@ -420,6 +317,115 @@ class MP {
 			} catch (Exception $e) {
 				echo '<xmp>'.$e->getMessage()."\n".$e->getTraceAsString().'</xmp>';
 			}
+		}
+	}
+	
+	static function printMessageMedia($MP, $m, $id, $imgs, $lng) {
+		$media = $m['media'];
+		$reason = null;
+		if(isset($media['photo'])) {
+			if($imgs) {
+				echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig"><img class="mi" src="file.php?m='.$m['id'].'&c='.$id.'&p=rprev"></img></a></div>';
+			} else {
+				echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig">'.MP::x($lng['photo']).'</a></div>';
+			}
+		} else if(isset($media['document'])) {
+			$thumb = isset($media['document']['thumbs']);
+			$d = $MP->getDownloadInfo($m);
+			$fn = $d['name'];
+			$fext = $d['ext'];
+			$n = $fn.$fext;
+			if(isset($media['document']['attributes'])
+				&& isset($media['document']['attributes'][0])
+			&& isset($media['document']['attributes'][0]['file_name'])) {
+				$n = $media['document']['attributes'][0]['file_name'];
+			}
+			$voice = $media['document']['attributes'][0]['voice'] ?? false;
+			$voicedur = $media['document']['attributes'][0]['duration'] ?? false;
+			echo '<div>';
+			try {
+				$img = true;
+				$open = true;
+				$q = 'rprev';
+				$fq = 'rorig';
+				switch(strtolower(substr($fext, 1))) {
+					case 'webp':
+						if(strpos($d['name'], 'sticker_') === 0) {
+							$dl = true;
+							$open = false;
+							$ie = MP::getIEVersion();
+							if(PNG_STICKERS && ($ie == 0 || $ie > 4)) {
+								$q = 'rstickerp';
+							} else {
+								$q = 'rsticker';
+							}
+						}
+						break;
+					case 'jpg':
+					case 'jpeg':
+						$img = true;
+						break;
+					case 'png':
+						$q = 'rprev';
+						$fq = 'rorig';
+						$img = true;
+						break;
+					case 'gif':
+						$img = false;
+						break;
+					case 'tgs':
+						break;
+					case 'mp3':
+						$img = false;
+						break;
+					default:
+						$img = false;
+						break;
+				}
+				if($voice && defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES) {
+					echo '<div class="mw"><a href="voice.php?m='.$m['id'].'&c='.$id.'">'.static::x($lng['voice']).' '.MP::durationstr($voicedur).'</a><br><audio controls preload="none" src="voice.php?m='.$m['id'].'&c='.$id.'">'.'</div>';
+				} else if($img && $imgs) {
+					if($open) {
+						echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p='.$fq.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></a></div>';
+					} else {
+						echo '<div><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></div>';
+					}
+				} else {
+					echo '<div class="mw"><b><a href="file.php?m='.$m['id'].'&c='.$id.'">'.MP::dehtml($n).'</a></b><br>';
+					if($thumb && $imgs) {
+						echo '<a href="file.php?m='.$m['id'].'&c='.$id.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'"></img></a><br>';
+					}
+					echo round($d['size']/1024.0/1024.0, 2).' MB';
+					echo '</div>';
+				}
+			} catch (Exception $e) {
+				echo $e;
+			}
+			echo '</div>';
+		} else if(isset($media['webpage'])) {
+			echo '<div class="mw">';
+			if(isset($media['webpage']['site_name'])) {
+				echo '<a href="'.$media['webpage']['url'].'">';
+				echo $media['webpage']['site_name'];
+				echo '</a>';
+			} else if(isset($media['webpage']['url'])) {
+				echo '<a href="'.$media['webpage']['url'].'">';
+				echo $media['webpage']['url'];
+				echo '</a>';
+			}
+			if(isset($media['webpage']['title'])) {
+				echo '<div class="mwt"><b>'.$media['webpage']['title'].'</b></div>';
+			}
+			echo '</div>';
+		} else if(isset($media['geo'])) {
+			$lat = str_replace(',', '.', strval($media['geo']['lat']));
+			$long = str_replace(',', '.', strval($media['geo']['long']));
+			$lat = substr($lat, 0, 9) ?? $lat;
+			$long = substr($long, 0, 9) ?? $long;
+			
+			echo '<div class="mw"><b>'.$lng['media_location'].'</b><br><a href="https://maps.google.com/maps?q='.$lat.','.$long.'&ll='.$lat.','.$long.'&z=16">'.$lat.', '.$long.'</a></div>';
+		} else {
+			echo '<div><i>'.$lng['media_att'].'</i></div>';
 		}
 	}
 	

@@ -98,5 +98,7 @@
 	"voice": "Voice message",
 	"chat_link": "Link",
 	"leave_chat": "Leave chat",
-	"media_location": "Location"
+	"media_location": "Location",
+	"set_msg_photos": "Preview photos",
+	"photo": "Photo"
 }
