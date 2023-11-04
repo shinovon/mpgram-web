@@ -112,5 +112,6 @@
 	"minutes_ago": [
 		[ "=", 1, "$ minute ago", "$ minutes ago" ]
 	],
-	"install_stickerset": "Install stickerset"
+	"install_stickerset": "Install stickerset",
+	"set_chat_status": "Chat status"
 }

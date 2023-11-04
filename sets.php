@@ -148,7 +148,7 @@ echo '<label for="texttop">'.MP::x($lng['set_chat_texttop']).'</label>';
 echo '<br><input type="checkbox" id="longpoll" name="longpoll"'.($longpoll ? ' checked' : '').'>';
 echo '<label for="longpoll">Longpoll</label>';
 echo '<br><input type="checkbox" id="status" name="status"'.($status ? ' checked' : '').'>';
-echo '<label for="status">Chat status (test)</label>';
+echo '<label for="status">'.MP::x($lng['set_chat_status']).'</label>';
 echo '<br><input type="checkbox" id="imgs" name="imgs"'.($status ? ' checked' : '').'>';
 echo '<label for="imgs">'.MP::x($lng['set_msg_photos']).'</label>';
 echo '</p><p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
