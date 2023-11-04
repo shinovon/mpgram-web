@@ -101,5 +101,15 @@
 	"media_location": "Location",
 	"set_msg_photos": "Preview photos",
 	"photo": "Photo",
-	"edit": "Edit"
+	"edit": "Edit",
+	"last_seen": "last seen",
+	"last_seen_at": "at",
+	"yesterday": "yesterday",
+	"just_now": "just now",
+	"recently": "recently",
+	"last_week": "within a week",
+	"last_month": "within a month",
+	"minutes_ago": [
+		[ "=", 1, "$ minute ago", "$ minutes ago" ]
+	]
 }

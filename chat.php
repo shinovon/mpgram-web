@@ -260,40 +260,38 @@ setTimeout("location.reload(true);",'.$updint.'000);
 			if($status) {
 				switch($status['_']) {
 				case 'userStatusOnline':
-					$status_str = 'online';
+					$status_str = MP::x($lng['online']);
 					break;
 				case 'userStatusOffline':
-					$time = time();
-					$was = $status['was_online'];
+					$time = time()-$timeoff;
+					$was = $status['was_online']-$timeoff;
 					if($was >= $time - 60) {
-						$status_str = 'last seen just now';
+						$status_str = MP::x($lng['last_seen'].' '.$lng['just_now']);
 					} else if($was >= $time - 60*60) {
-						$minutes = intval(($time-$was)/60);
-						if($minutes == 1) {
-							$status_str = 'last seen '.$minutes.' minute ago';
-						} else {
-							$status_str = 'last seen '.$minutes.' minutes ago';
-						}
-					} else if($was >= $time - 24*60*60) {
+						$status_str = MP::x($lng['last_seen'].' '.MPLocale::number('minutes_ago', intval(($time-$was)/60)));
+					} else /*if($was >= $time - 24*60*60) {
 						$hours = intval(($time-$was)/60/60);
 						if($hours == 1) {
 							$status_str = 'last seen '.$hours.' hour ago';
 						} else {
 							$status_str = 'last seen '.$hours.' hours ago';
 						}
+					} else*/ if(date('d.m.y', $was) == date('d.m.y', $time)) {
+						$status_str = MP::x($lng['last_seen']).' '.MP::x($lng['at']).' '.date('H:i', $status['was_online']-$timeoff);
+					} else if(date('d.m.y', $was) == date('d.m.y', $time-24*60*60)) {
+						$status_str = MP::x($lng['last_seen']).' '.MP::x($lng['yesterday'].' '.$lng['at']).' '.date('H:i', $was);
 					} else {
-						// TODO yestarday at hh:mm & date
-						$status_str = 'last seen ' . date('d.m.y', $status['was_online']);
+						$status_str = MP::x($lng['last_seen']).' '.date('d.m.y', $was);
 					}
 					break;
 				case 'userStatusRecently':
-					$status_str = 'last seen recently';
+					$status_str = MP::x($lng['last_seen'].' '.$lng['recently']);
 					break;
 				case 'userStatusLastWeek':
-					$status_str = 'last seen within a week';
+					$status_str = MP::x($lng['last_seen'].' '.$lng['last_week']);
 					break;
 				case 'userStatusLastMonth':
-					$status_str = 'last seen within a month';
+					$status_str = MP::x($lng['last_seen'].' '.$lng['last_month']);
 				default:
 				case 'userStatusEmpty':
 					$status_str = '';
