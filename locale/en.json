@@ -111,5 +111,6 @@
 	"last_month": "within a month",
 	"minutes_ago": [
 		[ "=", 1, "$ minute ago", "$ minutes ago" ]
-	]
+	],
+	"install_stickerset": "Install stickerset"
 }
