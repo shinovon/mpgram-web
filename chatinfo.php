@@ -94,7 +94,7 @@ try {
 		}
 		echo '<p><a href="chat.php?c='.$id.'&leave">'.MP::x($lng['leave_chat']).'</a></p>';
 	}
-	echo '<p><a href="chatsearch.php?c='.$id.'">'.MP::x($lng['search_messages']).'</a></p>';
+	echo '<p><a href="chatsearch.php?c='.$id.'">'.MP::x($lng['search_messages']).'</a> <a href="chatmedia.php?c='.$id.'">'.MP::x($lng['chat_media']).'</a></p>';
 	if($type != 'user' && $members) {
 		$avas = MP::getSettingInt('avas', 0);
 		echo MP::x($lng['chat_members']).':';
