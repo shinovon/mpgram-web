@@ -317,8 +317,8 @@ try {
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
 			$id = MP::getId($d['peer']);
 			try {
-				echo '<tr class="c">';
 				$cl = 'chat.php?c='.$id;
+				echo '<tr class="c" onclick="location.href=\''.$cl.'\';">';
 				$unr = $d['unread_count'];
 				if($unr > $msglimit) {
 					$cl .= '&m='.$d['read_inbox_max_id'].'&offset='.(-$msglimit-1);
