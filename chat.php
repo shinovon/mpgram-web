@@ -277,9 +277,9 @@ setTimeout("location.reload(true);",'.$updint.'000);
 							$status_str = 'last seen '.$hours.' hours ago';
 						}
 					} else*/ if(date('d.m.y', $was) == date('d.m.y', $time)) {
-						$status_str = MP::x($lng['last_seen']).' '.MP::x($lng['at']).' '.date('H:i', $status['was_online']-$timeoff);
+						$status_str = MP::x($lng['last_seen']).' '.MP::x($lng['last_seen_at']).' '.date('H:i', $status['was_online']-$timeoff);
 					} else if(date('d.m.y', $was) == date('d.m.y', $time-24*60*60)) {
-						$status_str = MP::x($lng['last_seen']).' '.MP::x($lng['yesterday'].' '.$lng['at']).' '.date('H:i', $was);
+						$status_str = MP::x($lng['last_seen']).' '.MP::x($lng['yesterday'].' '.$lng['last_seen_at']).' '.date('H:i', $was);
 					} else {
 						$status_str = MP::x($lng['last_seen']).' '.date('d.m.y', $was);
 					}
