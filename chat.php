@@ -333,7 +333,10 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	echo '</div>';
 	if(!$reverse) {
 		if(count($rm) >= $msglimit) {
-			echo '<p><a href="'.$file.'?c='.$id.'&d=d&offset_from='.$rm[count($rm)-1]['id'].'">'.MP::x($lng['history_down']).'</a></p>';
+			if($endReached)
+				echo '<p><a href="'.$file.'?c='.$id.'&offset='.$msglimit.'&d=d">'.MP::x($lng['history_down']).'</a></p>';
+			else
+				echo '<p><a href="'.$file.'?c='.$id.'&d=d&offset_from='.$rm[count($rm)-1]['id'].'">'.MP::x($lng['history_down']).'</a></p>';
 		}
 	} else {
 		if($hasOffset && !$endReached) {
