@@ -334,16 +334,31 @@ class MP {
 			$d = $MP->getDownloadInfo($m);
 			$fn = $d['name'];
 			$fext = $d['ext'];
-			$n2 = $n = $fn.$fext;
+			$title = $fn.$fext;
+			$nameset = false;
+			$voice = false;
+			$dur = false;
 			if(isset($media['document']['attributes'])) {
 				foreach($media['document']['attributes'] as $attr) {
 					if($attr['_'] == 'documentAttributeFilename') {
-						$n = $attr['file_name'];
+						if($nameset) continue;
+						$title = $attr['file_name'];
+					}
+					if($attr['_'] == 'documentAttributeAudio') {
+						$audio = true;
+						$voice = $attr['voice'] ?? false;
+						$dur = $attr['duration'] ?? false;
+						if($nameset) continue;
+						if(isset($attr['title'])) {
+							$title = $attr['title'];
+							if(isset($attr['performer'])) {
+								$title = $attr['performer'].' - '.$title;
+							}
+							$nameset = true;
+						}
 					}
 				}
 			}
-			$voice = $media['document']['attributes'][0]['voice'] ?? false;
-			$voicedur = $media['document']['attributes'][0]['duration'] ?? false;
 			echo '<div>';
 			try {
 				$img = true;
@@ -388,7 +403,7 @@ class MP {
 						break;
 				}
 				if($voice && defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES) {
-					echo '<div class="mw"><a href="voice.php?m='.$m['id'].'&c='.$id.'">'.static::x($lng['voice']).' '.MP::durationstr($voicedur).'</a><br><audio controls preload="none" src="voice.php?m='.$m['id'].'&c='.$id.'">'.'</div>';
+					echo '<div class="mw"><a href="voice.php?m='.$m['id'].'&c='.$id.'">'.static::x($lng['voice']).' '.MP::durationstr($dur).'</a><br><audio controls preload="none" src="voice.php?m='.$m['id'].'&c='.$id.'">'.'</div>';
 				} else if($img && $imgs) {
 					if($open) {
 						echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p='.$fq.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></a></div>';
@@ -399,7 +414,7 @@ class MP {
 					$url = 'file.php?m='.$m['id'].'&c='.$id;
 					//if($audio) $url .= '&audio';
 					echo '<div class="mw"><b><a href="
-					'.$url.'">'.MP::dehtml($n).'</a></b><br>';
+					'.$url.'">'.MP::dehtml($title).'</a></b><br>';
 					if($thumb && $imgs) {
 						echo '<a href='.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'"></img></a><br>';
 					}
