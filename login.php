@@ -16,11 +16,11 @@ $theme = 0;
 $ua = '';
 $iev = MP::getIEVersion();
 if($iev > 0 && $iev < 4) $theme = 1;
-$theme = MP::getSettingInt('theme', $theme);
+$theme = MP::getSettingInt('theme', $theme, true);
 $post = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false) || ($iev < 4 && $iev == 0);
 
 $lng = MP::initLocale();
-MP::cookie('theme', $theme, time() + (86400 * 365));
+//MP::cookie('theme', $theme, time() + (86400 * 365));
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
@@ -45,15 +45,10 @@ if(isset($_GET['phone'])) {
 	$phone = $_POST['phone'];
 }
 
-if(isset($_COOKIE['user']))
-	$user = $_COOKIE['user'];
-else if(isset($_SESSION['user']))
-	$user = $_SESSION['user'];
-if(strpos(strval($user), '/') !== false || strpos(strval($user), '.') !== false) {
-	$user = null;
-}
+$user = MP::getUser();
+
 // Check session existance
-$nouser = $user == null || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
+$nouser = $user == null || $user === false || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
 function removeSession($logout=false) {
 	global $user;
 	global $nouser;
@@ -111,7 +106,7 @@ try {
 //--></script>';
 	}
 	echo '</head>';
-	echo Themes::bodyStart();
+	echo Themes::bodyStart('style="margin:5px"');
 	echo '<h1>MPGram Web</h1>';
 }
 $MP = null;
@@ -341,7 +336,7 @@ if($phone !== null) {
 	if($wrong) {
 		echo MP::x('<b>'.$lng['wrong_number_format'].'</b><br>');
 	} else {
-//		echo MP::x('<a href="qrlogin.php">'.$lng['qr_login'].'</a>');
+		echo MP::x('<a href="qrlogin.php">'.$lng['qr_login'].'</a>');
 	}
 	echo '<br><div>';
 	echo MP::x('<a href="about.php">'.$lng['about'].'</a> <a href="login.php?lang=en">English</a> <a href="login.php?lang=ru">Русский</a>');
