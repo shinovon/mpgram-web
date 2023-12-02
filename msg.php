@@ -227,3 +227,4 @@ if(!$ch) {
 	}
 }
 echo Themes::bodyEnd();
+die;
