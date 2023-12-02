@@ -156,13 +156,13 @@ try {
 					$img = resize($img, $w, $h);
 				}
 			} else if($p == 'audio') {
-				if($w > 48) {
-					$h = ($h/$w)*48;
-					$w = 48;
+				if($h > 36) {
+					$w = ($w/$h)*36;
+					$h = 36;
 					$img = resize($img, $w, $h);
-				} else if($h > 48) {
-					$w = ($w/$h)*48;
-					$h = 48;
+				} else if($w > 36) {
+					$h = ($h/$w)*36;
+					$w = 36;
 					$img = resize($img, $w, $h);
 				}
 			}

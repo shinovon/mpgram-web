@@ -413,12 +413,18 @@ class MP {
 				} else {
 					$url = 'file.php?m='.$m['id'].'&c='.$id;
 					//if($audio) $url .= '&audio';
-					echo '<div class="mw"><b><a href="
-					'.$url.'">'.MP::dehtml($title).'</a></b><br>';
+					echo '<div class="mw">';
 					if($thumb && $imgs) {
-						echo '<a href='.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'"></img></a><br>';
+						echo '<a href='.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'" class="acv"></img></a>';
 					}
-					echo round($d['size']/1024.0/1024.0, 2).' MB';
+					echo '<div class="cst"><b><a href="'.$url.'">'.MP::dehtml($title).'</a></b></div>';
+					echo '<div>';
+					if($audio && $dur > 0) {
+						echo MP::durationstr($dur);
+					} else {
+						echo round($d['size']/1024.0/1024.0, 2).' MB';
+					}
+					echo '</div>';
 					/*if($audio) {
 						echo '<br><audio controls preload="none" src="file.php?m='.$m['id'].'&c='.$id.'">';
 					}*/

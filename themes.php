@@ -232,6 +232,13 @@ class Themes {
 			width: 100%;
 			'.(static::$iev > 0 && static::$iev < 5 ? 'height: 48px;' : 'height: 2.7em;').'
 		}
+		.acv {
+			padding-left: 2px;
+			margin-top: 4px;
+			padding-right: 4px;
+			float: left;
+			height: 36px;
+		}
 		--></style>';
 	}
 }
