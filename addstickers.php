@@ -7,7 +7,7 @@ include 'mp.php';
 $user = MP::getUser();
 if(!$user) {
 	header('Location: login.php?logout=1');
-	die();
+	die;
 }
 
 $theme = MP::getSettingInt('theme');

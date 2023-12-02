@@ -6,7 +6,7 @@ use chillerlan\QRCode\QROptions;
 use chillerlan\QRCode\Output\QROutputInterface;
 if(!isset($_SESSION['qr_token'])) {
 	http_response_code(400);
-	die();
+	die;
 }
 try {
 	$options = new QROptions;
@@ -14,9 +14,9 @@ try {
 	$options->scale = 6;
 	$options->imageTransparent = false;
 	$options->imageBase64 = false;
-	$png = (new QRCode($options))->render(base64_decode($_SESSION['qr_token']));
+	$qr = (new QRCode($options))->render(base64_decode($_SESSION['qr_token']));
 	header("Content-Type: image/png");
-	echo $png;
+	echo $qr;
 } catch (Exception $e) {
 	http_response_code(500);
 }

@@ -15,7 +15,7 @@ $lng = MP::initLocale();
 $user = MP::getUser();
 if(!$user) {
 	header('Location: login.php?logout=1');
-	die();
+	die;
 }
 
 $count = 300;

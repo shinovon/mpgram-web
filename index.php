@@ -11,6 +11,6 @@ if(FORCE_HTTPS || (CHROME_HTTPS && isset($_SERVER['HTTP_USER_AGENT']) && strpos(
 		$s .= '/';
 	}
 	header('Location: ' . $s . 'login.php');
-	die();
+	die;
 }
 header('Location: login.php');

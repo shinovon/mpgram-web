@@ -15,7 +15,7 @@ $theme = MP::getSettingInt('theme');
 $user = MP::getUser();
 if(!$user) {
 	header('Location: login.php?logout=1');
-	die();
+	die;
 }
 
 $id = $_GET['c'] ?? $_GET['peer'] ?? die;

@@ -45,7 +45,7 @@ try {
 	$user = MP::getUser();
 	if(!$user) {
 		http_response_code(401);
-		die();
+		die;
 	}
 	$MP = MP::getMadelineAPI($user);
 	$msg = null;
@@ -66,12 +66,9 @@ try {
 		} else {
 			echo file_get_contents('us.png');
 		}
-		die();
+		die;
 	}
-	$p = '';
-	if(isset($_GET['p'])) {
-		$p = $_GET['p'];
-	}
+	$p = $_GET['p'] ?? '';
 	if(strpos($p, 'r') === 0) {
 		header('Cache-Control: private, max-age=86400');
 		$p = substr($p, 1);

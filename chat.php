@@ -43,7 +43,7 @@ if(isset($_GET['max_id'])) {
 $user = MP::getUser();
 if(!$user) {
 	header('Location: login.php?logout=1');
-	die();
+	die;
 }
 
 header('Content-Type: text/html; charset='.MP::$enc);
@@ -372,4 +372,3 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	echo '<b>'.MP::x($lng['error']).'!</b><br>';
 	echo '<xmp>'.$e->getMessage()."\n".$e->getTraceAsString().'</xmp>';
 }
-?>

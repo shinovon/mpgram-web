@@ -145,4 +145,3 @@ class MPLocale {
 		return str_replace('$', strval($number), $value);
 	}
 }
-?>

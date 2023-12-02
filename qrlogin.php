@@ -4,29 +4,16 @@ ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 session_start();
-$logout = false;
-if(isset($_GET['logout'])) {
+$logout = isset($_GET['logout']);
+if($logout) {
 	$_SESSION = array();
-	$logout = true;
 }
 
 $user = null;
 $nouser = true;
 
-$confirm = null;
-if(isset($_GET['confirm'])) {
-	$confirm = $_GET['confirm'];
-} else if(isset($_POST['confirm'])) {
-	$confirm = $_POST['confirm'];
-}
+$confirm = $_GET['confirm'] ?? $_POST['confirm'] ?? null;
 
-if(isset($_COOKIE['user']))
-	$user = $_COOKIE['user'];
-else if(isset($_SESSION['user']))
-	$user = $_SESSION['user'];
-if(strpos(strval($user), '/') !== false || strpos(strval($user), '.') !== false) {
-	$user = null;
-}
 $post = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false;
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
@@ -36,6 +23,7 @@ function exceptions_error_handler($severity, $message, $filename, $lineno) {
 set_error_handler('exceptions_error_handler');
 
 include 'mp.php';
+$user = MP::getUser();
 $nouser = $user == null || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
 
 $theme = 0;

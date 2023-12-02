@@ -8,5 +8,5 @@ if(!isset($_SERVER['HTTPS']) && (FORCE_HTTPS || (CHROME_HTTPS && isset($_SERVER[
 		$s .= '/';
 	}
 	header('Location: ' . $s);
-	die();
+	die;
 }

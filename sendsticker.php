@@ -13,20 +13,8 @@ if(!$user) {
 $theme = MP::getSettingInt('theme');
 $lng = MP::initLocale();
 
-$id = null;
-if(isset($_POST['c'])) {
-	$id = $_POST['c'];
-} else if(isset($_GET['c'])) {
-	$id = $_GET['c'];
-} else {
-	die();
-}
-$reply_to = null;
-if(isset($_POST['reply_to'])) {
-	$reply_to = $_POST['reply_to'];
-} else if(isset($_GET['reply_to'])) {
-	$reply_to = $_GET['reply_to'];
-}
+$id = $_POST['c'] ?? $_GET['c'] ?? die;
+$reply_to = $_POST['reply_to'] ?? $_GET['reply_to'] ?? null;
 
 header("Content-Type: text/html; charset=utf-8");
 header("Cache-Control: private, no-cache, no-store");
@@ -52,7 +40,7 @@ try {
 		$params['media'] = ['_' => 'document', 'id' => (int) $_GET['id'], 'access_hash' => (int) $_GET['access_hash']];
 		$MP->messages->sendMedia($params);
 		header('Location: chat.php?c='.$id);
-		die();
+		die;
 	} else if(isset($_GET['set'])) {
 		echo '<div><a href="sendsticker.php?c='.$id.($reply_to?'&reply_to='.$reply_to:'').'">'.MP::x($lng['back']).'</a></div><br>';
 		$set = $_GET['set'];

@@ -51,4 +51,3 @@ require_once 'vendor/autoload.php';
 echo '<br>Running on MadelineProto ' . \danog\MadelineProto\API::RELEASE;
 echo ' PHP ' . phpversion();
 echo Themes::bodyEnd();
-?>

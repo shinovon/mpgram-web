@@ -8,7 +8,7 @@ try {
 	$user = MP::getUser();
 	if(!$user) {
 		http_response_code(401);
-		die();
+		die;
 	}
 	$MP = MP::getMadelineAPI($user);
 	if(!isset($_GET['c']) || !isset($_GET['m'])) die;
@@ -29,7 +29,7 @@ try {
 	$outpath = $inpath.'.mp3';
 	if(!file_exists($outpath)) {
 		$MP->downloadToFile($di, $inpath);
-		shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$inpath.'" -b:a 32k -ac 1 -acodec mp3 "'.$outpath.'"');
+		shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$inpath.'" -b:a 64k -ac 1 -acodec mp3 "'.$outpath.'"');
 		unlink($inpath);
 	}
 	header('Content-Type: audio/mpeg');

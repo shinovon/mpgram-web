@@ -897,4 +897,3 @@ class MP {
 	}
 }
 MP::init();
-?>

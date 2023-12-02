@@ -1,10 +1,10 @@
 <?php
-if(!isset($_GET['id'])) die();
+if(!isset($_GET['id'])) die;
 $i = intval($_GET['m'] ?? 0);
 $limit = $_GET['l'] ?? 0;
 include 'mp.php';
 $user = MP::getUser();
-if(!$user) die();
+if(!$user) die;
 $id = $_GET['id'];
 $timeoff = $_GET['t'] ?? 0;
 $offset = $_GET['o'] ?? -1;
@@ -67,7 +67,7 @@ try {
 	if($longpoll) {
 		$so = $offset;
 		while(true) {
-			if(microtime(true) - $time >= $timeout) die();
+			if(microtime(true) - $time >= $timeout) die;
 			$updates = $MP->getUpdates(['offset' => $offset+1, 'limit' => 100, 'timeout' => 10]);
 			$minid = 0;
 			$maxid = 0;
@@ -96,7 +96,7 @@ try {
 			}
 			if($minid != 0) {
 				printMsgs($MP, $minmsg, $maxmsg, $minid, $maxid);
-				die();
+				die;
 			}
 		}
 		return;
@@ -111,7 +111,7 @@ try {
 	'min_id' => $i,
 	'hash' => 0]);
 	$rm = $r['messages'];
-	if(count($rm) == 0 || !isset($rm[0])) die();
+	if(count($rm) == 0 || !isset($rm[0])) die;
 	$info = $MP->getInfo($id);
 	$name = null;
 	$pm = false;

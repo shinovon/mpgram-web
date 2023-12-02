@@ -7,8 +7,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 session_start();
-if(isset($_GET['logout']))
-	$_SESSION = [];
+if(isset($_GET['logout'])) $_SESSION = [];
 
 include 'mp.php';
 
@@ -38,12 +37,7 @@ $wrong = isset($_GET['wrong']);
 $user = null;
 $nouser = true;
 
-$phone = null;
-if(isset($_GET['phone'])) {
-	$phone = $_GET['phone'];
-} else if(isset($_POST['phone'])) {
-	$phone = $_POST['phone'];
-}
+$phone = $_GET['phone'] ?? $_POST['phone'] ?? null;
 
 $user = MP::getUser();
 
@@ -117,13 +111,13 @@ if($user != null
 	// Already logged in
 	if(isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {
 		header('Location: chats.php');
-		die();
+		die;
 	} else {
 		$MP = MP::getMadelineAPI($user, true);
 		if($MP->getAuthorization() === 3) {
 			MP::cookie('code', '1', time() + (86400 * 365));
 			header('Location: chats.php');
-			die();
+			die;
 		}
 		if($phone === null) {
 			unset($MP);
@@ -135,7 +129,7 @@ if($phone !== null) {
 	$p = $phone;
 	if(empty($p) || strlen($p) < 10 || !is_numeric(str_replace('-','',str_replace('+','', $p)))) {
 		header('Location: login.php?wrong=number');
-		die();
+		die;
 	}
 	if(!isset($_SESSION['captcha_entered'])) {
 		if(!isset($_POST['c']) && !isset($_GET['c'])) {
@@ -154,7 +148,7 @@ if($phone !== null) {
 			echo '</form>';
 			echo MP::x('<a href="login.php?logout=2">'.$lng['logout'].'</a>');
 			echo Themes::bodyEnd();
-			die();
+			die;
 		} else {
 			$c = null;
 			if(isset($_POST['c'])) {
@@ -180,7 +174,7 @@ if($phone !== null) {
 				echo '</form>';
 				if($b) echo '<b>'.MP::x($lng['wrong_captcha']).'</b>';
 				echo Themes::bodyEnd();
-				die();
+				die;
 			}
 			$_SESSION['captcha_entered'] = 1;
 		}
@@ -194,7 +188,7 @@ if($phone !== null) {
 		if(isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {
 			unset($_SESSION['captcha_entered']);
 			header('Location: chats.php');
-			die();
+			die;
 		} else if(isset($_POST['pass']) || isset($_GET['pass'])) {
 			$MP = MP::getMadelineAPI($user, true);
 			try {
@@ -207,7 +201,7 @@ if($phone !== null) {
 				$MP->complete2faLogin($password);
 				MP::cookie('code', '1', time() + (86400 * 365));
 				header('Location: chats.php');
-				die();
+				die;
 			} catch (Exception $e) {
 				if(strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
 					htmlStart();
@@ -220,13 +214,13 @@ if($phone !== null) {
 					echo '</form>';
 					echo '<b>'.MP::x($lng['password_hash_invalid']).'</b><br>';
 					echo Themes::bodyEnd();
-					die();
+					die;
 				} else if(strpos($e->getMessage(), 'AUTH_RESTART') !== false/* || strpos($e->getMessage(), 'I\'m not waiting') !== false*/) {
 				} else {
 					echo '<xmp>';
 					echo $e;
 					echo '</xmp>';
-					die();
+					die;
 				}
 			}
 		} else if(isset($_POST['code']) || isset($_GET['code'])) {
@@ -248,7 +242,7 @@ if($phone !== null) {
 						htmlStart();
 						echo '<b>'.MP::x($lng['no_pass_code']).'</b>';
 						echo Themes::bodyEnd();
-						die();
+						die;
 					} else if(isset($a['_']) && $a['_'] === 'account.password') {
 						htmlStart();
 						echo MP::x($lng['pass_code']).':<br>';
@@ -259,16 +253,16 @@ if($phone !== null) {
 						echo '<input type="submit">';
 						echo '</form>';
 						echo Themes::bodyEnd();
-						die();
+						die;
 					} else if(isset($a['_']) && $a['_'] === 'account.needSignup') {
 						htmlStart();
 						echo MP::x($lng['need_signup']);
 						echo Themes::bodyEnd();
-						die();
+						die;
 					} else {
 						MP::cookie('code', '1', time() + (86400 * 365));
 						header('Location: chats.php');
-						die();
+						die;
 					}
 				} catch (Exception $e) {
 					htmlStart();
@@ -282,7 +276,7 @@ if($phone !== null) {
 						echo MP::x('<b>'.$lng['error'].'</b><br>');
 						echo $e->getMessage();
 						echo Themes::bodyEnd();
-						die();
+						die;
 					}
 				}
 			}
@@ -298,7 +292,7 @@ if($phone !== null) {
 		} catch (Exception $e) {
 			echo $e->getMessage();
 			echo Themes::bodyEnd();
-			die();
+			die;
 		}
 	} else {
 		try {
@@ -306,11 +300,11 @@ if($phone !== null) {
 		} catch (Exception $e) {
 			if(strpos($e->getMessage(), 'PHONE_NUMBER_INVALID') !== false) {
 				header('Location: login.php?wrong=number');
-				die();
+				die;
 			} else {
 				echo $e->getMessage();
 				echo Themes::bodyEnd();
-				die();
+				die;
 			}
 		}
 	}
@@ -336,7 +330,7 @@ if($phone !== null) {
 	if($wrong) {
 		echo MP::x('<b>'.$lng['wrong_number_format'].'</b><br>');
 	} else {
-		echo MP::x('<a href="qrlogin.php">'.$lng['qr_login'].'</a>');
+		echo MP::x('<a href="qrlogin.php">'.$lng['qr_login'].'</a> (experimental)');
 	}
 	echo '<br><div>';
 	echo MP::x('<a href="about.php">'.$lng['about'].'</a> <a href="login.php?lang=en">English</a> <a href="login.php?lang=ru">Русский</a>');
@@ -344,4 +338,3 @@ if($phone !== null) {
 	echo '</div>';
 	echo Themes::bodyEnd();
 }
-?>

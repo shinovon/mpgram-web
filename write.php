@@ -8,7 +8,7 @@ session_start();
 $user = MP::getUser();
 if(!$user) {
 	header('Location: login.php?logout=1');
-	die();
+	die;
 }
 
 $id = $_POST['c'] ?? $_GET['c'] ?? die;
@@ -57,4 +57,3 @@ if($name) {
 }
 echo '<a href="chat.php?c='.$id.'">Back</a>';
 echo '</body>';
-?>

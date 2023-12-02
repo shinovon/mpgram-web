@@ -45,7 +45,7 @@ try {
 	$user = MP::getUser();
 	if(!$user) {
 		http_response_code(401);
-		die();
+		die;
 	}
 	$MP = MP::getMadelineAPI($user);
 	$msg = null;
@@ -66,10 +66,7 @@ try {
 		
 		$di = $MP->getDownloadInfo($msg['media']);
 	}
-	$p = '';
-	if(isset($_GET['p'])) {
-		$p = $_GET['p'];
-	}
+	$p = $_GET['p'] ?? '';
 	if(strpos($p, 'thumb') === 0) {
 		$p = substr($p, 5);
 		$t = str_replace('messagemedia', '', strtolower($msg['media']['_']));
