@@ -315,42 +315,36 @@ try {
 		echo '<table class="cl">';
 		foreach($dialogs as $d){
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
-			$id = MP::getId($d['peer']);
 			try {
+				$peer = $d['peer'];
+				$id = MP::getId($peer);
+				$lid = $peer['chat_id'] ?? $peer['channel_id'] ?? $id;
+				$n = null;
 				$cl = 'chat.php?c='.$id;
-				echo '<tr class="c" onclick="location.href=\''.$cl.'\';">';
 				$unr = $d['unread_count'];
+				$broadcast = false;
 				if($unr > $msglimit) {
 					$cl .= '&m='.$d['read_inbox_max_id'].'&offset='.(-$msglimit-1);
 				}
+				echo '<tr class="c" onclick="location.href=\''.$cl.'\';">';
 				if($avas) {
 					echo '<td class="cava cbd"><img class="ri" src="ava.php?c='.$id.'&p=r36"></td>';
 				}
 				echo '<td class="ctext cbd">';
 				echo '<a href="'.$cl.'"><b>';
-				$peer = $d['peer'];
-				$n = null;
-				$lid = $id;
-				if((int) $lid < 0) {
-					if(isset($peer['chat_id'])) {
-						$lid = $peer['chat_id'];
-					} else if(isset($peer['channel_id'])) {
-						$lid = $peer['channel_id'];
-					}
-				}
 				foreach(($r[$peer['_'] == 'peerUser' ? 'users' : 'chats']) as $p) {
-					if($p['id'] == $lid) {
-						if(isset($p['title'])) {
-							$n = $p['title'];
-						} else if(isset($p['first_name'])) {
-							$n = trim($p['first_name']).(isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
-						} else if(isset($p['last_name'])) {
-							$n = trim($p['last_name']);
-						} else {
-							$n = 'Deleted Account';
-						}
-						break;
+					if($p['id'] != $lid) continue;
+					$broadcast = $p['broadcast'] ?? false;
+					if(isset($p['title'])) {
+						$n = $p['title'];
+					} else if(isset($p['first_name'])) {
+						$n = trim($p['first_name']).(isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
+					} else if(isset($p['last_name'])) {
+						$n = trim($p['last_name']);
+					} else {
+						$n = 'Deleted Account';
 					}
+					break;
 				}
 				echo MP::dehtml($n).'</b>';
 				if($unr > 0) {
@@ -359,11 +353,10 @@ try {
 				echo '</a>';
 				try {
 					$msg = null;
-					foreach($msgs as $m1) {
-						if($m1['peer_id']==$d['peer']) {
-							$msg = $m1;
-							break;
-						}
+					foreach($msgs as $m) {
+						if($m['peer_id'] != $d['peer']) continue;
+						$msg = $m;
+						break;
 					}
 					$mfid = null;
 					$mfn = null;
@@ -382,7 +375,9 @@ try {
 					echo '<br><div class="cm">'.$t.' ';
 					if(isset($msg['message']) && strlen($msg['message']) > 0) {
 						echo '<a href="'.$cl.'" class="ct">';
-						if($mfn !== null && ($id > 0 ? $mfid != $selfid : true))
+						if(!$broadcast && (($msg['out'] ?? false) || $mfid == $selfid))
+							echo MP::x($lng['you']).': ';
+						else if($mfn !== null)
 							echo $mfn.': ';
 						$txt = MP::dehtml(str_replace("\n", " ", $msg['message']));
 						if(mb_strlen($txt, 'UTF-8') > 250) $txt = mb_substr($txt, 0, 250, 'UTF-8').'..';
@@ -392,7 +387,9 @@ try {
 						echo '<a href="'.$cl.'" class="cma">'.MP::parseMessageAction($msg['action'], $mfn, $mfid, $n, $lng, false, $MP).'</a>';
 					} else if(isset($msg['media'])) {
 						echo '<a href="'.$cl.'" class="cma">';
-						if($mfn !== null && ($id > 0 ? $mfid != $selfid : true))
+						if(!$broadcast && (($msg['out'] ?? false) || $mfid == $selfid))
+							echo MP::x($lng['you']).': ';
+						else if($mfn !== null)
 							echo $mfn.': ';
 						echo MP::x($lng['media_att']);
 						echo '</a>';
