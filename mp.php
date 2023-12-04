@@ -597,6 +597,10 @@ class MP {
 							if(strpos($s, '?start=') !== false) {
 								$s = str_replace('?start=', "&start=", $s);
 								$s .= '&rnd='.rand(0, 100000);
+							} else if(strpos($s, '?') !== false) {
+								$i = strpos($s, '?');
+								$s = substr($s, 0, $i).'&'.substr($s, $i+1);
+								$s .= '&rnd='.rand(0, 100000);
 							}
 							$url = static::getURL().'chat.php?c='.$s;
 						}

@@ -94,7 +94,7 @@
 	"search": "Search",
 	"global_search": "Global search",
 	"search_messages": "Search messages",
-	"send_uncompressed": "Send uncompressed",
+	"send_uncompressed": "Send uncompressed (Photo)",
 	"voice": "Voice message",
 	"chat_link": "Link",
 	"leave_chat": "Leave chat",
@@ -114,5 +114,6 @@
 	],
 	"install_stickerset": "Install stickerset",
 	"set_chat_status": "Chat status",
-	"chat_media": "Chat media"
+	"chat_media": "Chat media",
+	"send_voice": "Send as voice message (Audio)"
 }

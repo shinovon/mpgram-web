@@ -14,12 +14,17 @@ if(!$user) {
 $theme = MP::getSettingInt('theme');
 $lng = MP::initLocale();
 
+
 $id = $_POST['c'] ?? $_GET['c'] ?? die;
 $msg = $_POST['m'] ?? $_GET['m'] ?? null;
 $out = isset($_POST['o']) || isset($_GET['o']);
 $ch = isset($_POST['ch']) || isset($_GET['ch']);
 $random = $_POST['r'] ?? $_GET['r'] ?? null;
 $edit = isset($_POST['edit']) || isset($_GET['edit']);
+$uncompressed = isset($_GET['unc']) || isset($_POST['unc']);
+$voicesupport = defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES;
+$voice = (isset($_POST['voice']) || isset($_GET['voice'])) && $voicesupport;
+$spoiler = isset($_POST['sp']) || isset($_GET['sp']);
 
 header("Content-Type: text/html; charset=utf-8");
 header("Cache-Control: private, no-cache, no-store");
@@ -89,9 +94,30 @@ try {
 					$reason = 'Invalid file';
 				} else {
 					$ext = strtolower(substr($filename, $extidx+1));
-					if(isset($_GET['unc']) || isset($_POST['unc'])) {
+					if($uncompressed) {
 						$type = 'inputMediaUploadedDocument';
 						$attr = true;
+					} else if($voice) {
+						switch($ext) {
+							case 'amr':
+							case 'mp3':
+							case 'aac':
+							case 'ogg':
+							case 'm4a':
+								$newfile = $file.'.ogg';
+								$res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$file.'" -ac 1 "'.$newfile.'"') ?? '';
+								if(strpos($res, 'Conversion failed') !== false) {
+									$result = 'Conversion failed';
+									break;
+								}
+								unlink($file);
+								$file = $newfile;
+								$type = 'inputMediaUploadedDocument';
+								break;
+							default:
+								$reason = 'Unsupported audio format';
+								break;
+						}
 					} else {
 						switch($ext) {
 							case 'jpg':
@@ -142,7 +168,9 @@ try {
 						$params['reply_to_msg_id'] = $msg;
 					}
 					$attributes = [];
-					if($attr) {
+					if($voice) {
+						array_push($attributes, ['_' => 'documentAttributeAudio', 'voice' => true]);
+					} else if($attr) {
 						array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
 					}
 					$params['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes];
@@ -151,6 +179,9 @@ try {
 						$params['parse_mode'] = 'HTML';
 					}
 					$MP->messages->sendMedia($params);
+					try {
+						unlink($file);
+					} catch (Exception) {}
 					header('Location: chat.php?c='.$id);
 					die;
 				}
@@ -209,6 +240,10 @@ if(!$ch) {
 		echo '<br><input type="file" id="file" name="file"><br>';
 		echo '<input type="checkbox" id="unc" name="unc">';
 		echo '<label for="unc">'.MP::x($lng['send_uncompressed']).'</label>';
+		if($voicesupport) {
+			echo '<br><input type="checkbox" id="voice" name="voice">';
+			echo '<label for="voice">'.MP::x($lng['send_voice']).'</label>';
+		}
 	}
 	echo '<input type="hidden" name="r" value="'. \base64_encode(random_bytes(16)).'">';
 	echo '<br><input type="submit" value="'.MP::x($lng['send']).'">';

@@ -94,7 +94,7 @@
 	"search": "Поиск",
 	"global_search": "Глобальный поиск",
 	"search_messages": "Поиск по чату",
-	"send_uncompressed": "Отправить без сжатия",
+	"send_uncompressed": "Отправить без сжатия (Фото)",
 	"voice": "Голосовое сообщение",
 	"chat_link": "Ссылка",
 	"leave_chat": "Покинуть чат",
@@ -114,5 +114,6 @@
 	],
 	"install_stickerset": "Установить стикерпак",
 	"set_chat_status": "Статус чата",
-	"chat_media": "Медиафайлы чата"
+	"chat_media": "Медиафайлы чата",
+	"send_voice": "Отправить как голосовое (Аудио)"
 }
