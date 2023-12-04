@@ -1,4 +1,10 @@
 <?php
+
+function exceptions_error_handler($severity, $message, $filename, $lineno) {
+	throw new ErrorException($message, 0, $severity, $filename, $lineno);
+}
+set_error_handler('exceptions_error_handler');
+
 try {
 	include 'mp.php';
 	if(!defined('CONVERT_VOICE_MESSAGES') || !CONVERT_VOICE_MESSAGES) {
@@ -25,6 +31,20 @@ try {
 	}
 	$di = $MP->getDownloadInfo($msg['media']);
 	if(!file_exists(VOICE_TMP_DIR)) mkdir(VOICE_TMP_DIR);
+	
+	// automatically delete converted voices
+	try {
+		$scan = scandir(VOICE_TMP_DIR);
+		foreach($scan as $n) {
+			if(strpos($n, '.mp3') === false) continue;
+			if(date('d.m.y', filemtime(VOICE_TMP_DIR.$n)) == date('d.m.y', time())) {
+				continue;
+			}
+			unlink(VOICE_TMP_DIR.$n);
+		}
+	} catch (Exception) {
+	}
+	
 	$inpath = VOICE_TMP_DIR.\hash('crc32',$user).$cid.'_'.$mid;
 	$outpath = $inpath.'.mp3';
 	if(!file_exists($outpath)) {
