@@ -106,11 +106,11 @@ try {
 							case 'm4a':
 								$newfile = $file.'.ogg';
 								$res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$file.'" -ac 1 "'.$newfile.'"') ?? '';
+								unlink($file);
 								if(strpos($res, 'Conversion failed') !== false) {
 									$result = 'Conversion failed';
 									break;
 								}
-								unlink($file);
 								$file = $newfile;
 								$type = 'inputMediaUploadedDocument';
 								break;

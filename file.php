@@ -99,13 +99,18 @@ try {
 				imagealphablending($temp, false);
 				imagesavealpha($temp, true);
 				imagecopyresampled($temp, $img, 0, 0, 0, 0, $w, $h, $w1, $h1);
+				imagedestroy($img);
 				$img = $temp;
 			}
 			header('Content-Type: image/png');
 			imagepng($img);
+			imagedestroy($img);
+			die;
 		} else if($p == 'png') {
 			header('Content-Type: image/png');
 			imagepng($img);
+			imagedestroy($img);
+			die;
 		} else {
 			$w = imagesx($img);
 			$h = imagesy($img);
@@ -169,6 +174,7 @@ try {
 		}
 		header('Content-Type: image/jpeg');
 		imagejpeg($img, null, $q);
+		imagedestroy($img);
 	} else /*if(isset($_GET['audio'])) {
 		echo '<a href="file.php?m='.$_GET['m'].'&c='.$_GET['c'].'">Download</a><br>';
 		echo '<audio controls preload="none" src="file.php?m='.$_GET['m'].'&c='.$_GET['c'].'">';
