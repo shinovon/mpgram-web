@@ -25,6 +25,7 @@ if(isset($_GET['count'])) {
 $useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $avas = strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
 $avas = MP::getSettingInt('avas', $avas);
+$roundava = MP::getSettingInt('roundava', 0);
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
@@ -328,7 +329,7 @@ try {
 				}
 				echo '<tr class="c" onclick="location.href=\''.$cl.'\';">';
 				if($avas) {
-					echo '<td class="cava cbd"><img class="ri" src="ava.php?c='.$id.'&p=r36"></td>';
+					echo '<td class="cava cbd"><img class="ri" src="ava.php?c='.$id.'&p='.($roundava?'rc36':'r36').'"></td>';
 				}
 				echo '<td class="ctext cbd">';
 				echo '<a href="'.$cl.'"><b>';
