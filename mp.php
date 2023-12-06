@@ -367,7 +367,7 @@ class MP {
 			try {
 				$img = true;
 				$open = true;
-				$q = 'rprev';
+				$q = $mini ? 'raudio' : 'rprev';
 				$fq = 'rorig';
 				$audio = false;
 				switch(strtolower(substr($fext, 1))) {
@@ -388,7 +388,6 @@ class MP {
 						$img = true;
 						break;
 					case 'png':
-						$q = 'rprev';
 						$fq = 'rorig';
 						$img = true;
 						break;
@@ -408,7 +407,7 @@ class MP {
 				}
 				if($voice && defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES) {
 					echo '<div class="mw"><a href="voice.php?m='.$m['id'].'&c='.$id.'">'.static::x($lng['voice']).' '.MP::durationstr($dur).'</a><br><audio controls preload="none" src="voice.php?m='.$m['id'].'&c='.$id.'">'.'</div>';
-				} else if($img && $imgs) {
+				} else if($img && $imgs && !$mini) {
 					if($open) {
 						echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p='.$fq.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></a></div>';
 					} else {
@@ -419,7 +418,7 @@ class MP {
 					//if($audio) $url .= '&audio';
 					echo '<div class="mw">';
 					if($thumb && $imgs) {
-						echo '<a href='.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'" class="acv"></img></a>';
+						echo '<a href="'.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'" class="acv"></img></a>';
 					}
 					echo '<div class="cst"><b><a href="'.$url.'">'.MP::dehtml($title).'</a></b></div>';
 					echo '<div>';

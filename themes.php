@@ -237,7 +237,7 @@ class Themes {
 			margin-top: 4px;
 			padding-right: 4px;
 			float: left;
-			height: 36px;
+			max-height: 36px;
 		}
 		.mm {
 			display: inline;

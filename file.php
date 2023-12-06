@@ -166,7 +166,8 @@ try {
 					$w = ($w/$h)*36;
 					$h = 36;
 					$img = resize($img, $w, $h);
-				} else if($w > 36) {
+				}
+				if($w > 36) {
 					$h = ($h/$w)*36;
 					$w = 36;
 					$img = resize($img, $w, $h);
