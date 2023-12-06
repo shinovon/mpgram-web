@@ -84,7 +84,7 @@ try {
 	echo '</head>';
 	echo Themes::bodyStart();
 	echo '<div><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div>';
-	echo '<p><a href="chatmedia.php?c='.$id.'&f=Photos">Photos</a> <a href="chatmedia.php?c='.$id.'&f=Document">Documents</a> <a href="chatmedia.php?c='.$id.'&f=Music">Audio</a></p>';
+	echo '<p><a href="chatmedia.php?c='.$id.'&f=Photos">Photos</a> <a href="chatmedia.php?c='.$id.'&f=Document">Documents</a> <a href="chatmedia.php?c='.$id.'&f=Music">Audio</a> <a href="chatmedia.php?c='.$id.'&f=Voice">Voice</a></p>';
 	if($hasOffset && !$endReached) {
 		if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
 			echo '<p><a href="'.$file.'?c='.$id.'&f='.$filter.'">'.MP::x($lng['history_up']).'</a></p>';
