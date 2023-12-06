@@ -182,8 +182,7 @@ try {
 					} else if($attr) {
 						array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
 					}
-					$params['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes];
-					//$params['media'] = $MP->messages->uploadMedia(['media' => ['_' => $type, 'file' => $file, 'attributes' => $attributes]]);
+					$params['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes, 'spoiler' => $spoiler];
 					if(isset($_GET["format"]) || isset($_POST["format"])) {
 						$params['parse_mode'] = 'HTML';
 					}
@@ -253,6 +252,8 @@ if(!$ch) {
 			echo '<br><input type="checkbox" id="voice" name="voice">';
 			echo '<label for="voice">'.MP::x($lng['send_voice']).'</label>';
 		}
+		echo '<br><input type="checkbox" id="sp" name="sp">';
+		echo '<label for="sp">'.MP::x($lng['send_spoiler']).'</label>';
 	}
 	echo '<input type="hidden" name="r" value="'. \base64_encode(random_bytes(16)).'">';
 	echo '<br><input type="submit" value="'.MP::x($lng['send']).'">';

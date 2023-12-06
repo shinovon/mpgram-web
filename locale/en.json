@@ -115,5 +115,6 @@
 	"install_stickerset": "Install stickerset",
 	"set_chat_status": "Chat status",
 	"chat_media": "Chat media",
-	"send_voice": "Send as voice message (Audio)"
+	"send_voice": "Send as voice message (Audio)",
+	"send_spoiler": "Hide with spoiler"
 }
