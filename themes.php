@@ -239,6 +239,12 @@ class Themes {
 			float: left;
 			height: 36px;
 		}
+		.mm {
+			display: inline;
+			margin-right: 4px;
+			margin-bottom: 4px;
+			margin-top: 4px;
+		}
 		--></style>';
 	}
 }

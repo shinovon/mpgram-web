@@ -67,9 +67,6 @@ try {
 	'hash' => 0
 	]);
 	$id_offset = null;
-	echo '<xmp>';
-	//var_dump($r);
-	echo '</xmp>';
 	if(isset($r['offset_id_offset'])) {
 		$id_offset = $r['offset_id_offset'];
 		if($msgoffset < 0) {
@@ -95,8 +92,8 @@ try {
 	foreach($rm as $m) {
 		try {
 			if(!isset($m['media'])) continue;
-			echo '<div class="m" id="msg_'.$id.'_'.$m['id'].'">';
-			MP::printMessageMedia($MP, $m, $id, true, $lng);
+			echo '<div class="mm" id="msg_'.$id.'_'.$m['id'].'">';
+			MP::printMessageMedia($MP, $m, $id, true, $lng, true);
 			echo '</div>';
 		} catch (Exception $e) {
 			echo '<xmp>'.$e->getMessage()."\n".$e->getTraceAsString().'</xmp>';

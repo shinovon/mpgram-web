@@ -320,12 +320,16 @@ class MP {
 		}
 	}
 	
-	static function printMessageMedia($MP, $m, $id, $imgs, $lng) {
+	static function printMessageMedia($MP, $m, $id, $imgs, $lng, $mini=false) {
 		$media = $m['media'];
 		$reason = null;
 		if(isset($media['photo'])) {
 			if($imgs) {
-				echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig"><img class="mi" src="file.php?m='.$m['id'].'&c='.$id.'&p=rprev"></img></a></div>';
+				if($mini) {
+					echo '<a href="chat.php?m='.$m['id'].'&c='.$id.'"><img class="mi" src="file.php?m='.$m['id'].'&c='.$id.'&p=rmin"></img></a>';
+				} else {
+					echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig"><img class="mi" src="file.php?m='.$m['id'].'&c='.$id.'&p=rprev"></img></a></div>';
+				}
 			} else {
 				echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig">'.MP::x($lng['photo']).'</a></div>';
 			}
