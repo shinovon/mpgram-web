@@ -149,7 +149,7 @@ echo '<br><input type="checkbox" id="longpoll" name="longpoll"'.($longpoll ? ' c
 echo '<label for="longpoll">Longpoll</label>';
 echo '<br><input type="checkbox" id="status" name="status"'.($status ? ' checked' : '').'>';
 echo '<label for="status">'.MP::x($lng['set_chat_status']).'</label>';
-echo '<br><input type="checkbox" id="imgs" name="imgs"'.($status ? ' checked' : '').'>';
+echo '<br><input type="checkbox" id="imgs" name="imgs"'.($imgs ? ' checked' : '').'>';
 echo '<label for="imgs">'.MP::x($lng['set_msg_photos']).'</label>';
 echo '</p><p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
 echo '<input type="text" size="3" id="updint" name="updint" value="'.$updint.'"><br>';
