@@ -106,7 +106,7 @@ try {
 							case 'ogg':
 							case 'm4a':
 								$newfile = $file.'.ogg';
-								$res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$file.'" -ac 1 -y "'.$newfile.'" 2>&1') ?? '';
+								$res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$file.'" -ac 1 -y -map 0:a -map_metadata -1 "'.$newfile.'" 2>&1') ?? '';
 								unlink($file);
 								if(strpos($res, 'failed') !== false) {
 									$result = 'Conversion failed';
