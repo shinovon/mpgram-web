@@ -81,6 +81,7 @@ try {
 		$type = null;
 		$attr = false;
 		$dur = 0;
+		$waveform = false;
 		if(($_FILES['file']['error'] ?? false) && $_FILES['file']['error'] != 4) {
 			$reason = 'PHP Error: ' . $_FILES['file']['error'];
 		}
@@ -120,6 +121,64 @@ try {
 									$s = explode(':', $s);
 									$dur = ((int)$s[2])+((int)$s[1])*60+((int)$s[0])*60*60;
 								}
+								try {
+									$res = shell_exec(FFMPEG_DIR.'ffprobe -v error -f lavfi -i "amovie='.$newfile.',asetnsamples=44100,astats=metadata=1:reset=1" -show_entries frame_tags=lavfi.astats.Overall.Peak_level -of json 2>&1') ?? false;
+									
+									if($res) {
+										$j = json_decode($res);
+										if($j) {
+											$frames = $j->{'frames'};
+											unset($j);
+											$waveform = array(100);
+											$sampleIndex = 0;
+											$peakSample = 0;
+											$index = 0;
+											$sampleRate = max(1, (int) (count($frames) / 100));
+											$s2 = 100 / count($frames);
+											
+											foreach($frames as $frame) {
+												$sample = $frame->{'tags'}->{'lavfi.astats.Overall.Peak_level'};
+												$sample = $sample == '-inf' ? -100.0 : floatval($sample);
+												$sample = max(0, (int) (32768 * (10 ** ($sample / 20.0))));
+												if($sample > $peakSample) {
+													$peakSample = $sample;
+												}
+												if($sampleIndex++ % $sampleRate == 0) {
+													if($index < 100) {
+														if($sampleRate == 1) {
+															$i = 0;
+															while($i++ < $s2) $waveform[$index++] = $peakSample;
+														} else {
+															$waveform[$index++] = $peakSample;
+														}
+													}
+													$peakSample = 0;
+												}
+											}
+											unset($frames);
+											
+											if(count($waveform) > 100) {
+												$waveform = array_slice($waveform, 0, 100);
+											}
+											
+											$sumSamples = 0;
+											foreach($waveform as $sample) {
+												$sumSamples += $sample;
+											}
+											
+											$peak = (int) ($sumSamples * 1.8 / 100);
+											if($peak < 2500) $peak = 2500;
+											
+											for($i = 0; $i < 100; $i++) {
+												$sample = $waveform[$i];
+												if($sample > $peak) $sample = $peak;
+												$waveform[$i] = max(0, min(31, (int) ($sample * 31 / $peak)));
+											}
+										}
+									}
+								} catch (Exception) {
+								}
+								
 								$file = $newfile;
 								$type = 'inputMediaUploadedDocument';
 								break;
@@ -178,7 +237,11 @@ try {
 					}
 					$attributes = [];
 					if($voice) {
-						array_push($attributes, ['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => $dur]);
+						$att = ['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => $dur];
+						if($waveform !== false) {
+							$att['waveform'] = $waveform;
+						}
+						array_push($attributes, $att);
 					} else if($attr) {
 						array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
 					}
