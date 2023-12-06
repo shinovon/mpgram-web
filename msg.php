@@ -80,6 +80,7 @@ try {
 		$filename = null;
 		$type = null;
 		$attr = false;
+		$dur = 0;
 		if(($_FILES['file']['error'] ?? false) && $_FILES['file']['error'] != 4) {
 			$reason = 'PHP Error: ' . $_FILES['file']['error'];
 		}
@@ -105,11 +106,19 @@ try {
 							case 'ogg':
 							case 'm4a':
 								$newfile = $file.'.ogg';
-								$res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$file.'" -ac 1 "'.$newfile.'"') ?? '';
+								$res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$file.'" -ac 1 -y "'.$newfile.'" 2>&1') ?? '';
 								unlink($file);
-								if(strpos($res, 'Conversion failed') !== false) {
+								if(strpos($res, 'failed') !== false) {
 									$result = 'Conversion failed';
 									break;
+								}
+								$i = strpos($res, 'Duration:');
+								
+								if($i !== false) {
+									$i = strpos($res, ' ', $i);
+									$s = substr($res, $i, strpos($res, '.', $i));
+									$s = explode(':', $s);
+									$dur = ((int)$s[2])+((int)$s[1])*60+((int)$s[0])*60*60;
 								}
 								$file = $newfile;
 								$type = 'inputMediaUploadedDocument';
@@ -169,7 +178,7 @@ try {
 					}
 					$attributes = [];
 					if($voice) {
-						array_push($attributes, ['_' => 'documentAttributeAudio', 'voice' => true]);
+						array_push($attributes, ['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => $dur]);
 					} else if($attr) {
 						array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
 					}
