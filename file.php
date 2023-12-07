@@ -91,7 +91,7 @@ try {
 			$h1 = $h = imagesy($img);
 
 			if($w > 180) {
-				$h = ($h/$w)*180;
+				$h = (int)(($h/$w)*180);
 				$w = 180;
 				$temp = imagecreatetruecolor($w, $h);
 				$c = imagecolorallocatealpha($temp, 0, 0, 0, 127);
@@ -119,56 +119,56 @@ try {
 				$q = 80;
 			} else if($p == 'prev') {
 				if($w > 240) {
-					$h = ($h/$w)*240;
+					$h = (int)(($h/$w)*240);
 					$w = 240;
 					$img = resize($img, $w, $h);
 				} else if($h > 180) {
-					$w = ($w/$h)*180;
+					$w = (int)(($w/$h)*180);
 					$h = 180;
 					$img = resize($img, $w, $h);
 				}
 			} else if($p == 'min') {
 				$q = 30;
 				if($h > 90) {
-					$w = ($w/$h)*90;
+					$w = (int)(($w/$h)*90);
 					$h = 90;
 					$img = resize($img, $w, $h);
 				}
 				if($w > 180) {
-					$h = ($h/$w)*180;
+					$h = (int)(($h/$w)*180);
 					$w = 180;
 					$img = resize($img, $w, $h);
 				}
 			} else if($p == 'sticker') {
 				$q = 75;
 				if($w > 180) {
-					$h = ($h/$w)*180;
+					$h = (int)(($h/$w)*180);
 					$w = 180;
 					$img = resize($img, $w, $h);
 				} else if($h > 90) {
-					$w = ($w/$h)*90;
+					$w = (int)(($w/$h)*90);
 					$h = 90;
 					$img = resize($img, $w, $h);
 				}
 			} else if($p == 'sprev') {
 				$q = 29;//2
 				if($w > 100) {
-					$h = ($h/$w)*100;
+					$h = (int)(($h/$w)*100);
 					$w = 100;
 					$img = resize($img, $w, $h);
 				} else if($h > 80) {
-					$w = ($w/$h)*80;
+					$w = (int)(($w/$h)*80);
 					$h = 80;
 					$img = resize($img, $w, $h);
 				}
 			} else if($p == 'audio') {
 				if($h > 36) {
-					$w = ($w/$h)*36;
+					$w = (int)(($w/$h)*36);
 					$h = 36;
 					$img = resize($img, $w, $h);
 				}
 				if($w > 36) {
-					$h = ($h/$w)*36;
+					$h = (int)(($h/$w)*36);
 					$w = 36;
 					$img = resize($img, $w, $h);
 				}
@@ -185,4 +185,5 @@ try {
 	}
 } catch (Exception $e) {
 	http_response_code(500);
+	echo $e;
 }
