@@ -370,11 +370,13 @@ class MP {
 				$q = $mini ? 'raudio' : 'rprev';
 				$fq = 'rorig';
 				$audio = false;
+				$smallprev = false;
 				switch(strtolower(substr($fext, 1))) {
 					case 'webp':
 						if(strpos($d['name'], 'sticker_') === 0) {
 							$dl = true;
 							$open = false;
+							$img = true;
 							$ie = MP::getIEVersion();
 							if(PNG_STICKERS && ($ie == 0 || $ie > 4)) {
 								$q = 'rstickerp';
@@ -389,7 +391,7 @@ class MP {
 						break;
 					case 'png':
 						$fq = 'rorig';
-						$img = true;
+						$smallprev = $img = true;
 						break;
 					case 'gif':
 						$img = false;
@@ -398,7 +400,7 @@ class MP {
 						break;
 					case 'mp3':
 						$img = false;
-						$audio = true;
+						$smallprev = $audio = true;
 						$q = 'raudio';
 						break;
 					default:
@@ -415,22 +417,32 @@ class MP {
 					}
 				} else {
 					$url = 'file.php?m='.$m['id'].'&c='.$id;
-					//if($audio) $url .= '&audio';
-					echo '<div class="mw">';
-					if($thumb && $imgs) {
-						echo '<a href="'.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'" class="acv"></img></a>';
-					}
-					echo '<div class="cst"><b><a href="'.$url.'">'.MP::dehtml($title).'</a></b></div>';
-					echo '<div>';
-					if($audio && $dur > 0) {
-						echo MP::durationstr($dur);
+					$size = $d['size'];
+					if($size >= 1024 * 1024) {
+						$size = round($d['size']/1024.0/1024.0, 2).' MB';
 					} else {
-						echo round($d['size']/1024.0/1024.0, 2).' MB';
+						$size = round($d['size']/1024.0, 2).' KB';
 					}
-					echo '</div>';
-					/*if($audio) {
-						echo '<br><audio controls preload="none" src="file.php?m='.$m['id'].'&c='.$id.'">';
-					}*/
+					echo '<div class="mw">';
+					if($smallprev) {
+						if($thumb && $imgs) {
+							echo '<a href="'.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'" class="acv"></img></a>';
+						}
+						echo '<div class="cst"><b><a href="'.$url.'">'.MP::dehtml($title).'</a></b></div>';
+						echo '<div>';
+						if($dur > 0) {
+							echo MP::durationstr($dur);
+						} else {
+							echo $size;
+						}
+						echo '</div>';
+					} else {
+						echo '<a href="'.$url.'">'.MP::dehtml($title).'</a></b><br>';
+						if($thumb && $imgs) {
+							echo '<a href="'.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'"></img></a><br>';
+						}
+						echo $size;
+					}
 					echo '</div>';
 				}
 			} catch (Exception $e) {
