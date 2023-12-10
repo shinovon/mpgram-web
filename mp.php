@@ -419,9 +419,9 @@ class MP {
 					$url = 'file.php?m='.$m['id'].'&c='.$id;
 					$size = $d['size'];
 					if($size >= 1024 * 1024) {
-						$size = round($d['size']/1024.0/1024.0, 2).' MB';
+						$size = round($size/1024.0/1024.0, 2).' MB';
 					} else {
-						$size = round($d['size']/1024.0, 2).' KB';
+						$size = round($size/1024.0, 2).' KB';
 					}
 					echo '<div class="mw">';
 					if($smallprev) {
