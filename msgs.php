@@ -79,7 +79,7 @@ try {
 				$offset = $update['update_id'];
 				if($type == 'updateNewMessage' || $type == 'updateNewChannelMessage') {
 					$msg = $update['update']['message'];
-					if(MP::getId($msg['peer_id']) != $id) continue;
+					if($msg['peer_id'] != $id) continue;
 					if($msg['id'] < $i) continue;
 					if($msg['id'] == $i) continue;
 					if($minid == 0) {

@@ -11,6 +11,9 @@ if(!defined("api_id") || api_id == 0) {
 if(!file_exists(sessionspath)) {
 	mkdir(sessionspath, 0777);
 }
+
+use danog\MadelineProto\Magic;
+
 class MP {
 	static $enc;
 	static $iev;
@@ -25,7 +28,23 @@ class MP {
 	}
 
 	static function getId($a) {
-		return $a['user_id'] ?? (isset($a['chat_id']) ? '-'.$a['chat_id'] : (isset($a['channel_id']) ? '-100'.$a['channel_id'] : null));
+		if(is_int($a)) return $a;
+		return $a['user_id'] ?? (isset($a['chat_id']) ? -$a['chat_id'] : (isset($a['channel_id']) ? (Magic::ZERO_CHANNEL_ID - $a['channel_id']) : null));
+	}
+	
+	static function getLocalId($id) {
+		if($id < 0) {
+			if(-Magic::MAX_CHAT_ID <= $id) {
+				return -$id;
+			}
+			if(Magic::ZERO_CHANNEL_ID - Magic::MAX_CHANNEL_ID <= $id && $id !== Magic::ZERO_CHANNEL_ID) {
+				return -$id + Magic::ZERO_CHANNEL_ID;
+			}
+			if(Magic::ZERO_SECRET_CHAT_ID + Magic::MIN_INT32 <= $id && $id !== Magic::ZERO_SECRET_CHAT_ID) {
+				return -$id + DialogId::SECRET_CHAT; // TODO ?
+			}
+		}
+		return $id;
 	}
 
 	static function getName($MP, $a, $full = false) {
@@ -204,7 +223,7 @@ class MP {
 					if(isset($m['fwd_from']['from_name'])) {
 						$fwname = $m['fwd_from']['from_name'];
 					} else if(isset($m['fwd_from']['from_id'])){
-						$fwid = MP::getId($m['fwd_from']['from_id']);
+						$fwid = $m['fwd_from']['from_id'];
 						$fwname = MP::getNameFromId($MP, $fwid, true);
 					}
 				}
@@ -901,7 +920,7 @@ class MP {
 			$last_id = 0;
 			$t['messages'] = array_reverse($t['messages'] ?? []);
 			foreach(array_reverse($t['dialogs'] ?? []) as $dialog) {
-				$id = static::getId($dialog['peer']);
+				$id = $dialog['peer'];
 				if(!isset($d[$id])) {
 					$d[$id] = $dialog;
 					array_push($r['dialogs'], $dialog);
@@ -914,7 +933,7 @@ class MP {
 						$last_id = $dialog['top_message'];
 					}
 					foreach($t['messages'] as $message) {
-						if($message['_'] !== 'messageEmpty' && static::getId($message['peer_id']) === $last_peer && $last_id === $message['id']) {
+						if($message['_'] !== 'messageEmpty' && $message['peer_id'] === $last_peer && $last_id === $message['id']) {
 							$last_date = $message['date'];
 							break;
 						}
