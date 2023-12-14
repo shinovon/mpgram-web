@@ -139,7 +139,7 @@ if($phone !== null) {
 			echo '<form action="login.php"'.($post?' method="post"':'').'>';
 			if(isset($_GET['code']))
 				echo '<input type="hidden" name="code" value="'.$_GET['code'].'">';
-			else if(isset($_POST['code']))
+			elseif(isset($_POST['code']))
 				echo '<input type="hidden" name="code" value="'.$_POST['code'].'">';
 			if($phone !== null)
 				echo '<input type="hidden" name="phone" value="'.$phone.'">';
@@ -153,7 +153,7 @@ if($phone !== null) {
 			$c = null;
 			if(isset($_POST['c'])) {
 				$c = $_POST['c'];
-			} else if(isset($_GET['c'])) {
+			} elseif(isset($_GET['c'])) {
 				$c = $_GET['c'];
 			}
 			$b = isset($_SESSION['captcha']);
@@ -165,7 +165,7 @@ if($phone !== null) {
 				echo '<form action="login.php"'.($post?' method="post"':'').'>';
 				if(isset($_GET['code']))
 					echo '<input type="hidden" name="code" value="'.$_GET['code'].'">';
-				else if(isset($_POST['code']))
+				elseif(isset($_POST['code']))
 					echo '<input type="hidden" name="code" value="'.$_POST['code'].'">';
 				if($phone !== null)
 					echo '<input type="hidden" name="phone" value="'.$phone.'">';
@@ -189,13 +189,13 @@ if($phone !== null) {
 			unset($_SESSION['captcha_entered']);
 			header('Location: chats.php');
 			die;
-		} else if(isset($_POST['pass']) || isset($_GET['pass'])) {
+		} elseif(isset($_POST['pass']) || isset($_GET['pass'])) {
 			$MP = MP::getMadelineAPI($user, true);
 			try {
 				$password = null;
 				if(isset($_POST['pass'])) {
 					$password = $_POST['pass'];
-				} else if(isset($_GET['pass'])) {
+				} elseif(isset($_GET['pass'])) {
 					$password = $_GET['pass'];
 				}
 				$MP->complete2faLogin($password);
@@ -215,7 +215,7 @@ if($phone !== null) {
 					echo '<b>'.MP::x($lng['password_hash_invalid']).'</b><br>';
 					echo Themes::bodyEnd();
 					die;
-				} else if(strpos($e->getMessage(), 'AUTH_RESTART') !== false/* || strpos($e->getMessage(), 'I\'m not waiting') !== false*/) {
+				} elseif(strpos($e->getMessage(), 'AUTH_RESTART') !== false/* || strpos($e->getMessage(), 'I\'m not waiting') !== false*/) {
 				} else {
 					echo '<xmp>';
 					echo $e;
@@ -223,11 +223,11 @@ if($phone !== null) {
 					die;
 				}
 			}
-		} else if(isset($_POST['code']) || isset($_GET['code'])) {
+		} elseif(isset($_POST['code']) || isset($_GET['code'])) {
 			$code = null;
 			if(isset($_POST['code'])) {
 				$code = $_POST['code'];
-			} else if(isset($_GET['code'])) {
+			} elseif(isset($_GET['code'])) {
 				$code = $_GET['code'];
 			}
 			if(!empty($code) && is_numeric($code)) {
@@ -243,7 +243,7 @@ if($phone !== null) {
 						echo '<b>'.MP::x($lng['no_pass_code']).'</b>';
 						echo Themes::bodyEnd();
 						die;
-					} else if(isset($a['_']) && $a['_'] === 'account.password') {
+					} elseif(isset($a['_']) && $a['_'] === 'account.password') {
 						htmlStart();
 						echo MP::x($lng['pass_code']).':<br>';
 						echo '<form action="login.php"'.($post?' method="post"':'').'>';
@@ -254,7 +254,7 @@ if($phone !== null) {
 						echo '</form>';
 						echo Themes::bodyEnd();
 						die;
-					} else if(isset($a['_']) && $a['_'] === 'account.needSignup') {
+					} elseif(isset($a['_']) && $a['_'] === 'account.needSignup') {
 						htmlStart();
 						echo MP::x($lng['need_signup']);
 						echo Themes::bodyEnd();
@@ -268,9 +268,9 @@ if($phone !== null) {
 					htmlStart();
 					if(strpos($e->getMessage(), 'PHONE_CODE_INVALID') !== false) {
 						echo MP::x('<b>'.$lng['phone_code_invalid'].'</b><br>');
-					} else if(strpos($e->getMessage(), 'PHONE_CODE_EXPIRED') !== false) {
+					} elseif(strpos($e->getMessage(), 'PHONE_CODE_EXPIRED') !== false) {
 						echo MP::x('<b>'.$lng['phone_code_expired'].'</b><br>');
-					} else if(strpos($e->getMessage(), 'AUTH_RESTART') !== false) {
+					} elseif(strpos($e->getMessage(), 'AUTH_RESTART') !== false) {
 						unset($hash);
 					} else {
 						echo MP::x('<b>'.$lng['error'].'</b><br>');

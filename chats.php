@@ -322,9 +322,9 @@ try {
 					$broadcast = $p['broadcast'] ?? false;
 					if(isset($p['title'])) {
 						$n = $p['title'];
-					} else if(isset($p['first_name'])) {
+					} elseif(isset($p['first_name'])) {
 						$n = trim($p['first_name']).(isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
-					} else if(isset($p['last_name'])) {
+					} elseif(isset($p['last_name'])) {
 						$n = trim($p['last_name']);
 					} else {
 						$n = 'Deleted Account';
@@ -355,19 +355,19 @@ try {
 							echo '<a href="'.$cl.'" class="ct">';
 							if(!$broadcast && (($msg['out'] ?? false) || $mfid == $selfid))
 								echo MP::x($lng['you']).': ';
-							else if($mfn !== null)
+							elseif($mfn !== null)
 								echo $mfn.': ';
 							$txt = MP::dehtml(str_replace("\n", " ", $msg['message']));
 							if(mb_strlen($txt, 'UTF-8') > 250) $txt = mb_substr($txt, 0, 250, 'UTF-8').'..';
 							echo $txt;
 							echo '</a>';
-						} else if(isset($msg['action'])) {
+						} elseif(isset($msg['action'])) {
 							echo '<a href="'.$cl.'" class="cma">'.MP::parseMessageAction($msg['action'], $mfn, $mfid, $n, $lng, false, $MP).'</a>';
-						} else if(isset($msg['media'])) {
+						} elseif(isset($msg['media'])) {
 							echo '<a href="'.$cl.'" class="cma">';
 							if(!$broadcast && (($msg['out'] ?? false) || $mfid == $selfid))
 								echo MP::x($lng['you']).': ';
-							else if($mfn !== null)
+							elseif($mfn !== null)
 								echo $mfn.': ';
 							echo MP::x($lng['media_att']);
 							echo '</a>';

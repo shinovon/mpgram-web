@@ -36,7 +36,7 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 		if(isset($info['Chat']['title'])) {
 			$name = $info['Chat']['title'];
 		}
-	} else if(isset($info['User']) && isset($info['User']['first_name'])) {
+	} elseif(isset($info['User']) && isset($info['User']['first_name'])) {
 		$name = $info['User']['first_name'];
 		$pm = true;
 	}
@@ -121,7 +121,7 @@ try {
 		if(isset($info['Chat']['title'])) {
 			$name = $info['Chat']['title'];
 		}
-	} else if(isset($info['User']) && isset($info['User']['first_name'])) {
+	} elseif(isset($info['User']) && isset($info['User']['first_name'])) {
 		$name = $info['User']['first_name'];
 		$pm = true;
 	}

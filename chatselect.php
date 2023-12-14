@@ -106,7 +106,7 @@ try {
 			$dialogs = [];
 			$r = $MP->contacts->search(['q' => $query]);
 			$dialogs = $r[$globalsearch ? 'results' : 'my_results'];
-		} else if($fid == 1) {
+		} elseif($fid == 1) {
 			$r = $MP->messages->getDialogs([
 			'offset_date' => 0,
 			'offset_id' => 0,
@@ -266,9 +266,9 @@ try {
 				if($p['id'] != $lid) continue;
 				if(isset($p['title'])) {
 					$name = $p['title'];
-				} else if(isset($p['first_name'])) {
+				} elseif(isset($p['first_name'])) {
 					$name = trim($p['first_name']).(isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
-				} else if(isset($p['last_name'])) {
+				} elseif(isset($p['last_name'])) {
 					$name = trim($p['last_name']);
 				} else {
 					$name = 'Deleted Account';

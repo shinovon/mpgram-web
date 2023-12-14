@@ -64,7 +64,7 @@ try {
 			break;
 		}
 		die;
-	} else if(isset($_POST['sent'])) {
+	} elseif(isset($_POST['sent'])) {
 		if(isset($random)) {
 			if(isset($_SESSION['random']) && $_SESSION['random'] == $random) {
 				header('Location: chat.php?c='.$id);
@@ -99,7 +99,7 @@ try {
 					if($uncompressed) {
 						$type = 'inputMediaUploadedDocument';
 						$attr = true;
-					} else if($voice) {
+					} elseif($voice) {
 						switch($ext) {
 							case 'amr':
 							case 'mp3':
@@ -242,7 +242,7 @@ try {
 							$att['waveform'] = $waveform;
 						}
 						array_push($attributes, $att);
-					} else if($attr) {
+					} elseif($attr) {
 						array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
 					}
 					$params['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes, 'spoiler' => $spoiler];
@@ -279,7 +279,7 @@ echo Themes::bodyStart();
 echo '<div><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div>';
 if($edit) {
 	echo '<b>'.MP::x($lng['edit']).'</b>:';
-} else if($msg) {
+} elseif($msg) {
 	echo '<p>';
 	echo '<b>'.MP::x($lng['actions']).'</b>:<br>';
 	if($out) {
@@ -291,7 +291,7 @@ if($edit) {
 	echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=save">'.MP::x($lng['forward_save']).'</a>';
 	echo '</p>';
 	if(!$ch) echo '<b>'.MP::x($lng['reply']).'</b>:';
-} else if($title) {
+} elseif($title) {
 	echo '<h3>'.$title.'</h3><br>';
 }
 if($reason) {

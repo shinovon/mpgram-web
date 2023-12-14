@@ -44,7 +44,7 @@ if($set) {
 		$chats = (int) $_GET['chats'];
 		if($chats < 10) {
 			$chats = 10;
-		} else if($chats > 100) {
+		} elseif($chats > 100) {
 			$chats = 100;
 		}
 	}
@@ -52,7 +52,7 @@ if($set) {
 		$limit = (int) $_GET['limit'];
 		if($limit < 5) {
 			$limit = 5;
-		} else if($chats > 50) {
+		} elseif($chats > 50) {
 			$limit = 50;
 		}
 	}

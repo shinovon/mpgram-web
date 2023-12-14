@@ -41,7 +41,7 @@ try {
 		$MP->messages->sendMedia($params);
 		header('Location: chat.php?c='.$id);
 		die;
-	} else if(isset($_GET['set'])) {
+	} elseif(isset($_GET['set'])) {
 		echo '<div><a href="sendsticker.php?c='.$id.($reply_to?'&reply_to='.$reply_to:'').'">'.MP::x($lng['back']).'</a></div><br>';
 		$set = $_GET['set'];
 		$sets = $MP->messages->getAllStickers()['sets'];
