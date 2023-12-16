@@ -11,6 +11,7 @@ if(!$user) {
 }
 
 $theme = MP::getSettingInt('theme', 0);
+$pngava = MP::getSettingInt('pngava', 0);
 
 $id = $_POST['c'] ?? $_GET['c'] ?? die;
 
@@ -61,7 +62,7 @@ try {
 	echo Themes::bodyStart();
 	echo '<div>';
 	echo '<div class="chr"><small><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></small></div>';
-	echo '<div class="cava"><img class="ri" src="ava.php?c='.$id.'&p=r48"></div>';
+	echo '<div class="cava"><img class="ri" src="ava.php?c='.$id.'&p='.($pngava?'rc':'r').'48"></div>';
 	echo '<div>';
 	echo MP::dehtml($name);
 	echo '</div>';
@@ -131,7 +132,7 @@ try {
 				}
 			}
 			if($avas) {
-				echo '<td class="cava cbd"><img class="ri" src="ava.php?c='.$u['id'].'&p=r36"></td>';
+				echo '<td class="cava cbd"><img class="ri" src="ava.php?c='.$u['id'].'&p='.($pngava?'rc':'r').'36"></td>';
 			}
 			echo '<td class="ctext cbd">';
 			if($rank) {

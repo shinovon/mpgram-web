@@ -52,14 +52,10 @@ try {
 	$di = null;
 	$cid = $_GET['c'];
 	$info = $MP->getInfo($cid);
-	if(isset($info['User'])) {
-		$info = $info['User'];
-	} elseif(isset($info['Chat'])) {
-		$info = $info['Chat'];
-	}
+	$info = $info['User'] ?? $info['Chat'] ?? $info;
 	try {
 		$di = $MP->getPropicInfo($info);
-	} catch (Exception $e) {
+	} catch (Exception) {
 		header('Content-Type: image/png');
 		if((int) $cid < 0) {
 			echo file_get_contents('gr.png');

@@ -70,7 +70,7 @@
 	"action_historyclear": "Chat history was cleared",
 	"action_chatcreate": "Group created",
 	"compactchats": "Compact",
-	"set_chat_avas": "Chat photos",
+	"set_chat_avas": "Chat avatars",
 	"chat_info": "Info",
 	"chat_about": "About",
 	"chat_members": "Members",
@@ -116,5 +116,6 @@
 	"set_chat_status": "Chat status",
 	"chat_media": "Chat media",
 	"send_voice": "Send as voice message (Audio)",
-	"send_spoiler": "Hide with spoiler"
+	"send_spoiler": "Hide with spoiler",
+	"set_png_avatar": "PNG avatars"
 }

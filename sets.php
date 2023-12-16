@@ -15,6 +15,7 @@ $texttop = $sym3 ? 1 : 0;
 $longpoll = strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') ? 1 : 0;
 $status = 0;
 $imgs = 1;
+$pngava = 0;
 $set = isset($_GET['set']);
 include 'mp.php';
 if($set) {
@@ -60,6 +61,7 @@ if($set) {
 	$longpoll = isset($_GET['longpoll']) ? 1 : 0;
 	$status = isset($_GET['status']) ? 1 : 0;
 	$imgs = isset($_GET['imgs']) ? 1 : 0;
+	$pngava = isset($_GET['pngava']) ? 1 : 0;
 	MP::cookie('lang', $lang, time() + (86400 * 365));
 	MP::cookie('autoupd', $autoupd, time() + (86400 * 365));
 	MP::cookie('updint', $updint, time() + (86400 * 365));
@@ -73,6 +75,7 @@ if($set) {
 	MP::cookie('longpoll', $longpoll, time() + (86400 * 365));
 	MP::cookie('status', $status, time() + (86400 * 365));
 	MP::cookie('imgs', $imgs, time() + (86400 * 365));
+	MP::cookie('pngava', $pngava, time() + (86400 * 365));
 } else {
 	if(isset($_COOKIE['lang'])) {
 		$lang = $_COOKIE['lang'];
@@ -113,6 +116,9 @@ if($set) {
 	if(isset($_COOKIE['imgs'])) {
 		$imgs = (int)$_COOKIE['imgs'];
 	}
+	if(isset($_COOKIE['pngava'])) {
+		$pngava = (int)$_COOKIE['pngava'];
+	}
 }
 
 $lng = MP::initLocale();
@@ -151,6 +157,9 @@ echo '<br><input type="checkbox" id="status" name="status"'.($status ? ' checked
 echo '<label for="status">'.MP::x($lng['set_chat_status']).'</label>';
 echo '<br><input type="checkbox" id="imgs" name="imgs"'.($imgs ? ' checked' : '').'>';
 echo '<label for="imgs">'.MP::x($lng['set_msg_photos']).'</label>';
+echo '<br><input type="checkbox" id="pngava" name="pngava"'.($pngava ? ' checked' : '').'>';
+echo '<label for="pngava">'.MP::x($lng['set_png_avatar']).'</label>';
+
 echo '</p><p><label for="updint">'.MP::x($lng['set_chat_autoupdate_interval']).'</label>:<br>';
 echo '<input type="text" size="3" id="updint" name="updint" value="'.$updint.'"><br>';
 echo '<label for="limit">'.MP::x($lng['set_msgs_limit']).'</label>:<br>';

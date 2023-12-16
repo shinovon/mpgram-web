@@ -21,6 +21,7 @@ $full = MP::getSettingInt('full', 0) == 1;
 $texttop = MP::getSettingInt('texttop', $sym3) == 1;
 $imgs = MP::getSettingInt('imgs', 1) == 1;
 $longpoll = MP::getSettingInt('longpoll', strpos($ua, 'AppleWebKit') || strpos($ua, 'Chrome') || strpos($ua, 'Symbian') || strpos($ua, 'SymbOS') || strpos($ua, 'Android')) == 1;
+$pngava = MP::getSettingInt('pngava', 0);
 
 $lng = MP::initLocale();
 
@@ -233,7 +234,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	if($iev != 0 && $iev <= 7) {
 		echo '<header>';
 		if($avas) {
-			echo '<div class="chava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></div>';
+			echo '<div class="chava"><img class="ri" src="ava.php?c='.$id.'&p='.($pngava?'rc':'r').'36"></div>';
 		}
 		echo '<div class="chn">';
 		echo MP::dehtml($name);
@@ -250,7 +251,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 		echo ' <a href="chatinfo.php?c='.$id.'">'.MP::x($lng['chat_info']??null).'</a>';
 		echo '</small></div>';
 		if($avas) {
-			echo '<div class="chava"><img class="ri" src="ava.php?c='.$id.'&p=r36"></div>';
+			echo '<div class="chava"><img class="ri" src="ava.php?c='.$id.'&p='.($pngava?'rc':'r').'36"></div>';
 		}
 		echo '<div class="chn">';
 		echo MP::dehtml($name);
