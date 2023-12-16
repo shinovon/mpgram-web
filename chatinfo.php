@@ -48,7 +48,7 @@ try {
 			foreach($members as $i => $m) {
 				if(isset($m['kicked_by'])) {
 					unset($members[$i]);
-				} else if(isset($m['user']) && isset($m['user']['status']) && $m['user']['status']['_'] == 'userStatusOnline') {
+				} elseif(isset($m['user']) && isset($m['user']['status']) && $m['user']['status']['_'] == 'userStatusOnline') {
 					$onlines ++;
 				}
 			}
@@ -122,11 +122,11 @@ try {
 			$rank = null;
 			if(isset($m['rank'])) {
 				$rank = $m['rank'];
-			} else if(isset($m['role'])) {
+			} elseif(isset($m['role'])) {
 				$role = $m['role'];
 				if($role == 'creator') {
 					$rank = MP::x($lng['owner']);
-				} else if($role == 'admin') {
+				} elseif($role == 'admin') {
 					$rank = MP::x($lng['admin']);
 				}
 			}

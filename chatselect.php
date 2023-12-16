@@ -106,7 +106,7 @@ try {
 			$dialogs = [];
 			$r = $MP->contacts->search(['q' => $query]);
 			$dialogs = $r[$globalsearch ? 'results' : 'my_results'];
-		} else if($fid == 1) {
+		} elseif($fid == 1) {
 			$r = $MP->messages->getDialogs([
 			'offset_date' => 0,
 			'offset_id' => 0,
@@ -128,65 +128,57 @@ try {
 				}
 				unset($folders);
 				$r = MP::getAllDialogs($MP);
-				$dialogs = array();
+				$dialogs = [];
 				$all = $r['dialogs'];
+				unset($r['dialogs']);
 				if($f['contacts'] || $f['non_contacts']) {
 					$contacts = $MP->contacts->getContacts()['contacts'];
 					foreach($all as $d) {
-						if($d['peer']['_'] !== 'peerUser') continue;
-						$peer = $d['peer'];
+						if($d['peer'] < 0) continue;
 						$found = false;
 						foreach($contacts as $c) {
-							if(MP::getId($peer) == MP::getId($c)) {
-								$found = true;
-								if($f['contacts']) array_push($dialogs, $d);
-								break;
-							}
+							if($d['peer'] != MP::getId($c)) continue;
+							$found = true;
+							if($f['contacts']) array_push($dialogs, $d);
+							break;
 						}
-						if(!$found && $f['non_contacts']) {
-							if(!in_array($d, $dialogs)) {
-								array_push($dialogs, $d);
-							}
-						}
+						if($found || $f['non_contacts']) continue;
+						if(!in_array($d, $dialogs)) array_push($dialogs, $d);
 					}
 					unset($contacts);
 				}
 				if($f['groups']) {
 					foreach($all as $d) {
 						$peer = $d['peer'];
-						if($peer['_'] === 'peerUser') continue;
-						if($peer['_'] === 'peerChannel') {
-							foreach($r['chats'] as $c) {
-								if($c['id'] == $peer && !$c['broadcast'] && !in_array($d, $dialogs)) {
-									array_push($dialogs, $d);
-								}
-							}
-							continue;
-						}
-						if(!in_array($d, $dialogs)) {
-							array_push($dialogs, $d);
+						if($peer > 0) continue;
+						$peer = MP::getLocalId($peer);
+						foreach($r['chats'] as $c) {
+							if($c['id'] != $peer || $c['broadcast']) continue;
+							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+							break;
 						}
 					}
 				}
 				if($f['broadcasts']) {
 					foreach($all as $d) {
 						$peer = $d['peer'];
-						if($peer['_'] !== 'peerChannel') continue;
+						if($peer > 0) continue;
+						$peer = MP::getLocalId($peer);
 						foreach($r['chats'] as $c) {
-							if($c['id'] == $peer && $c['broadcast'] && !in_array($d, $dialogs)) {
-								array_push($dialogs, $d);
-							}
+							if($c['id'] != $peer || !$c['broadcast']) continue;
+							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+							break;
 						}
 					}
 				}
 				if($f['bots']) {
 					foreach($all as $d) {
 						$peer = $d['peer'];
-						if($peer['_'] !== 'peerUser') continue;
+						if($peer < 0) continue;
 						foreach($r['users'] as $u) {
-							if($u['id'] == $peer['user_id'] && $u['bot'] && !in_array($d, $dialogs)) {
-								array_push($dialogs, $d);
-							}
+							if($u['id'] != $peer || !$u['bot']) continue;
+							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+							break;
 						}
 						continue;
 					}
@@ -194,39 +186,31 @@ try {
 				if(count($f['include_peers']) > 0) {
 					foreach($f['include_peers'] as $p) {
 						foreach($all as $d) {
-							$peer = $d['peer'];
-							if(MP::getId($peer) == MP::getId($p)) {
-								if(!in_array($d, $dialogs)) {
-									array_push($dialogs, $d);
-								}
-								break;
-							}
+							if($d['peer'] != MP::getId($p)) continue;
+							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+							break;
 						}
 					}
 				}
 				if(count($f['exclude_peers']) > 0) {
 					foreach($f['exclude_peers'] as $p) {
 						foreach($dialogs as $idx => $d) {
-							$peer = $d['peer'];
-							if(MP::getId($peer) == MP::getId($p)) {
-								unset($dialogs[$idx]);
-								break;
-							}
+							if($d['peer'] != MP::getId($p)) continue;
+							unset($dialogs[$idx]);
+							break;
 						}
 					}
 				}
 				if($f['exclude_archived']) {
 					foreach($dialogs as $idx => $d) {
-						if(isset($d['folder_id']) && $d['folder_id'] == 1) {
-							unset($dialogs[$idx]);
-						}
+						if(!isset($d['folder_id']) || $d['folder_id'] != 1) continue;
+						unset($dialogs[$idx]);
 					}
 				}
 				if($f['exclude_read']) {
 					foreach($dialogs as $idx => $d) {
-						if(isset($d['unread_count']) && $d['unread_count'] == 0) {
-							unset($dialogs[$idx]);
-						}
+						if(!isset($d['unread_count']) || $d['unread_count'] > 0) continue;
+						unset($dialogs[$idx]);
 					}
 				}
 				function cmp($a, $b) {
@@ -251,15 +235,12 @@ try {
 					return ($ma['date'] > $mb['date']) ? -1 : 1;
 				}
 				usort($dialogs, 'cmp');
-				$pinned = array();
 				if(count($f['pinned_peers']) > 0) {
+					$pinned = array();
 					foreach($f['pinned_peers'] as $p) {
 						foreach($all as $d) {
-							$peer = $d['peer'];
-							if(MP::getId($peer) == MP::getId($p)) {
-								if(in_array($d, $dialogs)) {
-									unset($dialogs[array_search($d, $dialogs)]);
-								}
+							if($d['peer'] == MP::getId($p)) {
+								if(in_array($d, $dialogs)) unset($dialogs[array_search($d, $dialogs)]);
 								array_push($pinned, $d);
 								break;
 							}
@@ -268,6 +249,7 @@ try {
 					$dialogs = array_merge($pinned, $dialogs);
 				}
 				unset($all);
+				unset($r['messages']);
 			} else {
 				$r = MP::getAllDialogs($MP, 0, 0);
 				$dialogs = $r['dialogs'];
@@ -277,30 +259,21 @@ try {
 		$c = 0;
 		foreach($dialogs as $d){
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
-			$peer = $d['peer'] ?? $d;
-			$id = MP::getId($peer);
+			$id = $d['peer'];
 			$name = null;
-			$lid = $id;
-			if((int) $lid < 0) {
-				if(isset($peer['chat_id'])) {
-					$lid = $peer['chat_id'];
-				} else if(isset($peer['channel_id'])) {
-					$lid = $peer['channel_id'];
+			$lid = MP::getLocalId($id);
+			foreach(($r[$id > 0 ? 'users' : 'chats']) as $p) {
+				if($p['id'] != $lid) continue;
+				if(isset($p['title'])) {
+					$name = $p['title'];
+				} elseif(isset($p['first_name'])) {
+					$name = trim($p['first_name']).(isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
+				} elseif(isset($p['last_name'])) {
+					$name = trim($p['last_name']);
+				} else {
+					$name = 'Deleted Account';
 				}
-			}
-			foreach(($r[$peer['_'] == 'peerUser' ? 'users' : 'chats']) as $p) {
-				if($p['id'] == $lid) {
-					if(isset($p['title'])) {
-						$name = $p['title'];
-					} else if(isset($p['first_name'])) {
-						$name = trim($p['first_name']).(isset($p['last_name']) ? ' '.trim($p['last_name']) : '');
-					} else if(isset($p['last_name'])) {
-						$name = trim($p['last_name']);
-					} else {
-						$name = 'Deleted Account';
-					}
-					break;
-				}
+				break;
 			}
 			try {
 				echo '<div class="c'.($c%2==0 ? '1': '0').'">';

@@ -54,7 +54,7 @@ try {
 	$info = $MP->getInfo($cid);
 	if(isset($info['User'])) {
 		$info = $info['User'];
-	} else if(isset($info['Chat'])) {
+	} elseif(isset($info['Chat'])) {
 		$info = $info['Chat'];
 	}
 	try {

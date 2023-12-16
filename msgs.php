@@ -36,7 +36,7 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 		if(isset($info['Chat']['title'])) {
 			$name = $info['Chat']['title'];
 		}
-	} else if(isset($info['User']) && isset($info['User']['first_name'])) {
+	} elseif(isset($info['User']) && isset($info['User']['first_name'])) {
 		$name = $info['User']['first_name'];
 		$pm = true;
 	}
@@ -79,7 +79,7 @@ try {
 				$offset = $update['update_id'];
 				if($type == 'updateNewMessage' || $type == 'updateNewChannelMessage') {
 					$msg = $update['update']['message'];
-					if(MP::getId($msg['peer_id']) != $id) continue;
+					if($msg['peer_id'] != $id) continue;
 					if($msg['id'] < $i) continue;
 					if($msg['id'] == $i) continue;
 					if($minid == 0) {
@@ -121,7 +121,7 @@ try {
 		if(isset($info['Chat']['title'])) {
 			$name = $info['Chat']['title'];
 		}
-	} else if(isset($info['User']) && isset($info['User']['first_name'])) {
+	} elseif(isset($info['User']) && isset($info['User']['first_name'])) {
 		$name = $info['User']['first_name'];
 		$pm = true;
 	}

@@ -33,7 +33,7 @@ if(isset($_GET['offset'])) {
 }
 if(isset($_GET['offset_from'])) {
 	$msgoffsetid = (int) $_GET['offset_from'];
-} else if(isset($_GET['m'])) {
+} elseif(isset($_GET['m'])) {
 	$msgoffsetid = (int) $_GET['m'];
 	$msgoffset = -1;
 }
@@ -84,11 +84,11 @@ try {
 			$canpost = $info['Chat']['admin_rights']['post_messages'];
 		}
 		$left = isset($info['Chat']['left']) && $info['Chat']['left'];
-	} else if(isset($info['User'])) {
+	} elseif(isset($info['User'])) {
 		$pm = true;
 		if(isset($info['User']['first_name'])) {
 			$name = $info['User']['first_name'];
-		} else if(isset($info['User']['last_name'])) {
+		} elseif(isset($info['User']['last_name'])) {
 			$name = $info['User']['last_name'];
 		}
 	}
@@ -96,7 +96,7 @@ try {
 	if($left && isset($_GET['join'])) {
 		$MP->channels->joinChannel(['channel' => $id]);
 		$left = false;
-	} else if(!$left && isset($_GET['leave'])) {
+	} elseif(!$left && isset($_GET['leave'])) {
 		$MP->channels->leaveChannel(['channel' => $id]);
 		$left = true;
 	}
@@ -123,7 +123,7 @@ try {
 			echo '<input type="hidden" name="r" value="'. \base64_encode(random_bytes(16)).'">';
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
 			echo '</form>';
-		} else if(!$ch || $canpost) {
+		} elseif(!$ch || $canpost) {
 			$post = strpos($ua, 'Series60/3') === false;
 			$opera = strpos($ua, 'Opera') !== false || ($iev != 0 && $iev <= 7);
 			$watchos = strpos($ua, 'Watch OS') !== false;
@@ -219,7 +219,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	$body = false;
 	if($reverse && $dir != 'd') {
 		echo Themes::bodyStart('onload="autoScroll(true, false);"'); $body = true;
-	} else if(!$reverse && $dir == 'u') {
+	} elseif(!$reverse && $dir == 'u') {
 		echo Themes::bodyStart('onload="autoScroll(true, true);"'); $body = true;
 	}
 	if(!$body)
@@ -267,7 +267,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 					$was = $status['was_online']-$timeoff;
 					if($was >= $time - 60) {
 						$status_str = MP::x($lng['last_seen'].' '.$lng['just_now']);
-					} else if($was >= $time - 60*60) {
+					} elseif($was >= $time - 60*60) {
 						$status_str = MP::x($lng['last_seen'].' '.MPLocale::number('minutes_ago', intval(($time-$was)/60)));
 					} else /*if($was >= $time - 24*60*60) {
 						$hours = intval(($time-$was)/60/60);
@@ -278,7 +278,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 						}
 					} else*/ if(date('d.m.y', $was) == date('d.m.y', $time)) {
 						$status_str = MP::x($lng['last_seen']).' '.MP::x($lng['last_seen_at']).' '.date('H:i', $status['was_online']-$timeoff);
-					} else if(date('d.m.y', $was) == date('d.m.y', $time-24*60*60)) {
+					} elseif(date('d.m.y', $was) == date('d.m.y', $time-24*60*60)) {
 						$status_str = MP::x($lng['last_seen']).' '.MP::x($lng['yesterday'].' '.$lng['last_seen_at']).' '.date('H:i', $was);
 					} else {
 						$status_str = MP::x($lng['last_seen']).' '.date('d.m.y', $was);

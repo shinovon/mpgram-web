@@ -11,6 +11,9 @@ if(!defined("api_id") || api_id == 0) {
 if(!file_exists(sessionspath)) {
 	mkdir(sessionspath, 0777);
 }
+
+use danog\MadelineProto\Magic;
+
 class MP {
 	static $enc;
 	static $iev;
@@ -25,7 +28,23 @@ class MP {
 	}
 
 	static function getId($a) {
-		return $a['user_id'] ?? (isset($a['chat_id']) ? '-'.$a['chat_id'] : (isset($a['channel_id']) ? '-100'.$a['channel_id'] : null));
+		if(is_int($a)) return $a;
+		return $a['user_id'] ?? (isset($a['chat_id']) ? -$a['chat_id'] : (isset($a['channel_id']) ? (Magic::ZERO_CHANNEL_ID - $a['channel_id']) : null));
+	}
+	
+	static function getLocalId($id) {
+		if($id < 0) {
+			if(-Magic::MAX_CHAT_ID <= $id) {
+				return -$id;
+			}
+			if(Magic::ZERO_CHANNEL_ID - Magic::MAX_CHANNEL_ID <= $id && $id !== Magic::ZERO_CHANNEL_ID) {
+				return -$id + Magic::ZERO_CHANNEL_ID;
+			}
+			if(Magic::ZERO_SECRET_CHAT_ID + Magic::MIN_INT32 <= $id && $id !== Magic::ZERO_SECRET_CHAT_ID) {
+				return -$id + DialogId::SECRET_CHAT; // TODO ?
+			}
+		}
+		return $id;
 	}
 
 	static function getName($MP, $a, $full = false) {
@@ -191,7 +210,7 @@ class MP {
 				if($m['out'] && !$ch) {
 					$uid = MP::getSelfId($MP);
 					$mname = $lng['you'];
-				} else if(($pm || $ch) && $name) {
+				} elseif(($pm || $ch) && $name) {
 					$uid = $id;
 					$mname = $name;
 				} else {
@@ -203,8 +222,8 @@ class MP {
 				if(isset($m['fwd_from'])) {
 					if(isset($m['fwd_from']['from_name'])) {
 						$fwname = $m['fwd_from']['from_name'];
-					} else if(isset($m['fwd_from']['from_id'])){
-						$fwid = MP::getId($m['fwd_from']['from_id']);
+					} elseif(isset($m['fwd_from']['from_id'])){
+						$fwid = $m['fwd_from']['from_id'];
 						$fwname = MP::getNameFromId($MP, $fwid, true);
 					}
 				}
@@ -301,7 +320,7 @@ class MP {
 							$s = '';
 							if(isset($button['data'])) {
 								$s = 'href="botcallback.php?m='.$m['id'].'&c='.$id.'&d='.urlencode(base64_encode($button['data'])).'"';
-							} else if(isset($button['url'])) {
+							} elseif(isset($button['url'])) {
 								$s = 'href="'.static::wrapUrl($button['url']).'"';
 							}
 							echo '<td class="btd"><a class="btn" '.$s.'>'.$button['text'].'</a></td>';
@@ -333,7 +352,7 @@ class MP {
 			} else {
 				echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig">'.MP::x($lng['photo']).'</a></div>';
 			}
-		} else if(isset($media['document'])) {
+		} elseif(isset($media['document'])) {
 			$thumb = isset($media['document']['thumbs']);
 			$d = $MP->getDownloadInfo($m);
 			$fn = $d['name'];
@@ -409,7 +428,7 @@ class MP {
 				}
 				if($voice && defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES) {
 					echo '<div class="mw"><a href="voice.php?m='.$m['id'].'&c='.$id.'">'.static::x($lng['voice']).' '.MP::durationstr($dur).'</a><br><audio controls preload="none" src="voice.php?m='.$m['id'].'&c='.$id.'">'.'</div>';
-				} else if($img && $imgs && !$mini) {
+				} elseif($img && $imgs && !$mini) {
 					if($open) {
 						echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p='.$fq.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></a></div>';
 					} else {
@@ -449,13 +468,13 @@ class MP {
 				echo $e;
 			}
 			echo '</div>';
-		} else if(isset($media['webpage'])) {
+		} elseif(isset($media['webpage'])) {
 			echo '<div class="mw">';
 			if(isset($media['webpage']['site_name'])) {
 				echo '<a href="'.$media['webpage']['url'].'">';
 				echo $media['webpage']['site_name'];
 				echo '</a>';
-			} else if(isset($media['webpage']['url'])) {
+			} elseif(isset($media['webpage']['url'])) {
 				echo '<a href="'.$media['webpage']['url'].'">';
 				echo $media['webpage']['url'];
 				echo '</a>';
@@ -464,7 +483,7 @@ class MP {
 				echo '<div class="mwt"><b>'.$media['webpage']['title'].'</b></div>';
 			}
 			echo '</div>';
-		} else if(isset($media['geo'])) {
+		} elseif(isset($media['geo'])) {
 			$lat = str_replace(',', '.', strval($media['geo']['lat']));
 			$long = str_replace(',', '.', strval($media['geo']['long']));
 			$lat = substr($lat, 0, 9) ?? $lat;
@@ -520,7 +539,7 @@ class MP {
 			$entity = $entities[$i];
 			if($entity['offset'] > $lastOffset) {
 				$html .= static::dehtml(static::utf16substr($text, $lastOffset, $entity['offset'] - $lastOffset));
-			} else if($entity['offset'] < $lastOffset) {
+			} elseif($entity['offset'] < $lastOffset) {
 				continue;
 			}
 			$skipEntity = false;
@@ -606,13 +625,13 @@ class MP {
 				default:
 					if(count($path) == 2 && strlen($path[1] > 0)) {
 						$url = static::getURL().'chat.php?c='.$path[0].'&m='.$path[1];
-					} else if(count($path) == 1) {
+					} elseif(count($path) == 1) {
 						if(strpos($path[0], 'iv?') !== 0) {
 							$s = $path[0];
 							if(strpos($s, '?start=') !== false) {
 								$s = str_replace('?start=', "&start=", $s);
 								$s .= '&rnd='.rand(0, 100000);
-							} else if(strpos($s, '?') !== false) {
+							} elseif(strpos($s, '?') !== false) {
 								$i = strpos($s, '?');
 								$s = substr($s, 0, $i).'&'.substr($s, $i+1);
 								$s .= '&rnd='.rand(0, 100000);
@@ -647,9 +666,9 @@ class MP {
 		$user = null;
 		if(isset($_GET['user']))
 			$user = $_GET['user'];
-		else if(isset($_COOKIE['user']))
+		elseif(isset($_COOKIE['user']))
 			$user = $_COOKIE['user'];
-		else if(isset($_SESSION) && isset($_SESSION['user']))
+		elseif(isset($_SESSION) && isset($_SESSION['user']))
 			$user = $_SESSION['user'];
 		if(strpos(strval($user), '/') !== false || strpos(strval($user), '.') !== false) {
 			$user = null;
@@ -690,12 +709,12 @@ class MP {
 					if(strpos($ua, 'Opera Mini') !== false) {
 						if(strpos($ua, 'J2ME/MIDP') !== false) {
 							$pl = 'J2ME';
-						} else if(strpos($ua, 'BlackBerry') !== false) {
+						} elseif(strpos($ua, 'BlackBerry') !== false) {
 							$pl = 'BlackBerry OS';
-						} else if(strpos($ua, 'Android') !== false) {
+						} elseif(strpos($ua, 'Android') !== false) {
 							$pl = 'Android';
 						}
-					} else if(strpos($ua, 'Series60/') !== false) {
+					} elseif(strpos($ua, 'Series60/') !== false) {
 						$s60 = substr($ua, strpos($ua, 'Series60/')+strlen('Series60/'), 3);
 						switch($s60) {
 						case '3.0':
@@ -729,9 +748,9 @@ class MP {
 								$pl = 'Symbian OS';
 							}
 						}
-					} else if(isset($b['platform_description'])) {
+					} elseif(isset($b['platform_description'])) {
 						$pl = $b['platform_description'];
-					} else if(isset($b['platform'])) {
+					} elseif(isset($b['platform'])) {
 						$pl = $b['platform'];
 					}
 					if($info) {
@@ -773,7 +792,7 @@ class MP {
 		if(isset($_GET[$name])) {
 			$x = $_GET[$name];
 			$write = true;
-		} else if(isset($_COOKIE[$name])) {
+		} elseif(isset($_COOKIE[$name])) {
 			$x = $_COOKIE[$name];
 		}
 		if($x && $write) {
@@ -786,7 +805,7 @@ class MP {
 		$x = $def;
 		if(isset($_GET[$name])) {
 			$x = (int)$_GET[$name];
-		} else if(isset($_COOKIE[$name])) {
+		} elseif(isset($_COOKIE[$name])) {
 			$x = (int)$_COOKIE[$name];
 		}
 		if($x && $write) {
@@ -901,7 +920,7 @@ class MP {
 			$last_id = 0;
 			$t['messages'] = array_reverse($t['messages'] ?? []);
 			foreach(array_reverse($t['dialogs'] ?? []) as $dialog) {
-				$id = static::getId($dialog['peer']);
+				$id = $dialog['peer'];
 				if(!isset($d[$id])) {
 					$d[$id] = $dialog;
 					array_push($r['dialogs'], $dialog);
@@ -914,7 +933,7 @@ class MP {
 						$last_id = $dialog['top_message'];
 					}
 					foreach($t['messages'] as $message) {
-						if($message['_'] !== 'messageEmpty' && static::getId($message['peer_id']) === $last_peer && $last_id === $message['id']) {
+						if($message['_'] !== 'messageEmpty' && $message['peer_id'] === $last_peer && $last_id === $message['id']) {
 							$last_date = $message['date'];
 							break;
 						}

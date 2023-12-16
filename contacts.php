@@ -56,7 +56,7 @@ try {
 				if($user['id'] == $id) {
 					if(isset($user['first_name'])) {
 						$name = trim($user['first_name']).(isset($user['last_name']) ? ' '.trim($user['last_name']) : '');
-					} else if(isset($user['last_name'])) {
+					} elseif(isset($user['last_name'])) {
 						$name = trim($user['last_name']);
 					} else {
 						$name = 'Deleted Account';

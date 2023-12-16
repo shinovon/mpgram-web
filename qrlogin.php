@@ -99,7 +99,7 @@ if(!$qr) {
 			$password = null;
 			if(isset($_POST['pass'])) {
 				$password = $_POST['pass'];
-			} else if(isset($_GET['pass'])) {
+			} elseif(isset($_GET['pass'])) {
 				$password = $_GET['pass'];
 			}
 			$MP->complete2faLogin($password);

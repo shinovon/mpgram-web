@@ -31,7 +31,7 @@ if(isset($_GET['offset'])) {
 }
 if(isset($_GET['offset_from'])) {
 	$msgoffsetid = (int) $_GET['offset_from'];
-} else if(isset($_GET['m'])) {
+} elseif(isset($_GET['m'])) {
 	$msgoffsetid = (int) $_GET['m'];
 	$msgoffset = -1;
 }
