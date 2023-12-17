@@ -245,6 +245,9 @@ class Themes {
 			margin-bottom: 4px;
 			margin-top: 4px;
 		}
+		.pre {
+			display: inline;
+		}
 		--></style>';
 	}
 }
