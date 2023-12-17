@@ -188,8 +188,9 @@ try {
 						if($peer > 0) continue;
 						$peer = MP::getLocalId($peer);
 						foreach($r['chats'] as $c) {
-							if($c['id'] != $peer || $c['broadcast']) continue;
-							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+							if($c['id'] != $peer) continue;
+							if(!($c['broadcast'] ?? false) && !in_array($d, $dialogs))
+								array_push($dialogs, $d);
 							break;
 						}
 					}
@@ -200,8 +201,9 @@ try {
 						if($peer > 0) continue;
 						$peer = MP::getLocalId($peer);
 						foreach($r['chats'] as $c) {
-							if($c['id'] != $peer || !$c['broadcast']) continue;
-							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+							if($c['id'] != $peer) continue;
+							if(($c['broadcast'] ?? false) && !in_array($d, $dialogs))
+								array_push($dialogs, $d);
 							break;
 						}
 					}
@@ -211,8 +213,9 @@ try {
 						$peer = $d['peer'];
 						if($peer < 0) continue;
 						foreach($r['users'] as $u) {
-							if($u['id'] != $peer || !$u['bot']) continue;
-							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+							if($u['id'] != $peer) continue;
+							if(($u['bot'] ?? false) && !in_array($d, $dialogs))
+								array_push($dialogs, $d);
 							break;
 						}
 						continue;
