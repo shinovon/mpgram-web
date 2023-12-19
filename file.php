@@ -1,4 +1,5 @@
 <?php
+set_time_limit(300);
 use Amp\Success;
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
 	throw new ErrorException($message, 0, $severity, $filename, $lineno);
