@@ -62,6 +62,7 @@ try {
 		} else {
 			echo file_get_contents('us.png');
 		}
+		header('Cache-Control: private, max-age=86400');
 		die;
 	}
 	$p = $_GET['p'] ?? '';
