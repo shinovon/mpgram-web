@@ -76,9 +76,8 @@ try {
 	if($fwdmsg !== null) {
 		$url .= 'm='.$fwdmsg.'&';
 	}
-	if(count($folders) > 1 || $hasArchiveChats) {
-		echo '<div>';
-		echo '<b>'.MP::x($lng['folders']).'</b>: ';
+	if($query === null && (count($folders) > 1 || $hasArchiveChats)) {
+		echo '<div><b>'.MP::x($lng['folders']).'</b>: ';
 		foreach($folders as $f) {
 			if(!isset($f['id'])) {
 				echo '<a href="'.$url.'">'.MP::x($lng['all_chats']).'</a> ';
