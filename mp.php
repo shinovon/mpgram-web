@@ -841,10 +841,14 @@ class MP {
 		if(is_dir($session)) {
 			$files = scandir($session);
 			foreach($files as $file) {
-				if($file != '.' && $file != '..')
-				unlink($session.DIRECTORY_SEPARATOR.$file);
+				if($file == '.' || $file == '..') continue;
+				try {
+					unlink($session.DIRECTORY_SEPARATOR.$file);
+				} catch (Exception) {}
 			}
-			rmdir($session);
+			try {
+				rmdir($session);
+			} catch (Exception) {}
 		} else {
 			// old madeline sessions
 			try {

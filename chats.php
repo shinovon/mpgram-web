@@ -305,7 +305,7 @@ try {
 		foreach($dialogs as $d){
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
 			try {
-				$id = $d['peer'];
+				$id = $d['peer'] ?? $d;
 				$n = null;
 				$cl = 'chat.php?c='.$id;
 				$unr = $d['unread_count'];

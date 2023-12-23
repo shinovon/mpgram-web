@@ -262,7 +262,7 @@ try {
 		$c = 0;
 		foreach($dialogs as $d){
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
-			$id = $d['peer'];
+			$id = $d['peer'] ?? $d;
 			$name = null;
 			$lid = MP::getLocalId($id);
 			foreach(($r[$id > 0 ? 'users' : 'chats']) as $p) {
