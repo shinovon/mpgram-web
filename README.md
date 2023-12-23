@@ -18,14 +18,14 @@ _It is highly recommended to run your own instance (read on)._
 
 You can deploy your own instance quickly with Docker Compose - [see how](https://github.com/shinovon/mpgram-web/blob/main/docker/README.md).
 
-### Manual deployment notes
+### Manual deployment
 
-- You should deny access to sessions folder (`s/` by default, see in `config.php`) and `MadelineProto.log`
-- You must have `php-gd` extension installed to get images working (`apt-get install php8.1-gd`)<br>
-and `php-mbstring` for MadelineProto (`apt-get install php8.1-mbstring`)
-- You need to set [browscap](https://browscap.org/) in `php.ini` to get better logged in device names
+- Deny access to sessions folder (`s/` by default, see in `config.php`) and `MadelineProto.log`
+- Install required php extensions: `gd`, `mbstring`, `xml`, `json`, `fileinfo`, `gmp`, `iconv`, `ffi`
+- Download and set [browscap](https://browscap.org/) database in `php.ini` to get better logged in device names
 - Install Composer v2+
 - Install MadelineProto and its dependencies with `composer update`
+- Make a background script that restarts php service at least every hour
 - For more details on installing MadelineProto <a href="https://docs.madelineproto.xyz/docs/REQUIREMENTS.html">see here</a>
 
 ## Tested browsers
@@ -34,10 +34,11 @@ Fully supported:
 
 - Internet Explorer 6.0 and above
 - Opera 9.0 and above
-- Nokia Browser for Symbian (Symbian 9.2 and above)
+- Nokia Browser for Symbian (S60v3 FP1 and above)
 - S40 6th Edition
 - Mozilla Firefox 2.0
 - WebPositive
+- Opera Mobile 12
 - All modern browsers (Chrome, Safari, etc)
 
 Partially supported (Auto update doesn't work and/or no auto scroll):
@@ -49,5 +50,4 @@ Partially supported (Auto update doesn't work and/or no auto scroll):
 
 Not supported
 - Internet Explorer 2 and older
-- ?
 
