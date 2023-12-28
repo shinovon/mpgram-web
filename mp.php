@@ -9,7 +9,7 @@ if(!defined("api_id") || api_id == 0) {
 	throw new Exception('api_id is not set!');
 }
 if(!file_exists(sessionspath)) {
-	mkdir(sessionspath, 0777);
+	mkdir(sessionspath, 0775);
 }
 
 use danog\MadelineProto\Magic;
@@ -70,7 +70,7 @@ class MP {
 			if(static::$chats !== null) {
 				foreach(static::$users as $p) {
 				$info = null;
-					if(('-'.$p['id']) == $id || ('-100'.$p['id']) == $id) {
+					if($p['id'] == static::getLocalId($id)) {
 						$info = $p;
 						break;
 					}
@@ -89,7 +89,7 @@ class MP {
 	
 	static function getUserName($p, $full = false) {
 		$last = isset($p['last_name']) ? trim($p['last_name']) : null;
-		return isset($p['first_name']) ? trim($p['first_name']).($full && $last !== null ? ' '.$last : '') : ($last ? $last : 'Deleted Account');
+		return isset($p['first_name']) ? trim($p['first_name']).($full && $last !== null ? ' '.$last : '') : ($last !== null ? $last : 'Deleted Account');
 	}
 
 	static function getSelfName($MP, $full = true) {
@@ -151,10 +151,7 @@ class MP {
 					break;
 				case 'chatdeleteuser':
 					$txt = var_export($a, true);
-					$u = null;
-					if(isset($a['user_id'])) {
-						$u = $a['user_id'];
-					}
+					$u = $a['user_id'] ?? null;
 					if($u == $mfid || $u === null) {
 						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a>';
 						$txt .= ' '.static::x($lng['action_leave']);
@@ -217,6 +214,19 @@ class MP {
 					$l = true;
 					$mname = $mname1 ? $mname1 : $name;
 				}
+				$color = '';
+				$lid = static::getLocalId($uid);
+				if($uid > 0 && isset(static::$users[$uid])) {
+					$user = static::$users[$uid];
+					if(isset($user['color'])) {
+						$color = 'style="color: #'. dechex($user['color']['color']) . '"';
+					}
+				} elseif($uid < 0 && isset(static::$chats[$lid])) {
+					$chat = static::$chats[$lid];
+					if(isset($chat['color'])) {
+						$color = 'style="color: #'. dechex($chat['color']['color']) . '"';
+					}
+				}
 				$fwid = null;
 				$fwname = null;
 				if(isset($m['fwd_from'])) {
@@ -238,9 +248,9 @@ class MP {
 				if(!isset($m['action'])) {
 					echo '<div class="m" id="msg_'.$id.'_'.$m['id'].'">';
 					if(!$pm && $uid != null && $l) {
-						echo '<b><a href="chat.php?c='.$uid.'" class="mn">'.MP::dehtml($mname).'</a></b>';
+						echo '<b><a href="chat.php?c='.$uid.'" class="mn" '.$color.'>'.MP::dehtml($mname).'</a></b>';
 					} else {
-						echo '<b class="mn">'.MP::dehtml($mname).'</b>';
+						echo '<b class="mn" '.$color.'>'.MP::dehtml($mname).'</b>';
 					}
 					echo ' '.date("H:i", $mtime);
 					if($m['media_unread']) {
@@ -440,7 +450,7 @@ class MP {
 					if($size >= 1024 * 1024) {
 						$size = round($size/1024.0/1024.0, 2).' MB';
 					} else {
-						$size = round($size/1024.0, 2).' KB';
+						$size = round($size/1024.0, 1).' KB';
 					}
 					echo '<div class="mw">';
 					if($smallprev) {
@@ -715,7 +725,7 @@ class MP {
 							$pl = 'Android';
 						}
 					} elseif(strpos($ua, 'Series60/') !== false) {
-						$s60 = substr($ua, strpos($ua, 'Series60/')+strlen('Series60/'), 3);
+						$s60 = substr($ua, strpos($ua, 'Series60/')+9, 3);
 						switch($s60) {
 						case '3.0':
 							$pl = 'Symbian 9.1';
@@ -761,8 +771,7 @@ class MP {
 					}
 				}
 			}
-		} catch (Exception) {
-		}
+		} catch (Exception) {}
 		$app->setAppVersion('web');
 		$sets->setAppInfo($app);
 		$peer = new \danog\MadelineProto\Settings\Peer;
@@ -779,11 +788,11 @@ class MP {
 	
 	static function getMadelineAPI($user, $login = false) {
 		require_once 'vendor/autoload.php';
-		if($login) {
+		//if($login) {
 			$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline', static::getMadelineSettings());
-		} else {
-			$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline');
-		}
+		//} else {
+		//	$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline');
+		//}
 		return $MP;
 	}
 
@@ -823,8 +832,7 @@ class MP {
 				$i = strpos($ua, 'MSIE ')+5;
 				static::$iev = (int)substr($ua, $i, $i+1);
 			}
-		} catch (Exception) {
-		}
+		} catch (Exception) {}
 		return static::$iev;
 	}
 
@@ -853,28 +861,22 @@ class MP {
 			// old madeline sessions
 			try {
 				unlink($session.'callback.ipc');
-			} catch (Exception) {
-			}
+			} catch (Exception) {}
 			try {
 				unlink($session.'.ipcState');
-			} catch (Exception) {
-			}
+			} catch (Exception) {}
 			try {
 				unlink($session.'.ipc');
-			} catch (Exception) {
-			}
+			} catch (Exception) {}
 			try {
 				unlink($session.'.lightState.php');
-			} catch (Exception) {
-			}
+			} catch (Exception) {}
 			try {
 				unlink($session.'.safe.php');
-			} catch (Exception) {
-			}
+			} catch (Exception) {}
 			try {
 				unlink($session);
-			} catch (Exception) {
-			}
+			} catch (Exception) {}
 		}
 	}
 	
@@ -897,8 +899,12 @@ class MP {
 	}
 	
 	public static function addUsers($users, $chats) {
-		static::$users = $users;
-		static::$chats = $chats;
+		foreach($users as $user) {
+			static::$users[$user['id']] = $user;
+		}
+		foreach($chats as $chat) {
+			static::$chats[$chat['id']] = $chat;
+		}
 	}
 	
 	public static function gc() {
