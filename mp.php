@@ -20,6 +20,7 @@ class MP {
 	static $useragent;
 	static $users;
 	static $chats;
+	static $colors;
 
 	// Removes html special characters and converts to browser encoding
 	static function dehtml($s) {
@@ -219,12 +220,14 @@ class MP {
 				if($uid > 0 && isset(static::$users[$uid])) {
 					$user = static::$users[$uid];
 					if(isset($user['color'])) {
-						$color = 'style="color: #'. dechex($user['color']['color']) . '"';
+						static::getPeerColors($MP);
+						$color = 'style="color: #'. static::$colors[$user['color']['color']] . '"';
 					}
 				} elseif($uid < 0 && isset(static::$chats[$lid])) {
 					$chat = static::$chats[$lid];
 					if(isset($chat['color'])) {
-						$color = 'style="color: #'. dechex($chat['color']['color']) . '"';
+						static::getPeerColors($MP);
+						$color = 'style="color: #'. static::$colors[$chat['color']['color']] . '"';
 					}
 				}
 				$fwid = null;
@@ -963,6 +966,19 @@ class MP {
 			}
 		}
 		return $r;
+	}
+
+	static function getPeerColors($MP) {
+		 if(!isset(static::$colors)) {
+                        $peercolors = $MP->help->getPeerColors();
+                        $theme = MP::getSettingInt('theme');
+                        static::$colors = [];
+                        foreach($peercolors['colors'] as $color) {
+                                if(isset($color['colors'])) {
+                 		       static::$colors[$color['color_id']] = substr('000000'.dechex($color[($theme==0?'dark_':'').'colors']['colors'][0]), -6);
+                                }
+                        }
+                }
 	}
 }
 MP::init();
