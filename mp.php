@@ -221,13 +221,17 @@ class MP {
 					$user = static::$users[$uid];
 					if(isset($user['color'])) {
 						static::getPeerColors($MP);
-						$color = 'style="color: #'. static::$colors[$user['color']['color']] . '"';
+						if(isset(static::$colors[$user['color']['color']])) {
+							$color = 'style="color: #'. static::$colors[$user['color']['color']] . '"';
+						}
 					}
 				} elseif($uid < 0 && isset(static::$chats[$lid])) {
 					$chat = static::$chats[$lid];
 					if(isset($chat['color'])) {
 						static::getPeerColors($MP);
-						$color = 'style="color: #'. static::$colors[$chat['color']['color']] . '"';
+						if(isset(static::$colors[$chat['color']['color']])) {
+							$color = 'style="color: #'. static::$colors[$chat['color']['color']] . '"';
+						}
 					}
 				}
 				$fwid = null;
