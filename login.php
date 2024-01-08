@@ -11,6 +11,8 @@ if(isset($_GET['logout'])) $_SESSION = [];
 
 include 'mp.php';
 
+if(!defined('LOGIN_CAPTCHA')) define('LOGIN_CAPTCHA', true);
+
 $theme = 0;
 $ua = '';
 $iev = MP::getIEVersion();
@@ -40,6 +42,8 @@ $nouser = true;
 $phone = $_GET['phone'] ?? $_POST['phone'] ?? null;
 
 $user = MP::getUser();
+
+$ipass = $_GET['ipass'] ?? $_POST['ipass'] ?? null;
 
 // Check session existance
 $nouser = $user == null || $user === false || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
@@ -74,9 +78,7 @@ function removeSession($logout=false) {
 		echo $e;
 	}
 }
-if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
-	removeSession(($_GET['logout'] ?? '') == '2');
-}
+
 function htmlStart() {
 	global $lng;
 	header("Content-Type: text/html; charset=utf-8");
@@ -103,11 +105,13 @@ try {
 	echo Themes::bodyStart('style="margin:5px"');
 	echo '<h1>MPGram Web</h1>';
 }
+
+if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
+	removeSession(($_GET['logout'] ?? '') == '2');
+}
+
 $MP = null;
-if($user != null
-	&& !$logout
-	&& !$nouser
-	) {
+if($user != null && !$logout && !$nouser) {
 	// Already logged in
 	if(isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {
 		header('Location: chats.php');
@@ -125,13 +129,25 @@ if($user != null
 		}
 	}
 }
+if(defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
+	if($ipass === null || $ipass != INSTANCE_PASSWORD) {
+		htmlStart();
+		echo 'Instance password:<br>';
+		echo '<form action="login.php"'.($post?' method="post"':'').'>';
+		echo '<input type="text" value="" name="ipass">';
+		echo '<input type="submit">';
+		echo '</form>';
+		if($ipass !== null) echo '<b>Wrong password</b>';
+		die;
+	}
+}
 if($phone !== null) {
 	$p = $phone;
 	if(empty($p) || strlen($p) < 10 || !is_numeric(str_replace('-','',str_replace('+','', $p)))) {
 		header('Location: login.php?wrong=number');
 		die;
 	}
-	if(!isset($_SESSION['captcha_entered'])) {
+	if(!isset($_SESSION['captcha_entered']) || !LOGIN_CAPTCHA) {
 		if(!isset($_POST['c']) && !isset($_GET['c'])) {
 			htmlStart();
 			echo 'CAPTCHA:<br>';
@@ -143,6 +159,8 @@ if($phone !== null) {
 				echo '<input type="hidden" name="code" value="'.$_POST['code'].'">';
 			if($phone !== null)
 				echo '<input type="hidden" name="phone" value="'.$phone.'">';
+			if($ipass !== null)
+				echo '<input type="hidden" name="ipass" value="'.$ipass.'">';
 			echo '<input type="text" name="c">';
 			echo '<input type="submit">';
 			echo '</form>';
@@ -169,6 +187,8 @@ if($phone !== null) {
 					echo '<input type="hidden" name="code" value="'.$_POST['code'].'">';
 				if($phone !== null)
 					echo '<input type="hidden" name="phone" value="'.$phone.'">';
+				if($ipass !== null)
+					echo '<input type="hidden" name="ipass" value="'.$ipass.'">';
 				echo '<input type="text" name="c">';
 				echo '<input type="submit">';
 				echo '</form>';
@@ -210,6 +230,8 @@ if($phone !== null) {
 					echo '<input type="text" name="pass">';
 					if($phone !== null)
 						echo '<input type="hidden" name="phone" value="'.$phone.'">';
+					if($ipass !== null)
+						echo '<input type="hidden" name="ipass" value="'.$ipass.'">';
 					echo '<input type="submit">';
 					echo '</form>';
 					echo '<b>'.MP::x($lng['password_hash_invalid']).'</b><br>';
@@ -250,6 +272,8 @@ if($phone !== null) {
 						echo '<input type="text" name="pass">';
 						if($phone !== null)
 							echo '<input type="hidden" name="phone" value="'.$phone.'">';
+						if($ipass !== null)
+							echo '<input type="hidden" name="ipass" value="'.$ipass.'">';
 						echo '<input type="submit">';
 						echo '</form>';
 						echo Themes::bodyEnd();
@@ -313,6 +337,8 @@ if($phone !== null) {
 	echo '<input type="text" name="code">';
 	if($phone !== null)
 		echo '<input type="hidden" name="phone" value="'.$phone.'">';
+	if($ipass !== null)
+		echo '<input type="hidden" name="ipass" value="'.$ipass.'">';
 	echo '<input type="submit">';
 	echo '</form>';
 	echo Themes::bodyEnd();
@@ -326,6 +352,8 @@ if($phone !== null) {
 	echo '<form action="login.php"'.($post?' method="post"':'').'>';
 	echo '<input type="text" value="" name="phone">';
 	echo '<input type="submit">';
+	if($ipass !== null)
+		echo '<input type="hidden" name="ipass" value="'.$ipass.'">';
 	echo '</form>';
 	if($wrong) {
 		echo MP::x('<b>'.$lng['wrong_number_format'].'</b><br>');
