@@ -294,11 +294,15 @@ class MP {
 								}
 							}
 							$replytext = '';
-							if(isset($replymsg['media'])) {
-								$replytext = $lng['media_att'].' ';
-							}
-							if(isset($replymsg['message'])) {
-								$replytext .= $replymsg['message'];
+							if(isset($m['reply_to']['quote_text'])) {
+								$replytext = $m['reply_to']['quote_text'];
+							} else {
+								if(isset($replymsg['media'])) {
+									$replytext = $lng['media_att'].' ';
+								}
+								if(isset($replymsg['message'])) {
+									$replytext .= $replymsg['message'];
+								}
 							}
 							if(mb_strlen($replytext, 'UTF-8') > 0) {
 								if(strlen($replytext) > 50)
