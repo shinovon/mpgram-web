@@ -103,7 +103,7 @@ try {
 		echo '<div>';
 		echo '<b>'.MP::x($lng['folders']).'</b>: ';
 		foreach($folders as $f) {
-			if(!isset($f['id'])) {	
+			if(!isset($f['id'])) {
 				echo '<a href="chats.php">'.MP::x($lng['all_chats']).'</a> ';
 			} else {
 				$sel = $fid == $f['id'];
@@ -360,7 +360,7 @@ try {
 								echo MP::x($lng['you']).': ';
 							elseif($mfn !== null)
 								echo $mfn.': ';
-							$txt = MP::dehtml(str_replace("\n", " ", $msg['message']));
+							$txt = MP::dehtml(trim(str_replace("\r","",str_replace("\n", " ", $msg['message']))));
 							if(mb_strlen($txt, 'UTF-8') > 250) $txt = mb_substr($txt, 0, 250, 'UTF-8').'..';
 							echo $txt;
 							echo '</a>';
