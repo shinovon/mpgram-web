@@ -120,6 +120,11 @@ try {
 									$s = substr($res, $i, strpos($res, '.', $i));
 									$s = explode(':', $s);
 									$dur = ((int)$s[2])+((int)$s[1])*60+((int)$s[0])*60*60;
+									if($dur > 3600) {
+										unlink($newfile);
+										$reason = 'Duration is too long';
+										break;
+									}
 								}
 								try {
 									$res = shell_exec(FFMPEG_DIR.'ffprobe -v error -f lavfi -i "amovie='.$newfile.',asetnsamples=44100,astats=metadata=1:reset=1" -show_entries frame_tags=lavfi.astats.Overall.Peak_level -of json 2>&1') ?? false;
