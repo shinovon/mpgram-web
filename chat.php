@@ -312,7 +312,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	}
 	unset($info);
 	$sname = $name ?? '';
-	if(mb_strlen($sname, 'UTF-8') > 30) $sname = mb_substr($sname, 0, 30, 'UTF-8');
+	if(MP::utflen($sname) > 30) $sname = MP::utfsubstr($sname, 0, 30);
 	if(!$reverse) {
 		printInputField();
 		if($hasOffset && !$endReached) {

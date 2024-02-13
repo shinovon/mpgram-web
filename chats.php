@@ -361,7 +361,7 @@ try {
 							elseif($mfn !== null)
 								echo $mfn.': ';
 							$txt = MP::dehtml(trim(str_replace("\r","",str_replace("\n", " ", $msg['message']))));
-							if(mb_strlen($txt, 'UTF-8') > 250) $txt = mb_substr($txt, 0, 250, 'UTF-8').'..';
+							if(MP::utflen($txt) > 250) $txt = MP::utfsubstr($txt, 0, 250).'..';
 							echo $txt;
 							echo '</a>';
 						} elseif(isset($msg['action'])) {

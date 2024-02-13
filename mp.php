@@ -129,7 +129,7 @@ class MP {
 					$txt = static::x($lng['action_channelcreate']);
 					break;
 				case 'chatedittitle':
-					$txt = static::x($lng['action_chatedittitle']).' '.MP::dehtml($a['title']);
+					$txt = static::x($lng['action_chatedittitle']).' '.static::dehtml($a['title']);
 					break;
 				case 'chateditphoto':
 					$txt = static::x($lng['action_chateditphoto']);
@@ -140,42 +140,42 @@ class MP {
 						$u = $a['users'][0];
 					}
 					if($mfid !== null && $chat) {
-						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a>';
+						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a>';
 					} else {
-						$txt = MP::dehtml($fn);
+						$txt = static::dehtml($fn);
 					}
 					if($u == $mfid || $u === null) {
 						$txt .= ' '.static::x($lng['action_join']);
 					} else {
-						$txt .= ' '.static::x($lng['action_add']).' '.MP::dehtml(MP::getNameFromId($MP, $u));
+						$txt .= ' '.static::x($lng['action_add']).' '.static::dehtml(static::getNameFromId($MP, $u));
 					}
 					break;
 				case 'chatdeleteuser':
 					$txt = var_export($a, true);
 					$u = $a['user_id'] ?? null;
 					if($u == $mfid || $u === null) {
-						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a>';
+						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a>';
 						$txt .= ' '.static::x($lng['action_leave']);
 					} else {
-						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a>';
+						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a>';
 						$txt .= ' '.static::x($lng['action_deleteuser']).' ';
-						$txt .= '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml(MP::getNameFromId($MP, $u)).'</a>';
+						$txt .= '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml(static::getNameFromId($MP, $u)).'</a>';
 					}
 					break;
 				case 'chatjoinedbylink':
-					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a> '.static::x($lng['action_joinedbylink']);
+					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a> '.static::x($lng['action_joinedbylink']);
 					break;
 				case 'channelcreate':
 					$txt = static::x($lng['action_channelcreate']);
 					break;
 				case 'pinmessage':
-					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a> '.static::x($lng['action_pin']);
+					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a> '.static::x($lng['action_pin']);
 					break;
 				case 'historyclear':
 					$txt = static::x($lng['action_historyclear']);
 					break;
 				case 'chatjoinedbyreqeuset':
-					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.MP::dehtml($fn).'</a> '.static::x($lng['action_joinedbyrequest']);
+					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a> '.static::x($lng['action_joinedbyrequest']);
 					break;
 				default:
 					if(isset($lng['action_'.$at])) {
@@ -198,15 +198,15 @@ class MP {
 				$mname1 = null;
 				$uid = null;
 				if(isset($m['from_id'])) {
-					$uid = MP::getId($m['from_id']);
-					$mname1 = MP::getNameFromId($MP, $uid);
+					$uid = static::getId($m['from_id']);
+					$mname1 = static::getNameFromId($MP, $uid);
 				}
-				if($mname1 != null && mb_strlen($mname1, 'UTF-8') > 30)
-					$mname1 = static::utf16substr($mname1, 0, 30);
+				if($mname1 != null && utflen($mname1) > 30)
+					$mname1 = static::utfsubstr($mname1, 0, 30);
 				$mname = null;
 				$l = false;
 				if($m['out'] && !$ch) {
-					$uid = MP::getSelfId($MP);
+					$uid = static::getSelfId($MP);
 					$mname = $lng['you'];
 				} elseif(($pm || $ch) && $name) {
 					$uid = $id;
@@ -241,7 +241,7 @@ class MP {
 						$fwname = $m['fwd_from']['from_name'];
 					} elseif(isset($m['fwd_from']['from_id'])){
 						$fwid = $m['fwd_from']['from_id'];
-						$fwname = MP::getNameFromId($MP, $fwid, true);
+						$fwname = static::getNameFromId($MP, $fwid, true);
 					}
 				}
 				$mtime = $m['date']-$timeoff;
@@ -250,27 +250,27 @@ class MP {
 					echo '<div class="ma">'.$mdate.'</div>';
 					$lastdate = $mdate;
 				}
-				if($fwname !== null && mb_strlen($fwname, 'UTF-8') > 30)
-					$fwname = static::utf16substr($fwname, 0, 30);
+				if($fwname !== null && static::utflen($fwname) > 30)
+					$fwname = static::utfsubstr($fwname, 0, 30);
 				if(!isset($m['action'])) {
 					echo '<div class="m" id="msg_'.$id.'_'.$m['id'].'">';
 					if(!$pm && $uid != null && $l) {
-						echo '<b><a href="chat.php?c='.$uid.'" class="mn" '.$color.'>'.MP::dehtml($mname).'</a></b>';
+						echo '<b><a href="chat.php?c='.$uid.'" class="mn" '.$color.'>'.static::dehtml($mname).'</a></b>';
 					} else {
-						echo '<b class="mn" '.$color.'>'.MP::dehtml($mname).'</b>';
+						echo '<b class="mn" '.$color.'>'.static::dehtml($mname).'</b>';
 					}
 					echo ' '.date("H:i", $mtime);
 					if($m['media_unread']) {
 						echo ' •';
 					}
 					if($unswer) {
-						echo ' <small><a href="msg.php?c='.$id.'&m='.$m['id'].($m['out']?'&o':'').($ch?'&ch':'').'" class="u">'.MP::x($lng['msg_options']).'</a></small>';
+						echo ' <small><a href="msg.php?c='.$id.'&m='.$m['id'].($m['out']?'&o':'').($ch?'&ch':'').'" class="u">'.static::x($lng['msg_options']).'</a></small>';
 					}
 				} else {
 					echo '<div class="ma" id="msg_'.$id.'_'.$m['id'].'">';
 				}
 				if($fwname != null) {
-					echo '<div class="mf">'.static::x($lng['fwd_from']).' <b>'.MP::dehtml($fwname).'</b></div>';
+					echo '<div class="mf">'.static::x($lng['fwd_from']).' <b>'.static::dehtml($fwname).'</b></div>';
 				}
 				if(isset($m['reply_to'])) {
 					$replyid = $m['reply_to']['reply_to_msg_id'];
@@ -287,10 +287,10 @@ class MP {
 							if(isset($replymsg['from_id'])) {
 								$replyfromid = $replymsg['from_id'];
 								if($replyfromid) {
-									$replyname = MP::getName($MP, $replyfromid, true);
-									if(mb_strlen($replyname, 'UTF-8') > 30)
-										$mname = static::utf16substr($replyname, 0, 30).'...';
-									echo '<b class="rn">'.MP::dehtml($replyname).'</b>';
+									$replyname = static::getName($MP, $replyfromid, true);
+									if(static::utflen($replyname) > 30)
+										$mname = static::utfsubstr($replyname, 0, 30).'...';
+									echo '<b class="rn">'.static::dehtml($replyname).'</b>';
 								}
 							}
 							$replytext = '';
@@ -304,12 +304,12 @@ class MP {
 									$replytext .= $replymsg['message'];
 								}
 							}
-							if(mb_strlen($replytext, 'UTF-8') > 0) {
+							if(static::utflen($replytext) > 0) {
 								if(strlen($replytext) > 50)
-									$replytext = static::utf16substr($replytext, 0, 50);
+									$replytext = static::utfsubstr($replytext, 0, 50);
 								echo '<div class="rt">';
 								echo '<a href="chat.php?c='.$id.'&m='.$replyid.'">';
-								echo MP::dehtml(str_replace("\n", " ", $replytext));
+								echo static::dehtml(str_replace("\n", " ", $replytext));
 								echo '</a>';
 								echo '</div>';
 							}
@@ -325,7 +325,7 @@ class MP {
 						echo '</div>';
 					} else {
 						echo '<div class="mt">';
-						echo str_replace("\n", "<br>", MP::dehtml($text));
+						echo str_replace("\n", "<br>", static::dehtml($text));
 						echo '</div>';
 					}
 				}
@@ -351,7 +351,7 @@ class MP {
 					echo '</table>';
 				}
 				if(isset($m['action'])) {
-					echo MP::parseMessageAction($m['action'], $mname1, $uid, $name, $lng, true, $MP);
+					echo static::parseMessageAction($m['action'], $mname1, $uid, $name, $lng, true, $MP);
 				}
 				echo '</div>';
 			} catch (Exception $e) {
@@ -371,7 +371,7 @@ class MP {
 					echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig"><img class="mi" src="file.php?m='.$m['id'].'&c='.$id.'&p=rprev"></img></a></div>';
 				}
 			} else {
-				echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig">'.MP::x($lng['photo']).'</a></div>';
+				echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig">'.static::x($lng['photo']).'</a></div>';
 			}
 		} elseif(isset($media['document'])) {
 			$thumb = isset($media['document']['thumbs']);
@@ -417,7 +417,7 @@ class MP {
 							$dl = true;
 							$open = false;
 							$img = true;
-							$ie = MP::getIEVersion();
+							$ie = static::getIEVersion();
 							if(PNG_STICKERS && ($ie == 0 || $ie > 4)) {
 								$q = 'rstickerp';
 							} else {
@@ -448,7 +448,7 @@ class MP {
 						break;
 				}
 				if($voice && defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES) {
-					echo '<div class="mw"><a href="voice.php?m='.$m['id'].'&c='.$id.'">'.static::x($lng['voice']).' '.MP::durationstr($dur).'</a><br><audio controls preload="none" src="voice.php?m='.$m['id'].'&c='.$id.'">'.'</div>';
+					echo '<div class="mw"><a href="voice.php?m='.$m['id'].'&c='.$id.'">'.static::x($lng['voice']).' '.static::durationstr($dur).'</a><br><audio controls preload="none" src="voice.php?m='.$m['id'].'&c='.$id.'">'.'</div>';
 				} elseif($img && $imgs && !$mini) {
 					if($open) {
 						echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p='.$fq.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></a></div>';
@@ -468,16 +468,16 @@ class MP {
 						if($thumb && $imgs) {
 							echo '<a href="'.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'" class="acv"></img></a>';
 						}
-						echo '<div class="cst"><b><a href="'.$url.'">'.MP::dehtml($title).'</a></b></div>';
+						echo '<div class="cst"><b><a href="'.$url.'">'.static::dehtml($title).'</a></b></div>';
 						echo '<div>';
 						if($dur > 0) {
-							echo MP::durationstr($dur);
+							echo static::durationstr($dur);
 						} else {
 							echo $size;
 						}
 						echo '</div>';
 					} else {
-						echo '<a href="'.$url.'">'.MP::dehtml($title).'</a></b><br>';
+						echo '<a href="'.$url.'">'.static::dehtml($title).'</a></b><br>';
 						if($thumb && $imgs) {
 							echo '<a href="'.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'"></img></a><br>';
 						}
@@ -524,7 +524,11 @@ class MP {
 		return $min.':'.$sec;
 	}
 	
-	static function utf16substr($s, $offset, $length = null) {
+	static function utflen($str) {
+		return mb_strlen($str, 'utf-8');
+	}
+	
+	static function utfsubstr($s, $offset, $length = null) {
 		$s = iconv('utf-8', 'utf-16le', $s);
 		$s = $length !== null ? substr($s, $offset*2, $length*2) : substr($s, $offset*2);
 		return iconv('utf-16le', 'utf-8', $s);
@@ -556,20 +560,20 @@ class MP {
 		$html = [];
 		$lastOffset = 0;
 		$html = '';
-		for ($i = 0; $i < $len; $i++) {
+		for($i = 0; $i < $len; $i++) {
 			$entity = $entities[$i];
 			if($entity['offset'] > $lastOffset) {
-				$html .= static::dehtml(static::utf16substr($text, $lastOffset, $entity['offset'] - $lastOffset));
+				$html .= static::dehtml(static::utfsubstr($text, $lastOffset, $entity['offset'] - $lastOffset));
 			} elseif($entity['offset'] < $lastOffset) {
 				continue;
 			}
 			$skipEntity = false;
-			$entityText = static::utf16substr($text, $entity['offset'], $entity['length']);
+			$entityText = static::utfsubstr($text, $entity['offset'], $entity['length']);
 			switch($entity['_']) {
 			case 'messageEntityUrl':
 			case 'messageEntityTextUrl':
 				$inner = null;
-				if ($entity['_'] == 'messageEntityTextUrl') {
+				if($entity['_'] == 'messageEntityTextUrl') {
 					$url = $entity['url'];
 					$url = static::wrapUrl($url, true);
 					$inner = static::wrapRichNestedText($entityText, $entity, $entities);
@@ -623,7 +627,7 @@ class MP {
 			}
 			$lastOffset = $entity['offset'] + ($skipEntity ? 0 : $entity['length']);
 		}
-		$html .= static::dehtml(static::utf16substr($text, $lastOffset, null));
+		$html .= static::dehtml(static::utfsubstr($text, $lastOffset, null));
 		
 		return $html;
 	}
@@ -892,7 +896,7 @@ class MP {
 	}
 	
 	public static function initLocale() {
-		$xlang = $lang = MP::getSetting('lang');
+		$xlang = $lang = static::getSetting('lang');
 		$lang ??= isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? (strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en') : 'ru';
 		include 'locale.php';
 		MPLocale::init();
@@ -900,7 +904,7 @@ class MP {
 			MPLocale::load($lang = 'en');
 		}
 		if($lang != $xlang) {
-			MP::cookie('lang', $lang, time() + (86400 * 365));
+			static::cookie('lang', $lang, time() + (86400 * 365));
 		}
 		return MPLocale::$lng;
 	}
@@ -977,16 +981,14 @@ class MP {
 	}
 
 	static function getPeerColors($MP) {
-		 if(!isset(static::$colors)) {
-                        $peercolors = $MP->help->getPeerColors();
-                        $theme = MP::getSettingInt('theme');
-                        static::$colors = [];
-                        foreach($peercolors['colors'] as $color) {
-                                if(isset($color['colors'])) {
-                 		       static::$colors[$color['color_id']] = substr('000000'.dechex($color[($theme==0?'dark_':'').'colors']['colors'][0]), -6);
-                                }
-                        }
-                }
+		if(isset(static::$colors)) return;
+		$peercolors = $MP->help->getPeerColors();
+		$theme = static::getSettingInt('theme');
+		static::$colors = [];
+		foreach($peercolors['colors'] as $color) {
+			if(!isset($color['colors'])) continue;
+			static::$colors[$color['color_id']] = substr('000000'.dechex($color[($theme==0?'dark_':'').'colors']['colors'][0]), -6);
+		}
 	}
 }
 MP::init();
