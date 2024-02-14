@@ -201,7 +201,7 @@ class MP {
 					$uid = static::getId($m['from_id']);
 					$mname1 = static::getNameFromId($MP, $uid);
 				}
-				if($mname1 != null && utflen($mname1) > 30)
+				if($mname1 != null && static::utflen($mname1) > 30)
 					$mname1 = static::utfsubstr($mname1, 0, 30);
 				$mname = null;
 				$l = false;
