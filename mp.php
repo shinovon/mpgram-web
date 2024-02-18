@@ -140,7 +140,7 @@ class MP {
 						$u = $a['users'][0];
 					}
 					if($mfid !== null && $chat) {
-						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a>';
+						$txt = "<a href=\"chat.php?c={$mfid}\" class=\"mn\">".static::dehtml($fn).'</a>';
 					} else {
 						$txt = static::dehtml($fn);
 					}
@@ -154,32 +154,32 @@ class MP {
 					$txt = var_export($a, true);
 					$u = $a['user_id'] ?? null;
 					if($u == $mfid || $u === null) {
-						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a>';
+						$txt = "<a href=\"chat.php?c={$mfid}\" class=\"mn\">".static::dehtml($fn).'</a>';
 						$txt .= ' '.static::x($lng['action_leave']);
 					} else {
-						$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a>';
+						$txt = "<a href=\"chat.php?c={$mfid}\" class=\"mn\">".static::dehtml($fn).'</a>';
 						$txt .= ' '.static::x($lng['action_deleteuser']).' ';
 						$txt .= '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml(static::getNameFromId($MP, $u)).'</a>';
 					}
 					break;
 				case 'chatjoinedbylink':
-					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a> '.static::x($lng['action_joinedbylink']);
+					$txt = "<a href=\"chat.php?c={$mfid}\" class=\"mn\">".static::dehtml($fn).'</a> '.static::x($lng['action_joinedbylink']);
 					break;
 				case 'channelcreate':
 					$txt = static::x($lng['action_channelcreate']);
 					break;
 				case 'pinmessage':
-					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a> '.static::x($lng['action_pin']);
+					$txt = "<a href=\"chat.php?c={$mfid}\" class=\"mn\">".static::dehtml($fn).'</a> '.static::x($lng['action_pin']);
 					break;
 				case 'historyclear':
 					$txt = static::x($lng['action_historyclear']);
 					break;
 				case 'chatjoinedbyreqeuset':
-					$txt = '<a href="chat.php?c='.$mfid.'" class="mn">'.static::dehtml($fn).'</a> '.static::x($lng['action_joinedbyrequest']);
+					$txt = "<a href=\"chat.php?c={$mfid}\" class=\"mn\">".static::dehtml($fn).'</a> '.static::x($lng['action_joinedbyrequest']);
 					break;
 				default:
-					if(isset($lng['action_'.$at])) {
-						$txt = static::x($lng['action_'.$at]);
+					if(isset($lng["action_{$at}"])) {
+						$txt = static::x($lng["action_{$at}"]);
 						break;
 					}
 					$txt = $at;
@@ -247,7 +247,7 @@ class MP {
 				$mtime = $m['date']-$timeoff;
 				$mdate = date('d.m.y', $mtime);
 				if($mdate !== $lastdate) {
-					echo '<div class="ma">'.$mdate.'</div>';
+					echo "<div class=\"ma\">{$mdate}</div>";
 					$lastdate = $mdate;
 				}
 				if($fwname !== null && static::utflen($fwname) > 30)
@@ -255,19 +255,19 @@ class MP {
 				if(!isset($m['action'])) {
 					echo '<div class="m" id="msg_'.$id.'_'.$m['id'].'">';
 					if(!$pm && $uid != null && $l) {
-						echo '<b><a href="chat.php?c='.$uid.'" class="mn" '.$color.'>'.static::dehtml($mname).'</a></b>';
+						echo "<b><a href=\"chat.php?c={$uid}\" class=\"mn\" {$color}>".static::dehtml($mname).'</a></b>';
 					} else {
-						echo '<b class="mn" '.$color.'>'.static::dehtml($mname).'</b>';
+						echo "<b class=\"mn\" {$color}>".static::dehtml($mname).'</b>';
 					}
 					echo ' '.date("H:i", $mtime);
 					if($m['media_unread']) {
 						echo ' •';
 					}
 					if($unswer) {
-						echo ' <small><a href="msg.php?c='.$id.'&m='.$m['id'].($m['out']?'&o':'').($ch?'&ch':'').'" class="u">'.static::x($lng['msg_options']).'</a></small>';
+						echo " <small><a href=\"msg.php?c={$id}&m={$m['id']}".($m['out']?'&o':'').($ch?'&ch':'')."\" class=\"u\">".static::x($lng['msg_options'])."</a></small>";
 					}
 				} else {
-					echo '<div class="ma" id="msg_'.$id.'_'.$m['id'].'">';
+					echo "<div class=\"ma\" id=\"msg_{$id}_{$m['id']}\">";
 				}
 				if($fwname != null) {
 					echo '<div class="mf">'.static::x($lng['fwd_from']).' <b>'.static::dehtml($fwname).'</b></div>';
@@ -320,13 +320,9 @@ class MP {
 				if(isset($m['message']) && strlen($m['message']) > 0) {
 					$text = $m['message'];
 					if(isset($m['entities']) && count($m['entities']) > 0) {
-						echo '<div class="mt">';
-						echo static::wrapRichText($text, $m['entities']);
-						echo '</div>';
+						echo '<div class="mt">'.static::wrapRichText($text, $m['entities']).'</div>';
 					} else {
-						echo '<div class="mt">';
-						echo str_replace("\n", "<br>", static::dehtml($text));
-						echo '</div>';
+						echo '<div class="mt">'.str_replace("\n", "<br>", static::dehtml($text)).'</div>';
 					}
 				}
 				if(isset($m['media'])) {
@@ -355,7 +351,7 @@ class MP {
 				}
 				echo '</div>';
 			} catch (Exception $e) {
-				echo '<xmp>'.$e->getMessage()."\n".$e->getTraceAsString().'</xmp>';
+				echo "<xmp>{$e->getMessage()}\n{$e->getTraceAsString()}</xmp>";
 			}
 		}
 	}
@@ -366,12 +362,12 @@ class MP {
 		if(isset($media['photo'])) {
 			if($imgs) {
 				if($mini) {
-					echo '<a href="chat.php?m='.$m['id'].'&c='.$id.'"><img class="mi" src="file.php?m='.$m['id'].'&c='.$id.'&p=rmin"></img></a>';
+					echo "<a href=\"chat.php?m={$m['id']}&c={$id}\"><img class=\"mi\" src=\"file.php?m={$m['id']}&c={$id}&p=rmin\"></img></a>";
 				} else {
-					echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig"><img class="mi" src="file.php?m='.$m['id'].'&c='.$id.'&p=rprev"></img></a></div>';
+					echo "<div><a href=\"file.php?m={$m['id']}&c={$id}&p=rorig\"><img class=\"mi\" src=\"file.php?m={$m['id']}&c={$id}&p=rprev\"></img></a></div>";
 				}
 			} else {
-				echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p=rorig">'.static::x($lng['photo']).'</a></div>';
+				echo "<div><a href=\"file.php?m={$m['id']}&c={$id}&p=rorig\">".static::x($lng['photo'])."</a></div>";
 			}
 		} elseif(isset($media['document'])) {
 			$thumb = isset($media['document']['thumbs']);
@@ -396,7 +392,7 @@ class MP {
 						if(isset($attr['title'])) {
 							$title = $attr['title'];
 							if(isset($attr['performer'])) {
-								$title = $attr['performer'].' - '.$title;
+								$title = "{$attr['performer']} - {$title}";
 							}
 							$nameset = true;
 						}
@@ -448,15 +444,15 @@ class MP {
 						break;
 				}
 				if($voice && defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES) {
-					echo '<div class="mw"><a href="voice.php?m='.$m['id'].'&c='.$id.'">'.static::x($lng['voice']).' '.static::durationstr($dur).'</a><br><audio controls preload="none" src="voice.php?m='.$m['id'].'&c='.$id.'">'.'</div>';
+					echo "<div class=\"mw\"><a href=\"voice.php?m={$m['id']}&c={$id}\">".static::x($lng['voice']).' '.static::durationstr($dur)."</a><br><audio controls preload=\"none\" src=\"voice.php?m={$m['id']}&c={$id}\"></div>";
 				} elseif($img && $imgs && !$mini) {
 					if($open) {
-						echo '<div><a href="file.php?m='.$m['id'].'&c='.$id.'&p='.$fq.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></a></div>';
+						echo "<div><a href=\"file.php?m={$m['id']}&c={$id}&p={$fq}\"><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}\"></img></a></div>";
 					} else {
-						echo '<div><img src="file.php?m='.$m['id'].'&c='.$id.'&p='.$q.'"></img></div>';
+						echo "<div><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}\"></img></div>";
 					}
 				} else {
-					$url = 'file.php?m='.$m['id'].'&c='.$id;
+					$url = "file.php?m={$m['id']}&c={$id}";
 					$size = $d['size'];
 					if($size >= 1024 * 1024) {
 						$size = round($size/1024.0/1024.0, 2).' MB';
@@ -466,9 +462,9 @@ class MP {
 					echo '<div class="mw">';
 					if($smallprev) {
 						if($thumb && $imgs) {
-							echo '<a href="'.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'" class="acv"></img></a>';
+							echo "<a href=\"{$url}\"><img src=\"file.php?m={$m['id']}&c={$id}&p=thumb{$q}\" class=\"acv\"></img></a>";
 						}
-						echo '<div class="cst"><b><a href="'.$url.'">'.static::dehtml($title).'</a></b></div>';
+						echo "<div class=\"cst\"><b><a href=\"{$url}\">".static::dehtml($title).'</a></b></div>';
 						echo '<div>';
 						if($dur > 0) {
 							echo static::durationstr($dur);
@@ -479,7 +475,7 @@ class MP {
 					} else {
 						echo '<a href="'.$url.'">'.static::dehtml($title).'</a></b><br>';
 						if($thumb && $imgs) {
-							echo '<a href="'.$url.'"><img src="file.php?m='.$m['id'].'&c='.$id.'&p=thumb'.$q.'"></img></a><br>';
+							echo "<a href=\"{$url}\"><img src=\"file.php?m={$m['id']}&c={$id}&p=thumb{$q}'\"></img></a><br>";
 						}
 						echo $size;
 					}
@@ -492,16 +488,12 @@ class MP {
 		} elseif(isset($media['webpage'])) {
 			echo '<div class="mw">';
 			if(isset($media['webpage']['site_name'])) {
-				echo '<a href="'.$media['webpage']['url'].'">';
-				echo $media['webpage']['site_name'];
-				echo '</a>';
+				echo "<a href=\"{$media['webpage']['url']}\">{$media['webpage']['site_name']}</a>";
 			} elseif(isset($media['webpage']['url'])) {
-				echo '<a href="'.$media['webpage']['url'].'">';
-				echo $media['webpage']['url'];
-				echo '</a>';
+				echo "<a href=\"{$media['webpage']['url']}\">{$media['webpage']['url']}</a>";
 			}
 			if(isset($media['webpage']['title'])) {
-				echo '<div class="mwt"><b>'.$media['webpage']['title'].'</b></div>';
+				echo "<div class=\"mwt\"><b>{$media['webpage']['title']}</b></div>";
 			}
 			echo '</div>';
 		} elseif(isset($media['geo'])) {
@@ -510,18 +502,18 @@ class MP {
 			$lat = substr($lat, 0, 9) ?? $lat;
 			$long = substr($long, 0, 9) ?? $long;
 			
-			echo '<div class="mw"><b>'.$lng['media_location'].'</b><br><a href="https://maps.google.com/maps?q='.$lat.','.$long.'&ll='.$lat.','.$long.'&z=16">'.$lat.', '.$long.'</a></div>';
+			echo "<div class=\"mw\"><b>".static::x($lng['media_location'])."</b><br><a href=\"https://maps.google.com/maps?q={$lat},{$long}&ll={$lat},{$long}&z=16\">{$lat}, {$long}</a></div>";
 		} else {
-			echo '<div><i>'.$lng['media_att'].'</i></div>';
+			echo '<div><i>'.static::x($lng['media_att']).'</i></div>';
 		}
 	}
 	
 	static function durationstr($time) {
 		$sec = $time % 60;
-		if($sec < 10) $sec = '0'.$sec;
+		if($sec < 10) $sec = "0{$sec}";
 		$min = intval($time / 60);
-		if($min < 10) $min = '0'.$min;
-		return $min.':'.$sec;
+		if($min < 10) $min = "0{$min}";
+		return "{$min}:{$sec}";
 	}
 	
 	static function utflen($str) {
@@ -689,12 +681,16 @@ class MP {
 	
 	static function getUser() {
 		$user = null;
-		if(isset($_GET['user']))
+		if(isset($_GET['user'])) {
 			$user = $_GET['user'];
-		elseif(isset($_COOKIE['user']))
+		} elseif(isset($_COOKIE['user'])) {
 			$user = $_COOKIE['user'];
-		elseif(isset($_SESSION) && isset($_SESSION['user']))
+			if(strpos($user, ', ') !== false) {
+				$user = substr($user, 0, strpos($user, ', '));
+			}
+	    } elseif(isset($_SESSION) && isset($_SESSION['user'])) {
 			$user = $_SESSION['user'];
+		} 
 		if(strpos(strval($user), '/') !== false || strpos(strval($user), '.') !== false) {
 			$user = null;
 		}
@@ -818,6 +814,9 @@ class MP {
 			$write = true;
 		} elseif(isset($_COOKIE[$name])) {
 			$x = $_COOKIE[$name];
+			if(strpos($x, ', ') !== false) {
+				$x = substr($x, 0, strpos($x, ', '));
+			}
 		}
 		if($x && $write) {
 			static::cookie($name, $x, time() + (86400 * 365));
@@ -830,7 +829,11 @@ class MP {
 		if(isset($_GET[$name])) {
 			$x = (int)$_GET[$name];
 		} elseif(isset($_COOKIE[$name])) {
-			$x = (int)$_COOKIE[$name];
+			$x = $_COOKIE[$name];
+			if(strpos($x, ', ') !== false) {
+				$x = substr($x, 0, strpos($x, ', '));
+			}
+			$x = (int)$x;
 		}
 		if($x && $write) {
 			static::cookie($name, $x, time() + (86400 * 365));
@@ -851,12 +854,14 @@ class MP {
 		return static::$iev;
 	}
 
-	static function cookie($n, $v) {
-		header('Set-Cookie: '.$n.'='.$v.'; path=/; expires='.date('r', time() + (86400 * 365)), false);
+	static function cookie($n, $v, $e = null) {
+		if($e === null) $e = time() + (86400 * 365);
+		$e = date('D, d M Y H:i:s \G\M\T', $e);
+		header("Set-Cookie: {$n}={$v}; expires={$e}; path=/", false);
 	}
 
 	static function delCookie($n) {
-		header('Set-Cookie: '.$n.'=; path=/; expires='.date('r', time() - 86400), false);
+		static::cookie($n, '', time() - 86400);
 	}
 	
 	static function deleteSessionFile($user) {
