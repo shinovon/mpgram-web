@@ -56,6 +56,7 @@ $start = $_GET['start'] ?? null;
 $file = htmlentities($_SERVER['PHP_SELF']);
 
 $query = $_GET['q'] ?? null;
+$forum = $_GET['f'] ?? null;
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
 	throw new ErrorException($message, 0, $severity, $filename, $lineno);

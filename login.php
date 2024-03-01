@@ -49,10 +49,6 @@ $ipass = $_GET['ipass'] ?? $_POST['ipass'] ?? null;
 $nouser = $user == null || $user === false || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
 function removeSession($logout=false) {
 	global $user;
-	global $nouser;
-	global $logout;
-	$nouser = true;
-	$logout = true;
 	MP::delcookie('user');
 	MP::delcookie('code');
 	try {
@@ -63,15 +59,13 @@ function removeSession($logout=false) {
 					$MP = MP::getMadelineAPI($user, true);
 					$MP->logout();
 					unset($MP);
-				} catch (Exception) {
-				}
+				} catch (Exception) {}
 			}
 			try {
 				if(PHP_OS_FAMILY === "Linux") {
 					exec('kill -9 `ps -ef | grep -v grep | grep '.$user.'.madeline | awk \'{print $2}\'`');
 				}
-			} catch (Exception) {
-			}
+			} catch (Exception) {}
 			MP::deleteSessionFile($user);
 		}
 	} catch (Exception $e) {
@@ -107,7 +101,10 @@ try {
 }
 
 if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
+	$logout = true;
+	$nouser = true;
 	removeSession(($_GET['logout'] ?? '') == '2');
+	$user = null;
 }
 
 $MP = null;
