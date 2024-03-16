@@ -6,31 +6,6 @@ function exceptions_error_handler($severity, $message, $filename, $lineno) {
 }
 set_error_handler('exceptions_error_handler');
 require_once 'vendor/autoload.php';
-use Amp\ByteStream;
-class StringStream implements \Amp\ByteStream\WritableStream {
-		public $d;
-		public $closed;
-		public function write(string $data): void {
-			$this->d .= $data;
-		}
-		public function end(): void {
-		}											
-
-		public function get() {
-			return $this->d;
-		}
-		public function isWritable(): bool {
-			return true;
-		}
-		public function close(): void {
-			$this->closed = true;
-		}
-		public function isClosed(): bool {
-			return $this->closed;
-		}
-		public function onClose(\Closure $onClose): void {
-		}
-}
 
 function resize($image, $w, $h) {
 	$w = (int) $w;
@@ -91,9 +66,9 @@ try {
 	if(strpos($p, 'r') === 0) {
 		header('Cache-Control: private, max-age=86400');
 		$p = substr($p, 1);
-		$stream = new StringStream();
-		$MP->downloadToStream($di, $stream);
-		$img = imagecreatefromstring($stream->get());
+		$payload = new Amp\ByteStream\Payload($MP->downloadToReturnedStream($di));
+		$img = imagecreatefromstring($payload->buffer());
+		$payload->close();
 		if($p == 'stickerp') {
 			$w1 = $w = imagesx($img);
 			$h1 = $h = imagesy($img);
