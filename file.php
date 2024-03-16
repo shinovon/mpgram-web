@@ -165,6 +165,10 @@ try {
 		echo '<a href="file.php?m='.$_GET['m'].'&c='.$_GET['c'].'">Download</a><br>';
 		echo '<audio controls preload="none" src="file.php?m='.$_GET['m'].'&c='.$_GET['c'].'">';
 	} else */{
+		if(isset($_GET['name'])) {
+			unset($di['name']);
+			unset($di['ext']);
+		}
 		$MP->downloadToBrowser($di);
 	}
 } catch (Exception $e) {

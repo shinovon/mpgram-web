@@ -383,7 +383,7 @@ class MP {
 			$d = $MP->getDownloadInfo($m);
 			$fn = $d['name'];
 			$fext = $d['ext'];
-			$title = $fn.$fext;
+			$title = $filename = $fn.$fext;
 			$nameset = false;
 			$voice = false;
 			$dur = false;
@@ -391,7 +391,7 @@ class MP {
 				foreach($media['document']['attributes'] as $attr) {
 					if($attr['_'] == 'documentAttributeFilename') {
 						if($nameset) continue;
-						$title = $attr['file_name'];
+						$title = $filename = $attr['file_name'];
 					}
 					if($attr['_'] == 'documentAttributeAudio') {
 						$audio = true;
@@ -456,12 +456,14 @@ class MP {
 					echo "<div class=\"mw\"><a href=\"voice.php?m={$m['id']}&c={$id}\">".static::x($lng['voice']).' '.static::durationstr($dur)."</a><br><audio controls preload=\"none\" src=\"voice.php?m={$m['id']}&c={$id}\"></div>";
 				} elseif($img && $imgs && !$mini) {
 					if($open) {
-						echo "<div><a href=\"file.php?m={$m['id']}&c={$id}&p={$fq}\"><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}\"></img></a></div>";
+						$filename = defined('FILE_REWRITE') && FILE_REWRITE ? "file/{$filename}" : "file.php";
+						echo "<div><a href=\"{$filename}?m={$m['id']}&c={$id}&p={$fq}\"><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}\"></img></a></div>";
 					} else {
 						echo "<div><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}\"></img></div>";
 					}
 				} else {
-					$url = "file.php?m={$m['id']}&c={$id}";
+					$filename = defined('FILE_REWRITE') && FILE_REWRITE ? "file/{$filename}" : "file.php";
+					$url = "{$filename}?m={$m['id']}&c={$id}";
 					$size = $d['size'];
 					if($size >= 1024 * 1024) {
 						$size = round($size/1024.0/1024.0, 2).' MB';
@@ -808,13 +810,13 @@ class MP {
 		return $sets;
 	}
 	
-	static function getMadelineAPI($user, $login = false) {
+	static function getMadelineAPI($user, $settings = true) {
 		require_once 'vendor/autoload.php';
-		//if($login) {
+		if($settings) {
 			$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline', static::getMadelineSettings());
-		//} else {
-		//	$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline');
-		//}
+		} else {
+			$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline');
+		}
 		return $MP;
 	}
 

@@ -1,0 +1,9 @@
+<Files .htaccess>
+Deny from all
+</Files>
+<Files MadelineProto.log>
+Deny from all
+</Files>
+
+RewriteEngine on
+RewriteRule ^file/(.*)$ file.php?name=$1 [L,QSA]
