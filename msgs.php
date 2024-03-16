@@ -37,7 +37,7 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 		$name = $info['Chat']['title'] ?? null;
 		$ar = $info['Chat']['admin_rights'] ?? null;
 	} elseif(isset($info['User'])) {
-		$name = $info['User']['first_name'] ?? $info['User']['last_name'] ?? null;
+		$name = MP::removeEmoji($info['User']['first_name'] ?? $info['User']['last_name'] ?? null);
 		$pm = true;
 	}
 	$channel = isset($info['channel_id']);

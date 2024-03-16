@@ -334,7 +334,7 @@ try {
 					}
 					break;
 				}
-				echo MP::dehtml($n).'</b>';
+				echo MP::dehtml(MP::removeEmoji($n)).'</b>';
 				if($unr > 0) {
 					echo ' <b class="unr">+'.$unr.'</b>';
 				}
