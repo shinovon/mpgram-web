@@ -25,6 +25,9 @@ $uncompressed = isset($_GET['unc']) || isset($_POST['unc']);
 $voicesupport = defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES;
 $voice = (isset($_POST['voice']) || isset($_GET['voice'])) && $voicesupport;
 $spoiler = isset($_POST['sp']) || isset($_GET['sp']);
+$candelete = isset($_POST['d']) || isset($_GET['d']);
+$canban = isset($_POST['b']) || isset($_GET['b']);
+$canedit = isset($_POST['e']) || isset($_GET['e']);
 
 header("Content-Type: text/html; charset=utf-8");
 header("Cache-Control: private, no-cache, no-store");
@@ -60,6 +63,20 @@ try {
 			break;
 		case 'save':
 			$MP->messages->forwardMessages(['from_peer' => $id, 'to_peer' => 'me', 'id' => [(int)$msg]]);
+			header('Location: chat.php?c='.$id);
+			break;
+		case 'ban':
+			$msg = $MP->channels->getMessages(['channel' => $id, 'id' => [(int)$msg]]);
+			if(($msg = $msg['messages'] ?? null) === null || count($msg) < 1) {
+				echo "Message not found";
+				die;
+			}
+			$MP->channels->editBanned(['channel' => $id, 'participant' => $msg[0]['from_id'], 'banned_rights' => [
+			'_' => 'chatBannedRights',
+			'until_date' => 1,
+			'view_messages' => true,
+			'send_messages' => true
+			]]);
 			header('Location: chat.php?c='.$id);
 			break;
 		}
@@ -287,13 +304,15 @@ if($edit) {
 } elseif($msg) {
 	echo '<p>';
 	echo '<b>'.MP::x($lng['actions']).'</b>:<br>';
-	if($out) {
+	if($out || $candelete)
 		echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=delete">'.MP::x($lng['delete']).'</a> ';
+	if($out || $canedit)
 		echo '<a href="msg.php?c='.$id.'&m='.$msg.'&edit">'.MP::x($lng['edit']).'</a> ';
-	}
 	echo '<a href="chatselect.php?c='.$id.'&m='.$msg.'">'.MP::x($lng['forward']).'</a> ';
 	if(!$ch) echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=fwdh">'.MP::x($lng['forward_here']).'</a> ';
-	echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=save">'.MP::x($lng['forward_save']).'</a>';
+	echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=save">'.MP::x($lng['forward_save']).'</a> ';
+	if($canban)
+		echo '<a href="msg.php?c='.$id.'&m='.$msg.'&act=ban">'.MP::x($lng['ban_msg']).'</a> ';
 	echo '</p>';
 	if(!$ch) echo '<b>'.MP::x($lng['reply']).'</b>:';
 } elseif($title) {

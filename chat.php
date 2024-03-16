@@ -77,22 +77,16 @@ try {
 		$id = MP::getId($info);
 	}
 	$canpost = false;
+	$ar = null;
 	if(isset($info['Chat'])) {
 		$ch = isset($info['type']) && $info['type'] == 'channel';
-		if(isset($info['Chat']['title'])) {
-			$name = $info['Chat']['title'];
-		}
-		if(isset($info['Chat']['admin_rights']) && isset($info['Chat']['admin_rights']['post_messages'])) {
-			$canpost = $info['Chat']['admin_rights']['post_messages'];
-		}
-		$left = isset($info['Chat']['left']) && $info['Chat']['left'];
+		$name = $info['Chat']['title'] ?? null;
+		$ar = $info['Chat']['admin_rights'] ?? null;
+		$canpost = $ar !== null && $ar['post_messages'] ?? false;
+		$left = $info['Chat']['left'] ?? false;
 	} elseif(isset($info['User'])) {
 		$pm = true;
-		if(isset($info['User']['first_name'])) {
-			$name = $info['User']['first_name'];
-		} elseif(isset($info['User']['last_name'])) {
-			$name = $info['User']['last_name'];
-		}
+		$name = $info['User']['first_name'] ?? $info['User']['last_name'] ?? null;
 	}
 	$channel = isset($info['channel_id']);
 	if($left && isset($_GET['join'])) {
@@ -331,7 +325,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	}
 	if(!$texttop && !$reverse) echo '</p><p>';
 	echo '<div id="msgs">';
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true, $ar);
 	echo '</div>';
 	if(!$reverse) {
 		if(count($rm) >= $msglimit) {

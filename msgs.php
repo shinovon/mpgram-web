@@ -31,13 +31,13 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 	$name = null;
 	$pm = false;
 	$ch = false;
+	$ar = null;
 	if(isset($info['Chat'])) {
 		$ch = isset($info['type']) && $info['type'] == 'channel';
-		if(isset($info['Chat']['title'])) {
-			$name = $info['Chat']['title'];
-		}
-	} elseif(isset($info['User']) && isset($info['User']['first_name'])) {
-		$name = $info['User']['first_name'];
+		$name = $info['Chat']['title'] ?? null;
+		$ar = $info['Chat']['admin_rights'] ?? null;
+	} elseif(isset($info['User'])) {
+		$name = $info['User']['first_name'] ?? $info['User']['last_name'] ?? null;
 		$pm = true;
 	}
 	$channel = isset($info['channel_id']);
@@ -45,7 +45,7 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 	//echo $rm[0]['id'].'||';
 	echo $maxoffset.'||';
 	MP::addUsers($r['users'], $r['chats']);
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true, $ar);
 	// Mark as read
 	try {
 		if($ch || (int)$id < 0) {

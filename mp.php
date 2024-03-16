@@ -191,7 +191,7 @@ class MP {
 		return $txt;
 	}
 	
-	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name= null, $timeoff=0, $chid=false, $unswer=false) {
+	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null) {
 		$lastdate = date('d.m.y', time()-$timeoff);
 		foreach($rm as $m) {
 			try {
@@ -264,7 +264,16 @@ class MP {
 						echo ' •';
 					}
 					if($unswer) {
-						echo " <small><a href=\"msg.php?c={$id}&m={$m['id']}".($m['out']?'&o':'').($ch?'&ch':'')."\" class=\"u\">".static::x($lng['msg_options'])."</a></small>";
+						$mparams = '';
+						$out = $m['out'] ?? false;
+						if($out) $mparams .= '&o';
+						if($ch) $mparams .= '&ch';
+						if($ar !== null) {
+							if(!$out && $ar['ban_users'] ?? false) $mparams .= '&b';
+							if($ar['delete_messages'] ?? false) $mparams .= '&d';
+							if($ch && $ar['edit_messages'] ?? false) $mparams .= '&e';
+						}
+						echo " <small><a href=\"msg.php?c={$id}&m={$m['id']}{$mparams}\" class=\"u\">".static::x($lng['msg_options'])."</a></small>";
 					}
 				} else {
 					echo "<div class=\"ma\" id=\"msg_{$id}_{$m['id']}\">";

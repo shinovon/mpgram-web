@@ -117,5 +117,6 @@
 	"chat_media": "Chat media",
 	"send_voice": "Send as voice message (Audio)",
 	"send_spoiler": "Hide with spoiler",
-	"set_png_avatar": "PNG avatars"
+	"set_png_avatar": "PNG avatars",
+	"ban_msg": "Ban user"
 }
