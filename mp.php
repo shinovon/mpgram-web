@@ -269,7 +269,7 @@ class MP {
 						if($out) $mparams .= '&o';
 						if($ch) $mparams .= '&ch';
 						if($ar !== null) {
-							if(!$out && $ar['ban_users'] ?? false) $mparams .= '&b';
+							if(!$ch && !$out && $ar['ban_users'] ?? false) $mparams .= '&b';
 							if($ar['delete_messages'] ?? false) $mparams .= '&d';
 							if($ch && $ar['edit_messages'] ?? false) $mparams .= '&e';
 						}
