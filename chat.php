@@ -312,14 +312,14 @@ setTimeout("location.reload(true);",'.$updint.'000);
 		printInputField();
 		if($hasOffset && !$endReached) {
 			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
-				echo '<p><a href="'.$file.'?c='.$id.'&d=u">'.MP::x($lng['history_up']).'</a></p>';
+				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=u">'.MP::x($lng['history_up']).'</a></p>';
 			} else {
-				echo '<p><a href="'.$file.'?c='.$id.'&d=u&offset_from='.$rm[0]['id'].'&offset='.(-$msglimit-1).'">'.MP::x($lng['history_up']).'</a></p>';
+				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=u&offset_from='.$rm[0]['id'].'&offset='.(-$msglimit-1).'">'.MP::x($lng['history_up']).'</a></p>';
 			}
 		}
 	} else {
 		if(count($rm) >= $msglimit) {
-			echo '<p><a href="'.$file.'?c='.$id.'&d=u&offset_from='.$rm[count($rm)-1]['id'].'&reverse=1">'.MP::x($lng['history_up']).'</a></p>';
+			echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=u&offset_from='.$rm[count($rm)-1]['id'].'&reverse=1">'.MP::x($lng['history_up']).'</a></p>';
 		}
 		$rm = array_reverse($rm);
 	}
@@ -330,16 +330,16 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	if(!$reverse) {
 		if(count($rm) >= $msglimit) {
 			if($endReached && $autoupd)
-				echo '<p><a href="'.$file.'?c='.$id.'&offset='.$msglimit.'&d=d">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&offset='.$msglimit.'&d=d">'.MP::x($lng['history_down']).'</a></p>';
 			else
-				echo '<p><a href="'.$file.'?c='.$id.'&d=d&offset_from='.$rm[count($rm)-1]['id'].'">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=d&offset_from='.$rm[count($rm)-1]['id'].'">'.MP::x($lng['history_down']).'</a></p>';
 		}
 	} else {
 		if($hasOffset && !$endReached) {
 			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
-				echo '<p><a href="'.$file.'?c='.$id.'&d=d">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=d">'.MP::x($lng['history_down']).'</a></p>';
 			} else {
-				echo '<p><a href="'.$file.'?c='.$id.'&d=d&offset_from='.$rm[count($rm)-1]['id'].'&offset='.(-$msglimit-1).'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=d&offset_from='.$rm[count($rm)-1]['id'].'&offset='.(-$msglimit-1).'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
 			}
 		}
 		printInputField();
@@ -368,3 +368,4 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	echo '<b>'.MP::x($lng['error']).'!</b><br>';
 	echo '<xmp>'.$e->getMessage()."\n".$e->getTraceAsString().'</xmp>';
 }
+die;
