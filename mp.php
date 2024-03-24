@@ -578,10 +578,10 @@ class MP {
 				$inner = null;
 				if($entity['_'] == 'messageEntityTextUrl') {
 					$url = $entity['url'];
-					$url = static::wrapUrl($url, true);
+					$url = static::wrapUrl($url);
 					$inner = static::wrapRichNestedText($entityText, $entity, $entities);
 				} else {
-					$url = static::wrapUrl($entityText, false);
+					$url = static::wrapUrl($entityText);
 					$inner = static::dehtml($entityText);
 				}
 				$html .= '<a href="';
