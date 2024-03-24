@@ -191,7 +191,7 @@ class MP {
 		return $txt;
 	}
 	
-	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null) {
+	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false) {
 		$lastdate = date('d.m.y', time()-$timeoff);
 		foreach($rm as $m) {
 			try {
@@ -260,10 +260,13 @@ class MP {
 						echo "<b class=\"mn\" {$color}>".static::dehtml($mname).'</b>';
 					}
 					echo ' '.date("H:i", $mtime);
-					if($m['media_unread']) {
-						echo ' •';
-					}
-					if($unswer) {
+					
+						if($m['media_unread']) {
+							echo ' •';
+						}
+					if($search) { // replace "message options" link to "go to message" in history search
+						echo " <small><a href=\"chat.php?c={$id}&m={$m['id']}\" class=\"u\">".static::x($lng['msg_options'])."</a></small>";
+					} elseif($unswer) {
 						$mparams = '';
 						$out = $m['out'] ?? false;
 						if($out) $mparams .= '&o';
