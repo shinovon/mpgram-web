@@ -43,10 +43,14 @@ function h() {
 						var d=document.createElement("div");
 						d.innerHTML=e;
 						for(var i=d.childNodes.length-1;i>=0;i--){
+							e=d.childNodes[i];
+							try {
+								if(e instanceof HTMLBRElement) continue;
+							}catch(x){}
 							if(reverse){
-								msgs.appendChild(d.childNodes[i]);
+								msgs.appendChild(e);
 							}else{
-								msgs.insertBefore(d.childNodes[i],msgs.firstChild);
+								msgs.insertBefore(e,msgs.firstChild);
 							}
 						}
 						while(msgs.childNodes.length>msglimit){
