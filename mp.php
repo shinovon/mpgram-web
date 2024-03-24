@@ -265,7 +265,7 @@ class MP {
 							echo ' •';
 						}
 					if($search) { // replace "message options" link to "go to message" in history search
-						echo " <small><a href=\"chat.php?c={$id}&m={$m['id']}\" class=\"u\">".static::x($lng['msg_options'])."</a></small>";
+						echo " <small><a href=\"chat.php?c={$id}&m={$m['id']}\" class=\"u\">&gt;</a></small>";
 					} elseif($unswer) {
 						$mparams = '';
 						$out = $m['out'] ?? false;
