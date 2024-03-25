@@ -325,7 +325,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	}
 	if(!$texttop && !$reverse) echo '</p><p>';
 	echo '<div id="msgs">';
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true, $ar, $query!==false);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true, $ar, $query !== null);
 	echo '</div>';
 	if(!$reverse) {
 		if(count($rm) >= $msglimit) {
