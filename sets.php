@@ -176,4 +176,7 @@ foreach($themes as $k=>$v) {
 }
 echo '<p><input type="submit"></p>';
 echo '</form>';
+if(MP::getUser()) {
+	echo '<p><a href="login.php?logout=2">'.MP::x($lng['logout']).'</a></p>';
+}
 echo Themes::bodyEnd();

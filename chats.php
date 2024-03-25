@@ -15,7 +15,7 @@ $lng = MP::initLocale();
 $user = MP::getUser();
 if(!$user) {
 	header('Location: login.php?logout=1');
-	die();
+	die;
 }
 
 $count = MP::getSettingInt('chats', 15);
@@ -91,7 +91,6 @@ try {
 	echo ' <a href="contacts.php">'.MP::x($lng['contacts']).'</a>';
 	echo ' <a href="chatsearch.php">'.MP::x($lng['search']).'</a>';
 	echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
-	echo ' <a href="login.php?logout=2">'.MP::x($lng['logout']).'</a>';
 	echo '</div>';
 	$folders = $MP->messages->getDialogFilters();
 	$hasArchiveChats = count($MP->messages->getDialogs([
