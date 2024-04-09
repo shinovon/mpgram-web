@@ -30,7 +30,7 @@ class MP {
 
 	static function getId($a) {
 		if(is_int($a)) return $a;
-		return $a['user_id'] ?? (isset($a['chat_id']) ? -$a['chat_id'] : (isset($a['channel_id']) ? (Magic::ZERO_CHANNEL_ID - $a['channel_id']) : null));
+		return $a['user_id'] ?? (isset($a['chat_id']) ? $a['chat_id'] : (isset($a['channel_id']) ? ($a['channel_id']) : null));
 	}
 	
 	static function getLocalId($id) {
@@ -46,6 +46,10 @@ class MP {
 			}
 		}
 		return $id;
+	}
+	
+	static function isChannel($id) {
+		return $id < 0 && $id <= Magic::ZERO_CHANNEL_ID;
 	}
 
 	static function getName($MP, $a, $full = false) {
@@ -67,18 +71,17 @@ class MP {
 					return static::getNameFromInfo($info, $full);
 				}
 			}
-		} else {
-			if(static::$chats !== null) {
-				foreach(static::$users as $p) {
+		} else if(static::$chats !== null) {
+			$id = static::getId($id);
+			foreach(static::$users as $p) {
 				$info = null;
-					if($p['id'] == static::getLocalId($id)) {
-						$info = $p;
-						break;
-					}
+				if($p['id'] == $id) {
+					$info = $p;
+					break;
 				}
-				if($info !== null) {
-					return static::getNameFromInfo($info, $full);
-				}
+			}
+			if($info !== null) {
+				return static::getNameFromInfo($info, $full);
 			}
 		}
 		return static::getNameFromInfo($MP->getInfo($id), $full);
@@ -216,7 +219,6 @@ class MP {
 					$mname = $mname1 ? $mname1 : $name;
 				}
 				$color = '';
-				$lid = static::getLocalId($uid);
 				if($uid > 0 && isset(static::$users[$uid])) {
 					$user = static::$users[$uid];
 					if(isset($user['color'])) {
@@ -225,8 +227,8 @@ class MP {
 							$color = 'style="color: #'. static::$colors[$user['color']['color']] . '"';
 						}
 					}
-				} elseif($uid < 0 && isset(static::$chats[$lid])) {
-					$chat = static::$chats[$lid];
+				} elseif($uid < 0 && isset(static::$chats[$id])) {
+					$chat = static::$chats[$id];
 					if(isset($chat['color'])) {
 						static::getPeerColors($MP);
 						if(isset(static::$colors[$chat['color']['color']])) {

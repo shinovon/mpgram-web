@@ -31,7 +31,7 @@ try {
 	} else {
 		$cid = $_GET['c'];
 		$mid = $_GET['m'];
-		if(strpos($cid, '-100') === 0) {
+		if(MP::isChannel($cid)) {
 			$msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
 		} else {
 			$msg = $MP->messages->getMessages(['peer' => $cid, 'id' => [$mid]]);
@@ -169,6 +169,7 @@ try {
 			unset($di['name']);
 			unset($di['ext']);
 		}
+		header('Cache-Control: no-cache, no-store');
 		$MP->downloadToBrowser($di);
 	}
 } catch (Exception $e) {

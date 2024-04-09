@@ -64,6 +64,8 @@ try {
 	}
 	echo '<a href="'.$backurl.'">'.MP::x($lng['back']).'</a><br>';
 	$folders = $MP->messages->getDialogFilters();
+	if(($folders['_'] ?? '') == 'messages.dialogFilters')
+		$folders = $folders['filters'];
 	$hasArchiveChats = count($MP->messages->getDialogs([
 		'limit' => 1, 
 		'exclude_pinned' => true,
@@ -150,7 +152,6 @@ try {
 					foreach($all as $d) {
 						$peer = $d['peer'];
 						if($peer > 0) continue;
-						$peer = MP::getLocalId($peer);
 						foreach($r['chats'] as $c) {
 							if($c['id'] != $peer) continue;
 							if(!($c['broadcast'] ?? false) && !in_array($d, $dialogs))
@@ -163,7 +164,6 @@ try {
 					foreach($all as $d) {
 						$peer = $d['peer'];
 						if($peer > 0) continue;
-						$peer = MP::getLocalId($peer);
 						foreach($r['chats'] as $c) {
 							if($c['id'] != $peer) continue;
 							if(($c['broadcast'] ?? false) && !in_array($d, $dialogs))
@@ -187,8 +187,9 @@ try {
 				}
 				if(count($f['include_peers']) > 0) {
 					foreach($f['include_peers'] as $p) {
+						$p = MP::getId($p);
 						foreach($all as $d) {
-							if($d['peer'] != MP::getId($p)) continue;
+							if($d['peer'] != $p) continue;
 							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
 							break;
 						}
@@ -196,8 +197,9 @@ try {
 				}
 				if(count($f['exclude_peers']) > 0) {
 					foreach($f['exclude_peers'] as $p) {
+						$p = MP::getId($p);
 						foreach($dialogs as $idx => $d) {
-							if($d['peer'] != MP::getId($p)) continue;
+							if($d['peer'] != $p) continue;
 							unset($dialogs[$idx]);
 							break;
 						}
@@ -240,8 +242,9 @@ try {
 				if(count($f['pinned_peers']) > 0) {
 					$pinned = array();
 					foreach($f['pinned_peers'] as $p) {
+						$p = MP::getId($p);
 						foreach($all as $d) {
-							if($d['peer'] == MP::getId($p)) {
+							if($d['peer'] == $p) {
 								if(in_array($d, $dialogs)) unset($dialogs[array_search($d, $dialogs)]);
 								array_push($pinned, $d);
 								break;
@@ -263,9 +266,8 @@ try {
 			if($fid == 0 && isset($d['folder_id']) && $d['folder_id'] == 1) continue;
 			$id = $d['peer'] ?? $d;
 			$name = null;
-			$lid = MP::getLocalId($id);
 			foreach(($r[$id > 0 ? 'users' : 'chats']) as $p) {
-				if($p['id'] != $lid) continue;
+				if($p['id'] != $id) continue;
 				if(isset($p['title'])) {
 					$name = $p['title'];
 				} elseif(isset($p['first_name'])) {

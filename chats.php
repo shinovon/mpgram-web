@@ -93,6 +93,8 @@ try {
 	echo ' <a href="sets.php">'.MP::x($lng['settings']).'</a>';
 	echo '</div>';
 	$folders = $MP->messages->getDialogFilters();
+	if(($folders['_'] ?? '') == 'messages.dialogFilters')
+		$folders = $folders['filters'];
 	$hasArchiveChats = count($MP->messages->getDialogs([
 		'limit' => 1, 
 		'exclude_pinned' => true,
@@ -102,7 +104,7 @@ try {
 		echo '<div>';
 		echo '<b>'.MP::x($lng['folders']).'</b>: ';
 		foreach($folders as $f) {
-			if(!isset($f['id'])) {
+			if(($f['_'] ?? '') == 'dialogFilterDefault' || !isset($f['id'])) {
 				echo '<a href="chats.php">'.MP::x($lng['all_chats']).'</a> ';
 			} else {
 				$sel = $fid == $f['id'];
@@ -185,7 +187,6 @@ try {
 					foreach($all as $d) {
 						$peer = $d['peer'];
 						if($peer > 0) continue;
-						$peer = MP::getLocalId($peer);
 						foreach($r['chats'] as $c) {
 							if($c['id'] != $peer) continue;
 							if(!($c['broadcast'] ?? false) && !in_array($d, $dialogs))
@@ -198,7 +199,6 @@ try {
 					foreach($all as $d) {
 						$peer = $d['peer'];
 						if($peer > 0) continue;
-						$peer = MP::getLocalId($peer);
 						foreach($r['chats'] as $c) {
 							if($c['id'] != $peer) continue;
 							if(($c['broadcast'] ?? false) && !in_array($d, $dialogs))
@@ -222,8 +222,9 @@ try {
 				}
 				if(count($f['include_peers']) > 0) {
 					foreach($f['include_peers'] as $p) {
+						$p = MP::getId($p);
 						foreach($all as $d) {
-							if($d['peer'] != MP::getId($p)) continue;
+							if($d['peer'] != $p) continue;
 							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
 							break;
 						}
@@ -231,8 +232,9 @@ try {
 				}
 				if(count($f['exclude_peers']) > 0) {
 					foreach($f['exclude_peers'] as $p) {
+						$p = MP::getId($p);
 						foreach($dialogs as $idx => $d) {
-							if($d['peer'] != MP::getId($p)) continue;
+							if($d['peer'] != $p) continue;
 							unset($dialogs[$idx]);
 							break;
 						}
@@ -263,8 +265,9 @@ try {
 				if(count($f['pinned_peers']) > 0) {
 					$pinned = array();
 					foreach($f['pinned_peers'] as $p) {
+						$p = MP::getId($p);
 						foreach($all as $d) {
-							if($d['peer'] != MP::getId($p)) continue;
+							if($d['peer'] != $p) continue;
 							if(in_array($d, $dialogs)) {
 								unset($dialogs[array_search($d, $dialogs)]);
 							}
@@ -318,9 +321,8 @@ try {
 				}
 				echo '<td class="ctext cbd">';
 				echo '<a href="'.$cl.'"><b>';
-				$lid = MP::getLocalId($id);
 				foreach(($r[$id > 0 ? 'users' : 'chats']) as $p) {
-					if($p['id'] != $lid) continue;
+					if($p['id'] != $id) continue;
 					$broadcast = $p['broadcast'] ?? false;
 					if(isset($p['title'])) {
 						$n = $p['title'];
