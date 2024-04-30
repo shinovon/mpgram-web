@@ -30,7 +30,8 @@ try {
 	$info = $info['User'] ?? $info['Chat'] ?? $info;
 	try {
 		$di = $MP->getPropicInfo($info);
-	} catch (Exception) {
+	} catch (Exception) {}
+	if($di === null) {
 		header('Content-Type: image/png');
 		if((int) $cid < 0) {
 			echo file_get_contents('gr.png');
@@ -86,4 +87,5 @@ try {
 	}
 } catch (Exception $e) {
 	http_response_code(500);
+	echo '<xmp>'.$e.'</xmp>';
 }
