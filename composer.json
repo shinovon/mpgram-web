@@ -2,7 +2,7 @@
     "name": "shinovon/mpgram-web",
     "type": "project",
     "require": {
-        "danog/madelineproto": "8.0",
+        "danog/madelineproto": "8.0-beta204",
         "chillerlan/php-qrcode": "^5.0@beta"
     },
     "minimum-stability": "beta"
