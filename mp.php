@@ -843,10 +843,13 @@ class MP {
 	}
 
 	static function getSetting($name, $def=null, $write=false) {
+		startSession();
 		$x = $def;
 		if(isset($_GET[$name])) {
 			$x = $_GET[$name];
 			$write = true;
+		} elseif(isset($_SESSION[$name])) {
+			$x = $_SESSION[$name];
 		} elseif(isset($_COOKIE[$name])) {
 			$x = $_COOKIE[$name];
 			if(strpos($x, ', ') !== false) {
@@ -854,15 +857,19 @@ class MP {
 			}
 		}
 		if($x && $write) {
-			static::cookie($name, $x, time() + (86400 * 365));
+			$_SESSION[$name] = $x;
+			//static::cookie($name, $x, time() + (86400 * 365));
 		}
 		return $x;
 	}
 
 	static function getSettingInt($name, $def=0, $write=false) {
+		startSession();
 		$x = $def;
 		if(isset($_GET[$name])) {
-			$x = (int)$_GET[$name];
+			$x = (int) $_GET[$name];
+		} elseif(isset($_SESSION[$name])) {
+			$x = (int) $_SESSION[$name];
 		} elseif(isset($_COOKIE[$name])) {
 			$x = $_COOKIE[$name];
 			if(strpos($x, ', ') !== false) {
@@ -871,9 +878,19 @@ class MP {
 			$x = (int)$x;
 		}
 		if($x && $write) {
-			static::cookie($name, $x, time() + (86400 * 365));
+			$_SESSION[$name] = $x;
+			//static::cookie($name, $x, time() + (86400 * 365));
 		}
 		return $x;
+	}
+	
+	static function startSession() {
+		if(defined('session_started')) return;
+		ini_set('session.cookie_lifetime', 365 * 60 * 60 * 24);
+		ini_set('session.gc_maxlifetime', 365 * 60 * 60 * 24);
+		
+		session_start();
+		define('session_started', true);
 	}
 
 	static function getIEVersion() {

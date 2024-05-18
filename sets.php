@@ -21,6 +21,11 @@ $photosize = 180;
 $bgsize = 240;
 $set = isset($_GET['set']);
 include 'mp.php';
+
+ini_set('session.cookie_lifetime', 60 * 60 * 24 * 100);
+ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 100);
+session_start();
+
 if($set) {
 	$autoupd = isset($_GET['autoupd']) ? 1 : 0;
 	$reverse = isset($_GET['reverse']) ? 1 : 0;
@@ -73,22 +78,24 @@ if($set) {
 	$pngava = isset($_GET['pngava']) ? 1 : 0;
 	$oldchat = isset($_GET['oldchat']) ? 1 : 0;
 	MP::cookie('lang', $lang, time() + (86400 * 365));
-	MP::cookie('autoupd', $autoupd, time() + (86400 * 365));
+	MP::cookie('autoupd', $updint, time() + (86400 * 365));
 	MP::cookie('updint', $updint, time() + (86400 * 365));
 	MP::cookie('theme', $theme, time() + (86400 * 365));
-	MP::cookie('chats', $chats, time() + (86400 * 365));
-	MP::cookie('reverse', $reverse, time() + (86400 * 365));
-	MP::cookie('autoscroll', $autoscroll, time() + (86400 * 365));
-	MP::cookie('limit', $limit, time() + (86400 * 365));
-	MP::cookie('avas', $avas, time() + (86400 * 365));
-	MP::cookie('texttop', $texttop, time() + (86400 * 365));
-	MP::cookie('longpoll', $longpoll, time() + (86400 * 365));
-	MP::cookie('status', $status, time() + (86400 * 365));
-	MP::cookie('imgs', $imgs, time() + (86400 * 365));
-	MP::cookie('pngava', $pngava, time() + (86400 * 365));
-	MP::cookie('oldchat', $oldchat, time() + (86400 * 365));
-	MP::cookie('photosize', $photosize, time() + (86400 * 365));
-	MP::cookie('bgsize', $bgsize, time() + (86400 * 365));
+	
+	$_SESSION['autoupd'] = $autoupd;
+	$_SESSION['chats'] = $chats;
+	$_SESSION['reverse'] = $reverse;
+	$_SESSION['autoscroll'] = $autoscroll;
+	$_SESSION['limit'] = $limit;
+	$_SESSION['avas'] = $avas;
+	$_SESSION['texttop'] = $texttop;
+	$_SESSION['longpoll'] = $longpoll;
+	$_SESSION['status'] = $status;
+	$_SESSION['imgs'] = $imgs;
+	$_SESSION['pngava'] = $pngava;
+	$_SESSION['oldchat'] = $oldchat;
+	$_SESSION['photosize'] = $photosize;
+	$_SESSION['bgsize'] = $bgsize;
 } else {
 	if(isset($_COOKIE['lang']))
 		$lang = $_COOKIE['lang'];
@@ -99,31 +106,41 @@ if($set) {
 	if(isset($_COOKIE['theme']))
 		$theme = (int)$_COOKIE['theme'];
 	if(isset($_COOKIE['chats']))
-		$chats = (int)$_COOKIE['chats'];
-	if(isset($_COOKIE['reverse']))
-		$reverse = (int)$_COOKIE['reverse'];
-	if(isset($_COOKIE['autoscroll']))
-		$autoscroll = (int)$_COOKIE['autoscroll'];
-	if(isset($_COOKIE['limit']))
-		$limit = (int)$_COOKIE['limit'];
-	if(isset($_COOKIE['avas']))
-		$avas = (int)$_COOKIE['avas'];
-	if(isset($_COOKIE['texttop']))
-		$texttop = (int)$_COOKIE['texttop'];
-	if(isset($_COOKIE['longpoll']))
-		$longpoll = (int)$_COOKIE['longpoll'];
-	if(isset($_COOKIE['status']))
-		$status = (int)$_COOKIE['status'];
-	if(isset($_COOKIE['imgs']))
-		$imgs = (int)$_COOKIE['imgs'];
-	if(isset($_COOKIE['pngava']))
-		$pngava = (int)$_COOKIE['pngava'];
-	if(isset($_COOKIE['oldchat']))
-		$oldchat = (int)$_COOKIE['oldchat'];
-	if(isset($_COOKIE['photosize']))
-		$photosize = (int)$_COOKIE['photosize'];
-	if(isset($_COOKIE['bgsize']))
-		$bgsize = (int)$_COOKIE['bgsize'];
+	
+	if(isset($_SESSION['lang']))
+		$lang = $_SESSION['lang'];
+	if(isset($_SESSION['autoupd']))
+		$autoupd = (int)$_SESSION['autoupd'];
+	if(isset($_SESSION['updint']))
+		$updint = (int)$_SESSION['updint'];
+	if(isset($_SESSION['theme']))
+		$theme = (int)$_SESSION['theme'];
+	if(isset($_SESSION['chats']))
+		$chats = (int)$_SESSION['chats'];
+	if(isset($_SESSION['reverse']))
+		$reverse = (int)$_SESSION['reverse'];
+	if(isset($_SESSION['autoscroll']))
+		$autoscroll = (int)$_SESSION['autoscroll'];
+	if(isset($_SESSION['limit']))
+		$limit = (int)$_SESSION['limit'];
+	if(isset($_SESSION['avas']))
+		$avas = (int)$_SESSION['avas'];
+	if(isset($_SESSION['texttop']))
+		$texttop = (int)$_SESSION['texttop'];
+	if(isset($_SESSION['longpoll']))
+		$longpoll = (int)$_SESSION['longpoll'];
+	if(isset($_SESSION['status']))
+		$status = (int)$_SESSION['status'];
+	if(isset($_SESSION['imgs']))
+		$imgs = (int)$_SESSION['imgs'];
+	if(isset($_SESSION['pngava']))
+		$pngava = (int)$_SESSION['pngava'];
+	if(isset($_SESSION['oldchat']))
+		$oldchat = (int)$_SESSION['oldchat'];
+	if(isset($_SESSION['photosize']))
+		$photosize = (int)$_SESSION['photosize'];
+	if(isset($_SESSION['bgsize']))
+		$bgsize = (int)$_SESSION['bgsize'];
 }
 
 $lng = MP::initLocale();
@@ -194,7 +211,7 @@ foreach($bgsizes as $v) {
 	echo '<input type="radio" name="bgsize"'.($bgsize==$v ? ' checked' : '').' value="'.$v.'">'.MP::x($v).'<br>';
 }
 echo '<p><input type="submit"></p>';
-echo '</form>';
+echo '</form><br>';
 if(MP::getUser()) {
 	echo '<p><a href="login.php?logout=2">'.MP::x($lng['logout']).'</a></p>';
 }

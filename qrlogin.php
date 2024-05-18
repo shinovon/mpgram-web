@@ -3,11 +3,6 @@
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-session_start();
-$logout = isset($_GET['logout']);
-if($logout) {
-	$_SESSION = array();
-}
 
 $user = null;
 $nouser = true;
@@ -23,6 +18,11 @@ function exceptions_error_handler($severity, $message, $filename, $lineno) {
 set_error_handler('exceptions_error_handler');
 
 include 'mp.php';
+MP::startSession();
+$logout = isset($_GET['logout']);
+if($logout) {
+	$_SESSION = [];
+}
 $user = MP::getUser();
 $nouser = $user == null || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
 
@@ -113,8 +113,8 @@ if(!$qr) {
 				echo MP::x($lng['pass_code']).':<br>';
 				echo '<form action="qrlogin.php"'.($post?' method="post"':'').'>';
 				echo '<input type="text" name="pass">';
-				if($phone !== null)
-					echo '<input type="hidden" name="phone" value="'.$phone.'">';
+				//if($phone !== null)
+				//	echo '<input type="hidden" name="phone" value="'.$phone.'">';
 				echo '<input type="submit">';
 				echo '</form>';
 				echo '<b>'.MP::x($lng['password_hash_invalid']).'</b><br>';
@@ -135,8 +135,8 @@ if(!$qr) {
 		echo MP::x($lng['pass_code']).':<br>';
 		echo '<form action="qrlogin.php"'.($post?' method="post"':'').'>';
 		echo '<input type="text" name="pass">';
-		if($phone !== null)
-			echo '<input type="hidden" name="phone" value="'.$phone.'">';
+		//if($phone !== null)
+		//	echo '<input type="hidden" name="phone" value="'.$phone.'">';
 		echo '<input type="submit">';
 		echo '</form>';
 		echo Themes::bodyEnd();

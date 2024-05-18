@@ -97,6 +97,7 @@ class Themes {
 		}
 		.ct {
 			margin-left: 2px;
+			overflow: hidden;
 			color: '.(static::$theme == 0 ? '#aaa' : '#444').';
 		}
 		.m {
