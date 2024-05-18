@@ -22,9 +22,7 @@ $bgsize = 240;
 $set = isset($_GET['set']);
 include 'mp.php';
 
-ini_set('session.cookie_lifetime', 60 * 60 * 24 * 100);
-ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 100);
-session_start();
+MP::startSession();
 
 if($set) {
 	$autoupd = isset($_GET['autoupd']) ? 1 : 0;
@@ -77,12 +75,15 @@ if($set) {
 	$imgs = isset($_GET['imgs']) ? 1 : 0;
 	$pngava = isset($_GET['pngava']) ? 1 : 0;
 	$oldchat = isset($_GET['oldchat']) ? 1 : 0;
+	
 	MP::cookie('lang', $lang, time() + (86400 * 365));
-	MP::cookie('autoupd', $updint, time() + (86400 * 365));
 	MP::cookie('updint', $updint, time() + (86400 * 365));
 	MP::cookie('theme', $theme, time() + (86400 * 365));
 	
+	$_SESSION['lang'] = $lang;
 	$_SESSION['autoupd'] = $autoupd;
+	$_SESSION['updint'] = $updint;
+	$_SESSION['theme'] = $theme;
 	$_SESSION['chats'] = $chats;
 	$_SESSION['reverse'] = $reverse;
 	$_SESSION['autoscroll'] = $autoscroll;
@@ -106,6 +107,31 @@ if($set) {
 	if(isset($_COOKIE['theme']))
 		$theme = (int)$_COOKIE['theme'];
 	if(isset($_COOKIE['chats']))
+		$chats = (int)$_COOKIE['chats'];
+	if(isset($_COOKIE['reverse']))
+		$reverse = (int)$_COOKIE['reverse'];
+	if(isset($_COOKIE['autoscroll']))
+		$autoscroll = (int)$_COOKIE['autoscroll'];
+	if(isset($_COOKIE['limit']))
+		$limit = (int)$_COOKIE['limit'];
+	if(isset($_COOKIE['avas']))
+		$avas = (int)$_COOKIE['avas'];
+	if(isset($_COOKIE['texttop']))
+		$texttop = (int)$_COOKIE['texttop'];
+	if(isset($_COOKIE['longpoll']))
+		$longpoll = (int)$_COOKIE['longpoll'];
+	if(isset($_COOKIE['status']))
+		$status = (int)$_COOKIE['status'];
+	if(isset($_COOKIE['imgs']))
+		$imgs = (int)$_COOKIE['imgs'];
+	if(isset($_COOKIE['pngava']))
+		$pngava = (int)$_COOKIE['pngava'];
+	if(isset($_COOKIE['oldchat']))
+		$oldchat = (int)$_COOKIE['oldchat'];
+	if(isset($_COOKIE['photosize']))
+		$photosize = (int)$_COOKIE['photosize'];
+	if(isset($_COOKIE['bgsize']))
+		$bgsize = (int)$_COOKIE['bgsize'];
 	
 	if(isset($_SESSION['lang']))
 		$lang = $_SESSION['lang'];

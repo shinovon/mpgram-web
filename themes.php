@@ -14,6 +14,9 @@ class Themes {
 		case 2:
 			$theme = 1;
 			break;
+		case 3:
+			$theme = 0;
+			break;
 		}
 		static::$theme = $theme;
 	}
@@ -23,19 +26,23 @@ class Themes {
 		case 2:
 			$theme = 1;
 			static::$bg = 1;
-			$bgsize = MP::getSettingInt('bgsize', 0);
-			switch($bgsize) {
-			case 240:
-			case 320:
-			case 640:
-			case 720:
-			case 1000:
-				static::$bgsize = $bgsize;
-				break;
-			default:
-				static::$bgsize = '';
-				break;
-			}
+			break;
+		case 3:
+			$theme = 0;
+			static::$bg = 1;
+			break;
+		}
+		$bgsize = MP::getSettingInt('bgsize', 0);
+		switch($bgsize) {
+		case 240:
+		case 320:
+		case 640:
+		case 720:
+		case 1000:
+			static::$bgsize = $bgsize;
+			break;
+		default:
+			static::$bgsize = '';
 			break;
 		}
 		static::$theme = $theme;

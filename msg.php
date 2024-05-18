@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 include 'mp.php';
-session_start();
+MP::startSession();
 $user = MP::getUser();
 if(!$user) {
 	header('Location: login.php?logout=1');
