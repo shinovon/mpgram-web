@@ -10,6 +10,8 @@ $timeoff = $_GET['t'] ?? 0;
 $offset = $_GET['o'] ?? -1;
 $timeout = $_GET['timeout'] ?? 30;
 $longpoll = isset($_GET['l']);
+$old = isset($_GET['ol']);
+$photosize = $_GET['ps'] ?? 0;
 $lng = MP::initLocale();
 
 function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
@@ -129,7 +131,7 @@ try {
 	unset($info);
 	echo $rm[0]['id'].'||';
 	MP::addUsers($r['users'], $r['chats']);
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true, false, false, $old, $photosize);
 	// Mark as read
 	try {
 		if($ch || (int)$id < 0) {

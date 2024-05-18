@@ -34,9 +34,9 @@ try {
 	if($di === null) {
 		header('Content-Type: image/png');
 		if((int) $cid < 0) {
-			echo file_get_contents('gr.png');
+			echo file_get_contents('img/gr.png');
 		} else {
-			echo file_get_contents('us.png');
+			echo file_get_contents('img/us.png');
 		}
 		header('Cache-Control: private, max-age=86400');
 		die;

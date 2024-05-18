@@ -21,7 +21,7 @@ try {
 	$cid = $_GET['c'];
 	$mid = $_GET['m'];
 	if(!is_numeric($cid) || !is_numeric($mid)) die;
-	if(strpos($cid, '-100') === 0) {
+	if(MP::isChannel($cid)) {
 		$msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
 	} else {
 		$msg = $MP->messages->getMessages(['peer' => $cid, 'id' => [$mid]]);
@@ -49,7 +49,7 @@ try {
 	$outpath = $inpath.'.mp3';
 	if(!file_exists($outpath)) {
 		$MP->downloadToFile($di, $inpath);
-		$res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$inpath.'" -b:a 64k -ac 1 -y -acodec mp3 "'.$outpath.'" 2>&1') ?? '';
+		$res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$inpath.'" -b:a 64k -ac 1 -y -acodec mp3 "'.$outpath.'"'.(WINDOWS?'':' 2>&1')) ?? '';
 		unlink($inpath);
 		if(strpos($res, 'failed') !== false) {
 			echo 'Conversion failed';

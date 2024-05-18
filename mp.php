@@ -5,6 +5,8 @@ define('mp_loaded', true);
 require_once("config.php");
 require_once("api_values.php");
 
+define("WINDOWS", stripos(PHP_OS, 'WIN') === 0);
+
 if(!defined("api_id") || api_id == 0) {
 	throw new Exception('api_id is not set!');
 }
@@ -194,7 +196,7 @@ class MP {
 		return $txt;
 	}
 	
-	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false) {
+	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false, $old=false, $photosize=0) {
 		$lastdate = date('d.m.y', time()-$timeoff);
 		foreach($rm as $m) {
 			try {
@@ -254,8 +256,25 @@ class MP {
 				}
 				if($fwname !== null && static::utflen($fwname) > 30)
 					$fwname = static::utfsubstr($fwname, 0, 30);
+				$href = "msg.php?c={$id}&m={$m['id']}";
+				$out = $m['out'] ?? false;
+				if($search) {
+					$href = "chat.php?c={$id}&m={$m['id']}";
+				} else {
+					$mparams = '';
+					if($out) $mparams .= '&o';
+					if($ch) $mparams .= '&ch';
+					if($ar !== null) {
+						if(!$ch && !$out && $ar['ban_users'] ?? false) $mparams .= '&b';
+						if($ar['delete_messages'] ?? false) $mparams .= '&d';
+						if($ch && $ar['edit_messages'] ?? false) $mparams .= '&e';
+					}
+					$href = "msg.php?c={$id}&m={$m['id']}{$mparams}";
+				}
 				if(!isset($m['action'])) {
 					echo "<div class=\"m\" id=\"msg_{$id}_{$m['id']}\">";
+					if(!$old) echo "<div class=\"mc".($out?' my':' mo')."\">";
+					echo "<div class=\"mh\" onclick=\"location.href='{$href}';\">";
 					if(!$pm && $uid != null && $l) {
 						echo "<b><a href=\"chat.php?c={$uid}\" class=\"mn\" {$color}>".static::dehtml($mname).'</a></b>';
 					} else {
@@ -263,25 +282,18 @@ class MP {
 					}
 					echo ' '.date("H:i", $mtime);
 					
-						if($m['media_unread']) {
-							echo ' •';
-						}
-					if($search) { // replace "message options" link to "go to message" in history search
-						echo " <small><a href=\"chat.php?c={$id}&m={$m['id']}\" class=\"u\">&gt;</a></small>";
-					} elseif($unswer) {
-						$mparams = '';
-						$out = $m['out'] ?? false;
-						if($out) $mparams .= '&o';
-						if($ch) $mparams .= '&ch';
-						if($ar !== null) {
-							if(!$ch && !$out && $ar['ban_users'] ?? false) $mparams .= '&b';
-							if($ar['delete_messages'] ?? false) $mparams .= '&d';
-							if($ch && $ar['edit_messages'] ?? false) $mparams .= '&e';
-						}
-						echo " <small><a href=\"msg.php?c={$id}&m={$m['id']}{$mparams}\" class=\"u\">".static::x($lng['msg_options'])."</a></small>";
+					if($m['media_unread']) {
+						echo ' •';
 					}
+					if($search) { // replace "message options" link to "go to message" in history search
+						echo " <small><a href=\"{$href}\" class=\"u\">&gt;</a></small>";
+					} elseif($unswer) {
+						echo " <small><a href=\"{$href}\" class=\"u\">".static::x($lng['msg_options'])."</a></small>";
+					}
+					echo '</div>';
 				} else {
 					echo "<div class=\"ma\" id=\"msg_{$id}_{$m['id']}\">";
+					if(!$old) echo "<div class=\"mc\">";
 				}
 				if($fwname != null) {
 					echo '<div class="mf">'.static::x($lng['fwd_from']).' <b>'.static::dehtml($fwname).'</b></div>';
@@ -333,14 +345,16 @@ class MP {
 				}
 				if(isset($m['message']) && strlen($m['message']) > 0) {
 					$text = $m['message'];
+					echo '<div class="mt">';
 					if(isset($m['entities']) && count($m['entities']) > 0) {
-						echo '<div class="mt">'.static::wrapRichText($text, $m['entities']).'</div>';
+						echo static::wrapRichText($text, $m['entities']);
 					} else {
-						echo '<div class="mt">'.str_replace("\n", "<br>", static::dehtml($text)).'</div>';
+						echo str_replace("\n", "<br>", static::dehtml($text));
 					}
+					echo '</div>';
 				}
 				if(isset($m['media'])) {
-					echo static::printMessageMedia($MP, $m, $id, $imgs, $lng);
+					echo static::printMessageMedia($MP, $m, $id, $imgs, $lng, false, $photosize);
 				}
 				if(isset($m['reply_markup'])) {
 					$rows = $m['reply_markup']['rows'] ?? [];
@@ -364,13 +378,15 @@ class MP {
 					echo static::parseMessageAction($m['action'], $mname1, $uid, $name, $lng, true, $MP);
 				}
 				echo '</div>';
+				if(!$old) echo '</div>';
 			} catch (Exception $e) {
 				echo "<xmp>{$e->getMessage()}\n{$e->getTraceAsString()}</xmp>";
 			}
 		}
 	}
 	
-	static function printMessageMedia($MP, $m, $id, $imgs, $lng, $mini=false) {
+	static function printMessageMedia($MP, $m, $id, $imgs, $lng, $mini=false, $ps=0) {
+		if($ps <= 0) $ps = 180;
 		$media = $m['media'];
 		$reason = null;
 		if(isset($media['photo'])) {
@@ -378,7 +394,7 @@ class MP {
 				if($mini) {
 					echo "<a href=\"chat.php?m={$m['id']}&c={$id}\"><img class=\"mi\" src=\"file.php?m={$m['id']}&c={$id}&p=rmin\"></img></a>";
 				} else {
-					echo "<div><a href=\"file.php?m={$m['id']}&c={$id}&p=rorig\"><img class=\"mi\" src=\"file.php?m={$m['id']}&c={$id}&p=rprev\"></img></a></div>";
+					echo "<div><a href=\"file.php?m={$m['id']}&c={$id}&p=rorig\"><img class=\"mi\" src=\"file.php?m={$m['id']}&c={$id}&p=rprev&s={$ps}\"></img></a></div>";
 				}
 			} else {
 				echo "<div><a href=\"file.php?m={$m['id']}&c={$id}&p=rorig\">".static::x($lng['photo'])."</a></div>";
@@ -387,7 +403,7 @@ class MP {
 			$thumb = isset($media['document']['thumbs']);
 			$d = $MP->getDownloadInfo($m);
 			$fn = $d['name'];
-			$fext = $d['ext'];
+			$fext = $d['ext'] ?? '';
 			$title = $filename = $fn.$fext;
 			$nameset = false;
 			$voice = false;
@@ -421,18 +437,14 @@ class MP {
 				$fq = 'rorig';
 				$audio = false;
 				$smallprev = false;
+				$ie = static::getIEVersion();
+				$png = PNG_STICKERS && ($ie == 0 || $ie > 4);
 				switch(strtolower(substr($fext, 1))) {
 					case 'webp':
 						if(strpos($d['name'], 'sticker_') === 0) {
-							$dl = true;
 							$open = false;
 							$img = true;
-							$ie = static::getIEVersion();
-							if(PNG_STICKERS && ($ie == 0 || $ie > 4)) {
-								$q = 'rstickerp';
-							} else {
-								$q = 'rsticker';
-							}
+							$q = 'rsticker'.($png?'p':'');
 						}
 						break;
 					case 'jpg':
@@ -447,6 +459,9 @@ class MP {
 						$img = false;
 						break;
 					case 'tgs':
+						$open = false;
+						$img = true;
+						$q = 'rtgs'.($png?'p':'');
 						break;
 					case 'mp3':
 						$img = false;
@@ -462,9 +477,9 @@ class MP {
 				} elseif($img && $imgs && !$mini) {
 					if($open) {
 						$filename = defined('FILE_REWRITE') && FILE_REWRITE ? "file/{$filename}" : "file.php";
-						echo "<div><a href=\"{$filename}?m={$m['id']}&c={$id}&p={$fq}\"><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}\"></img></a></div>";
+						echo "<div><a href=\"{$filename}?m={$m['id']}&c={$id}&p={$fq}\"><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}&s={$ps}\"></img></a></div>";
 					} else {
-						echo "<div><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}\"></img></div>";
+						echo "<div><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}&s={$ps}\"></img></div>";
 					}
 				} else {
 					$filename = defined('FILE_REWRITE') && FILE_REWRITE ? "file/{$filename}" : "file.php";
@@ -485,15 +500,17 @@ class MP {
 						if($dur > 0) {
 							echo static::durationstr($dur);
 						} else {
-							echo $size;
+							echo $size.(strlen($fext)>0?' '.static::dehtml(strtoupper(substr($fext,1))):'');
 						}
 						echo '</div>';
 					} else {
+						if(static::utflen($title) > 30)
+							$title = static::utfsubstr($title, 0, 30).'..';
 						echo '<a href="'.$url.'">'.static::dehtml($title).'</a></b><br>';
 						if($thumb && $imgs) {
-							echo "<a href=\"{$url}\"><img src=\"file.php?m={$m['id']}&c={$id}&p=thumb{$q}'\"></img></a><br>";
+							echo "<a href=\"{$url}\"><img src=\"file.php?m={$m['id']}&c={$id}&p=thumb{$q}&s={$ps}\"></img></a><br>";
 						}
-						echo $size;
+						echo $size.(strlen($fext)>0?' '.static::dehtml(strtoupper(substr($fext,1))):'');
 					}
 					echo '</div>';
 				}

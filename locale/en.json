@@ -118,5 +118,9 @@
 	"send_voice": "Send as voice message (Audio)",
 	"send_spoiler": "Hide with spoiler",
 	"set_png_avatar": "PNG avatars",
-	"ban_msg": "Ban user"
+	"ban_msg": "Ban user",
+	"set_old_chat": "Legacy chat look",
+	"set_theme_light_bg": "Light with background",
+	"set_chat_photos_size": "Photo preview size",
+	"set_bg_size": "Background image size"
 }

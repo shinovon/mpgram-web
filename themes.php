@@ -3,11 +3,44 @@ if(!defined('mp_loaded'))
 require_once 'mp.php';
 class Themes {
 	static $theme = 0;
+	static $bg = 0;
+	static $fill = 0;
+	static $round = 1;
+	static $bgsize = 240;
 	static $iev;
 	
 	static function setTheme($theme) {
+		switch($theme) {
+		case 2:
+			$theme = 1;
+			break;
+		}
 		static::$theme = $theme;
 	}
+	
+	static function setChatTheme($theme) {
+		switch($theme) {
+		case 2:
+			$theme = 1;
+			static::$bg = 1;
+			$bgsize = MP::getSettingInt('bgsize', 0);
+			switch($bgsize) {
+			case 240:
+			case 320:
+			case 640:
+			case 720:
+			case 1000:
+				static::$bgsize = $bgsize;
+				break;
+			default:
+				static::$bgsize = '';
+				break;
+			}
+			break;
+		}
+		static::$theme = $theme;
+	}
+	
 	static function bodyStart($a = null) {
 		if($a) {
 			return '<body '.$a.'>'.(static::$iev > 0 ? '<div class="bc">' : '');
@@ -39,6 +72,14 @@ class Themes {
 			'.(static::$theme == 0 ?
 			'background: #000;
 			color: #eee;' : 'color: #111;').'
+			'.(static::$bg ?
+			'background-attachment: fixed;
+			background-image: url(/img/bg'.static::$bgsize.'.png);
+			'.(static::$bgsize == 1000 ?
+			'background-repeat: repeat;' : 
+			'background-size: cover;
+			background-repeat: no-repeat;')
+			 : '').'
 		}
 		a {
 			'.(static::$theme == 0 ?
@@ -56,19 +97,48 @@ class Themes {
 		}
 		.ct {
 			margin-left: 2px;
-			overflow: hidden;
 			color: '.(static::$theme == 0 ? '#aaa' : '#444').';
 		}
 		.m {
 			margin-left: 2px;
 			margin-bottom: 7px;
+			width: 99%;
+		}
+		.mc {
+			display: table;
+			width: auto;
+			overflow: hidden;
+			'.(static::$round ?
+			'border-radius: 6px;
+			padding-top: 4px;
+			padding-left: 6px;
+			padding-bottom: 4px;
+			padding-right: 4px;' :
+			'padding-left: 4px;
+			padding-top: 2px;
+			padding-bottom: 4px;
+			padding-right: 4px;
+			').'
+		}
+		.my {
+			margin-left: auto; 
+			'.(static::$bg || static::$fill ? 'background-color: ' : 'border: 1px solid ').
+			(static::$theme == 0 ? '#333' : '#eee').';
+		}
+		.mo {
+			'.(static::$bg || static::$fill ? 'background-color: ' : 'border: 1px solid ').
+			(static::$theme == 0 ? '#222' : '#eaeaea').';
 		}
 		.r, .mw {
+			display: block;
 			text-align: left;
 			border-left: 2px solid '.(static::$theme == 0 ? 'white' : '#168acd').';
 			padding-left: 4px;
 			margin-bottom: 2px;
 			margin-top: 2px;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
 		}
 		.rn, .mwt {
 			'.(static::$theme == 0 ? '' : 'color: #37a1de;').
@@ -91,7 +161,9 @@ class Themes {
 		}
 		.c {
 			min-height: 42px;
-			margin: 0px;
+			margin: 0px;'
+			.(static::$bg ? (static::$theme == 0 ?
+			'background: #111;' : 'background: #ddd;') : '').'
 		}
 		.cm {
 			color: '.(static::$theme == 0 ? '#ccc' : '#111').';

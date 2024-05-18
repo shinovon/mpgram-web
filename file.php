@@ -29,8 +29,10 @@ try {
 	if(isset($_GET['sticker'])) {
 		$di = $MP->getDownloadInfo(['_' => 'document', 'id' => (int)$_GET['sticker'], 'access_hash' => (int)$_GET['access_hash'], 'attributes' => [], 'dc_id' => 2, 'mime_type' => 'image/webp']);
 	} else {
+		if(!isset($_GET['c']) || !isset($_GET['m'])) die;
 		$cid = $_GET['c'];
 		$mid = $_GET['m'];
+		if(!is_numeric($cid) || !is_numeric($mid)) die;
 		if(MP::isChannel($cid)) {
 			$msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
 		} else {
@@ -48,6 +50,10 @@ try {
 		echo 'File is too large!';
 		die;
 	}
+
+	$size = 180;
+	if(isset($_GET['s'])) $size = (int) $_GET['s'];
+	if($size <= 0) $size = 180;
 	
 	$p = $_GET['p'] ?? '';
 	if(strpos($p, 'thumb') === 0) {
@@ -66,6 +72,53 @@ try {
 	if(strpos($p, 'r') === 0) {
 		header('Cache-Control: private, max-age=86400');
 		$p = substr($p, 1);
+		if(strpos($p, 'tgs') === 0) {
+			if(!CONVERT_TGS_STICKERS) {
+				http_response_code(403);
+				die;
+			}
+			$p = substr($p, 3);
+			$png = strpos($p, 'p') === 0;
+			$gif = LOTTIE_TO_GIF;
+			$inpath = TGS_TMP_DIR.\hash('crc32',$user).$cid.'_'.$mid;
+			$outpath = $inpath.($gif?'.gif':'.png');
+			$inpath .= '.tgs';
+			if(!file_exists($outpath)) {
+				if(!file_exists($inpath)) {
+					$MP->downloadToFile($di, $inpath);
+				}
+				$res = null;
+				if($gif) {
+					$res = shell_exec(LOTTIE_DIR.'lottie_to_gif.sh --output "'.$outpath.'" --width 180 --quality 70 --threads 1 --fps 10 "'.$inpath.'"'.(WINDOWS?'':' 2>&1')) ?? '';
+				} else {
+					$res = shell_exec(LOTTIE_DIR.'lottie_to_png.sh --output "'.$outpath.'" --width 180 --threads 1 "'.$inpath.'"'.(WINDOWS?'':' 2>&1')) ?? '';
+				}
+				echo 1;
+				echo $res;
+				die;
+				unlink($inpath);
+			}
+			if(!file_exists($outpath)) {
+				http_response_code(500);
+				die;
+			}
+			if($gif) {
+				header('Content-Type: image/gif');
+				echo file_get_contents($outpath);
+				die;
+			} elseif($png) {
+				header('Content-Type: image/png');
+				echo file_get_contents($outpath);
+				die;
+			}
+			
+			header('Content-Type: image/jpeg');
+			$img = imagecreatefromstring(file_get_contents($outpath));
+			header('Content-Type: image/jpeg');
+			imagejpeg($img, null, $q);
+			imagedestroy($img);
+			die;
+		}
 		$payload = new Amp\ByteStream\Payload($MP->downloadToReturnedStream($di));
 		$img = imagecreatefromstring($payload->buffer());
 		$payload->close();
@@ -73,10 +126,10 @@ try {
 			$w1 = $w = imagesx($img);
 			$h1 = $h = imagesy($img);
 
-			if($w > 180) {
-				$h = ($h/$w)*180;
+			if($w > $size) {
+				$h = ($h/$w)*$size;
 				$h = (int)$h;
-				$w = 180;
+				$w = $size;
 				$temp = imagecreatetruecolor($w, $h);
 				$c = imagecolorallocatealpha($temp, 0, 0, 0, 127);
 				imagefill($temp, 0, 0, $c);
@@ -102,13 +155,13 @@ try {
 			if($p == 'orig') {
 				$q = 80;
 			} elseif($p == 'prev') {
-				if($w > 240) {
-					$h = ($h/$w)*240;
-					$w = 240;
+				if($w > $size) {
+					$h = ($h/$w)*$size;
+					$w = $size;
 					$img = resize($img, $w, $h);
-				} elseif($h > 180) {
-					$w = ($w/$h)*180;
-					$h = 180;
+				} elseif($h > $size) {
+					$w = ($w/$h)*$size;
+					$h = $size;
 					$img = resize($img, $w, $h);
 				}
 			} elseif($p == 'min') {
@@ -125,9 +178,9 @@ try {
 				}
 			} elseif($p == 'sticker') {
 				$q = 75;
-				if($w > 180) {
-					$h = ($h/$w)*180;
-					$w = 180;
+				if($w > $size) {
+					$h = ($h/$w)*$size;
+					$w = $size;
 					$img = resize($img, $w, $h);
 				} elseif($h > 90) {
 					$w = ($w/$h)*90;

@@ -22,6 +22,8 @@ $texttop = MP::getSettingInt('texttop', $sym3) == 1;
 $imgs = MP::getSettingInt('imgs', 1) == 1;
 $longpoll = MP::getSettingInt('longpoll', strpos($ua, 'AppleWebKit') || strpos($ua, 'Chrome') || strpos($ua, 'Symbian') || strpos($ua, 'SymbOS') || strpos($ua, 'Android')) == 1;
 $pngava = MP::getSettingInt('pngava', 0);
+$old = MP::getSettingInt('oldchat', 0);
+$photosize = MP::getSettingInt('photosize', 0);
 
 $lng = MP::initLocale();
 
@@ -64,7 +66,7 @@ function exceptions_error_handler($severity, $message, $filename, $lineno) {
 set_error_handler('exceptions_error_handler');
 
 include 'themes.php';
-Themes::setTheme($theme);
+Themes::setChatTheme($theme);
 
 try {
 	$MP = MP::getMadelineAPI($user);
@@ -199,7 +201,7 @@ var reverse = '.($reverse?'true':'false').';
 var autoscroll = '.($autoscroll?'true':'false').';
 var longpoll = '.($longpoll?'true':'false').';
 var updint = '.($longpoll?'1000':$updint.'000').';
-var url = "'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&lang='.$lng['lang'].'&t='.$timeoff.($longpoll?'&l':'').'";
+var url = "'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&lang='.$lng['lang'].'&t='.$timeoff.($longpoll?'&l':'').($old?'&ol':'').'";
 var msglimit = '.$msglimit.';
 var msg = "'.$ii.'";';
 echo file_get_contents('chatupdate.js');
@@ -325,7 +327,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	}
 	if(!$texttop && !$reverse) echo '</p><p>';
 	echo '<div id="msgs">';
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true, $ar, $query !== null);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true, $ar, $query !== null, $old, $photosize);
 	echo '</div>';
 	if(!$reverse) {
 		if(count($rm) >= $msglimit) {
