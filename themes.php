@@ -126,7 +126,6 @@ class Themes {
 			padding-bottom: 4px;
 			padding-right: 4px;
 			').'
-			word-break: break-all;
 		}
 		.my {
 			margin-left: auto; 
@@ -327,6 +326,7 @@ class Themes {
 		pre {
 			display: inline;
 			white-space: pre-wrap;
+			word-break: break-all;
 		}
 		--></style>';
 	}
