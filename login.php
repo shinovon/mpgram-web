@@ -315,7 +315,7 @@ if($phone !== null) {
 				die;
 			}
 		} else {
-			$MP = MP::getMadelineAPI($user);
+			$MP = MP::getMadelineAPI($user, true);
 			htmlStart();
 		}
 	}

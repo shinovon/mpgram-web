@@ -35,14 +35,19 @@ try {
 	Themes::setTheme($theme);
 
 	$chat = $MP->getPwrChat($id);
+	
 	$name = $chat['title'] ?? (isset($chat['first_name']) ? $chat['first_name'] . (isset($chat['last_name']) ? ' '.$chat['last_name'] : '') : null) ?? 'Deleted Account';
 	$type = $chat['type'];
 
 	$desc = null;
+	
+	$fullinfo = $MP->getFullInfo($id)['full'] ?? null;
+	$pin = $fullinfo['pinned_msg_id'] ?? false;
 
 	if($type != 'user') {
-		$desc = $MP->getFullInfo($id)['full']['about'] ?? null;
+		$desc = $fullinfo['about'] ?? null;
 		$members = $chat['participants'] ?? null;
+		$memberscount = $chat['participants_count'] ?? false;
 		$onlines = 0;
 
 		if($members) {
@@ -68,7 +73,7 @@ try {
 	echo '</div>';
 	echo '<div>';
 	if($type != 'user' && !empty($members)) {
-		echo MP::x(MPLocale::number($type == 'chat' ? 'members' : 'subscribers', count($members)));
+		echo MP::x(MPLocale::number($type == 'chat' ? 'members' : 'subscribers', $memberscount !== false ? $memberscount : count($members)));
 		if($onlines > 0) {
 			echo ', ' . strval($onlines) . ' ' . MP::x($lng['online']);
 		}
@@ -89,13 +94,27 @@ try {
 		if(isset($chat['username'])) {
 			echo '<p>'.MP::x($lng['chat_username']).':<br>'.MP::dehtml($chat['username']).'</p>';
 		}
-	} else {
-		if(isset($chat['username'])) {
-			echo '<p>'.MP::x($lng['chat_link']).':<br>t.me/'.MP::dehtml($chat['username']).'</p>';
+	} elseif(isset($chat['username'])) {
+		echo '<p>'.MP::x($lng['chat_link']).':<br>t.me/'.MP::dehtml($chat['username']).'</p>';
+	}
+	if($pin) {
+		try {
+			$msg = $MP->messages->getHistory([
+				'peer' => $id,
+				'offset_id' => $pin,
+				'offset_date' => 0,
+				'add_offset' => -1,
+				'limit' => 1,
+				'hash' => 0])['messages'];
+			echo '<p>';
+			MP::printMessages($MP, $msg, $id, false, $type == 'channel', $lng, false, $name, MP::getSettingInt('timeoff'), false, false, null, true, false, 0, false);
+			echo '</p>';
+		} catch (Exception $e) {
+			echo $e;
 		}
-		echo '<p><a href="chat.php?c='.$id.'&leave">'.MP::x($lng['leave_chat']).'</a></p>';
 	}
 	echo '<p><a href="chatsearch.php?c='.$id.'">'.MP::x($lng['search_messages']).'</a> <a href="chatmedia.php?c='.$id.'">'.MP::x($lng['chat_media']).'</a></p>';
+	if($type != 'user') echo '<p><a href="chat.php?c='.$id.'&leave">'.MP::x($lng['leave_chat']).'</a></p>';
 	if($type != 'user' && $members) {
 		$avas = MP::getSettingInt('avas', 0);
 		echo MP::x($lng['chat_members']).':';
@@ -110,9 +129,6 @@ try {
 			echo '<tr class="c">';
 			$u = $m['user'] ?? $m['chat'] ?? $m['channel'];
 			$id = $u['id'];
-			if($u['type'] != 'user') {
-				$id = '-100'.$id;
-			}
 
 			$un = $u['title'] ?? (isset($u['first_name']) ? $u['first_name'] . (isset($u['last_name']) ? ' '.$u['last_name'] : '') : null) ?? 'Deleted Account';
 			$status = null;

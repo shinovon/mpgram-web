@@ -196,7 +196,7 @@ class MP {
 		return $txt;
 	}
 	
-	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false, $old=false, $photosize=0) {
+	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false, $old=false, $photosize=0, $showdate=true) {
 		$lastdate = date('d.m.y', time()-$timeoff);
 		foreach($rm as $m) {
 			try {
@@ -210,10 +210,10 @@ class MP {
 					$mname1 = static::utfsubstr($mname1, 0, 30);
 				$mname = null;
 				$l = false;
-				if($m['out'] && !$ch) {
+				if($m['out'] && !$ch && !$search) {
 					$uid = static::getSelfId($MP);
 					$mname = $lng['you'];
-				} elseif(($pm || $ch) && $name) {
+				} elseif(($pm || $ch) && $name && !$search) {
 					$uid = $id;
 					$mname = $name;
 				} else {
@@ -250,7 +250,7 @@ class MP {
 				}
 				$mtime = $m['date']-$timeoff;
 				$mdate = date('d.m.y', $mtime);
-				if($mdate !== $lastdate) {
+				if($mdate !== $lastdate && $showdate) {
 					echo "<div class=\"ma\">{$mdate}</div>";
 					$lastdate = $mdate;
 				}
@@ -273,7 +273,7 @@ class MP {
 				}
 				if(!isset($m['action'])) {
 					echo "<div class=\"m\" id=\"msg_{$id}_{$m['id']}\">";
-					if(!$old) echo "<div class=\"mc".($out?' my':' mo')."\">";
+					if(!$old) echo "<div class=\"mc".($out && !$search ?' my':' mo')."\">";
 					echo "<div class=\"mh\" onclick=\"location.href='{$href}';\">";
 					if(!$pm && $uid != null && $l) {
 						echo "<b><a href=\"chat.php?c={$uid}\" class=\"mn\" {$color}>".static::dehtml($mname).'</a></b>';
@@ -832,7 +832,7 @@ class MP {
 		return $sets;
 	}
 	
-	static function getMadelineAPI($user, $settings = true) {
+	static function getMadelineAPI($user, $settings = false) {
 		require_once 'vendor/autoload.php';
 		if($settings) {
 			$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline', static::getMadelineSettings());
