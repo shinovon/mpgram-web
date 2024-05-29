@@ -228,6 +228,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	$useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 	$avas = strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
 	$avas = MP::getSettingInt('avas', $avas) && strpos($useragent, 'SymbianOS/9') === false;
+	$statussett = MP::getSettingInt('status', 0);
 	if($iev != 0 && $iev <= 7) {
 		echo '<header>';
 		if($avas) {
@@ -248,13 +249,13 @@ setTimeout("location.reload(true);",'.$updint.'000);
 		echo ' <a href="chatinfo.php?c='.$id.'">'.MP::x($lng['chat_info']??null).'</a>';
 		echo '</small></div>';
 		$h = "height: 1.2em";
-		if($avas) {
+		if($avas && $statussett) {
 			$h = "height: 44px";
 			echo '<div class="chava"><img class="ri" src="ava.php?c='.$id.'&p='.($pngava?'rc':'r').'36"></div>';
 		}
 		echo '<div class="chn">';
 		echo MP::dehtml($name);
-		if(MP::getSettingInt('status')) {
+		if($statussett) {
 			$status = $info['User']['status'] ?? null;
 			$status_str = '';
 			if($status) {
@@ -301,7 +302,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 			echo '</div>';
 			if($status_str) {
 				if(!$avas) $h = "height: 2.2em";
-				echo '<br><small id="cst" class="cst">'.$status_str.'</small>';
+				echo '<small id="cst" class="cst">'.$status_str.'</small>';
 			}
 			echo '</div>';
 		} else {
