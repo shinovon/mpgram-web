@@ -85,8 +85,7 @@ class Themes {
 			'.(static::$bgsize == 1000 ?
 			'background-repeat: repeat;' : 
 			'background-size: cover;
-			background-repeat: no-repeat;')
-			 : '').'
+			background-repeat: no-repeat;') : '').'
 		}
 		a {
 			'.(static::$theme == 0 ?
@@ -127,6 +126,7 @@ class Themes {
 			padding-bottom: 4px;
 			padding-right: 4px;
 			').'
+			word-break: break-all;
 		}
 		.my {
 			margin-left: auto; 
@@ -258,7 +258,6 @@ class Themes {
 			width: 36px;
 		}
 		.chn {
-			display: inline;
 			text-overflow: ellipsis;
 			overflow: hidden;
 			white-space: nowrap;
@@ -325,8 +324,9 @@ class Themes {
 			margin-bottom: 4px;
 			margin-top: 4px;
 		}
-		.pre {
+		pre {
 			display: inline;
+			white-space: pre-wrap;
 		}
 		--></style>';
 	}

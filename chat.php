@@ -247,7 +247,9 @@ setTimeout("location.reload(true);",'.$updint.'000);
 		echo ' <a href="'.$file.'?c='.$id.'&upd=1">'.MP::x($lng['refresh']).'</a>';
 		echo ' <a href="chatinfo.php?c='.$id.'">'.MP::x($lng['chat_info']??null).'</a>';
 		echo '</small></div>';
+		$h = "height: 1.2em";
 		if($avas) {
+			$h = "height: 44px";
 			echo '<div class="chava"><img class="ri" src="ava.php?c='.$id.'&p='.($pngava?'rc':'r').'36"></div>';
 		}
 		echo '<div class="chn">';
@@ -296,16 +298,17 @@ setTimeout("location.reload(true);",'.$updint.'000);
 					break;
 				}
 			}
-			echo '</div><br><small id="cst" class="cst">'.$status_str.'</small></div>';
+			echo '</div>';
+			if($status_str) {
+				if(!$avas) $h = "height: 2.2em";
+				echo '<br><small id="cst" class="cst">'.$status_str.'</small>';
+			}
+			echo '</div>';
 		} else {
 			echo '</div></div>';
 		}
 		echo '</header>';
-		if($avas) {
-			echo '<div style="height: 36px;">&nbsp;</div>';
-		} else {
-			echo '<div>&nbsp;</div>';
-		}
+		echo "<div style=\"{$h};\">&nbsp;</div>";
 	}
 	unset($info);
 	$sname = $name ?? '';
