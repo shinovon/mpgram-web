@@ -239,6 +239,6 @@ foreach($bgsizes as $v) {
 echo '<p><input type="submit"></p>';
 echo '</form><br>';
 if(MP::getUser()) {
-	echo '<p><a href="login.php?logout=2">'.MP::x($lng['logout']).'</a></p>';
+	echo '<p><a class="bth ra" href="login.php?logout=2">'.MP::x($lng['logout']).'</a></p>';
 }
 echo Themes::bodyEnd();

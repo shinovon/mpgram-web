@@ -262,6 +262,11 @@ class Themes {
 			white-space: nowrap;
 			vertical-align: top;
 		}
+		.cin {
+			text-overflow: ellipsis;
+			overflow: hidden;
+			vertical-align: top;
+		}
 		.cst {
 			text-overflow: ellipsis;
 			overflow: hidden;
@@ -327,6 +332,20 @@ class Themes {
 			display: inline;
 			white-space: pre-wrap;
 			word-break: break-all;
+		}
+		.bth {
+			border: 1px solid '.(static::$theme == 0 ? '#444' : '#aaa').';
+			padding: 0 2px 0 2px;
+			border-radius: 4px;
+			background: '.(static::$theme == 0 ? '#222' : '#eee').';
+		}
+		.ra {
+			color: red;
+		}
+		.hb {
+			margin: 2px 0 2px 0;
+		}
+		.hed {
 		}
 		--></style>';
 	}

@@ -65,21 +65,19 @@ try {
 	echo Themes::head();
 	echo '</head>';
 	echo Themes::bodyStart();
-	echo '<div>';
-	echo '<div class="chr"><small><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></small></div>';
-	echo '<div class="cava"><img class="ri" src="ava.php?c='.$id.'&p='.($pngava?'rc':'r').'48"></div>';
-	echo '<div>';
+	echo '<div class="chc">';
+	echo '<div class="chr"><small><a class="bth" href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></small></div>';
+	echo '<div class="chava"><img class="ri" src="ava.php?c='.$id.'&p='.($pngava?'rc':'r').'48"></div>';
+	echo '<div class="cin">';
 	echo MP::dehtml($name);
-	echo '</div>';
-	echo '<div>';
+	echo '</div><div>';
 	if($type != 'user' && !empty($members)) {
-		echo MP::x(MPLocale::number($type == 'chat' ? 'members' : 'subscribers', $memberscount !== false ? $memberscount : count($members)));
+		echo MP::x(MPLocale::number($type == 'chat' || $type == 'supergroup' ? 'members' : 'subscribers', $memberscount !== false ? $memberscount : count($members)));
 		if($onlines > 0) {
 			echo ', ' . strval($onlines) . ' ' . MP::x($lng['online']);
 		}
 	}
-	echo '</div>';
-	echo '</div>';
+	echo '</div></div><br>';
 	if($desc) {
 		echo '<p>'.MP::x($lng['chat_about']).':<br>'.MP::dehtml($desc).'</p>';
 	}
@@ -113,8 +111,8 @@ try {
 			echo $e;
 		}
 	}
-	echo '<p><a href="chatsearch.php?c='.$id.'">'.MP::x($lng['search_messages']).'</a> <a href="chatmedia.php?c='.$id.'">'.MP::x($lng['chat_media']).'</a></p>';
-	if($type != 'user') echo '<p><a href="chat.php?c='.$id.'&leave">'.MP::x($lng['leave_chat']).'</a></p>';
+	echo '<p><a class="bth" href="chatsearch.php?c='.$id.'">'.MP::x($lng['search_messages']).'</a> <a class="bth" href="chatmedia.php?c='.$id.'">'.MP::x($lng['chat_media']).'</a>';
+	if($type != 'user') echo ' <a class="bth ra" href="chat.php?c='.$id.'&leave">'.MP::x($lng['leave_chat']).'</a></p>';
 	if($type != 'user' && $members) {
 		$avas = MP::getSettingInt('avas', 0);
 		echo MP::x($lng['chat_members']).':';

@@ -84,8 +84,8 @@ try {
 	if(isset($_GET['f'])) {
 		$fid = (int)$_GET['f'];
 	}
-	echo '<header>';
-	echo '<b>'.MP::x($selfname).'</b><div>';
+	echo '<div class="hed">';
+	echo '<b>'.MP::x($selfname).'</b><div class="hb">';
 	echo '<a href="chats.php?upd&f='.$fid.'">'.MP::x($lng['refresh']).'</a>';
 	echo ' <a href="chatselect.php">'.MP::x($lng['compactchats']).'</a>';
 	echo ' <a href="contacts.php">'.MP::x($lng['contacts']).'</a>';
@@ -122,7 +122,7 @@ try {
 		}
 		echo '</div>';
 	}
-	echo '<br></header>';
+	echo '</div><br>';
 	try {
 		$r = null;
 		$dialogs = null;

@@ -88,7 +88,7 @@ try {
 		$left = $info['Chat']['left'] ?? false;
 	} elseif(isset($info['User'])) {
 		$pm = true;
-		$name = MP::removeEmoji($info['User']['first_name'] ?? $info['User']['last_name'] ?? null);
+		$name = MP::getUserName($info['User'], true);
 	}
 	$channel = isset($info['channel_id']);
 	if($left && isset($_GET['join'])) {

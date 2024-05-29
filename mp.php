@@ -95,7 +95,8 @@ class MP {
 	
 	static function getUserName($p, $full = false) {
 		$last = isset($p['last_name']) ? trim($p['last_name']) : null;
-		return static::removeEmoji(isset($p['first_name']) ? trim($p['first_name']).($full && $last !== null ? ' '.$last : '') : ($last !== null ? $last : 'Deleted Account'));
+		$s = static::removeEmoji(isset($p['first_name']) ? trim($p['first_name']).($full && $last !== null ? ' '.$last : '') : ($last !== null ? $last : 'Deleted Account'));
+		return !$full && !$s ? static::removeEmoji("$last") : $s;
 	}
 
 	static function getSelfName($MP, $full = true) {
@@ -218,7 +219,7 @@ class MP {
 					$mname = $name;
 				} else {
 					$l = true;
-					$mname = $mname1 ? $mname1 : $name;
+					$mname = $mname1 !== null ? $mname1 : $name;
 				}
 				$color = '';
 				if($uid > 0 && isset(static::$users[$uid])) {
