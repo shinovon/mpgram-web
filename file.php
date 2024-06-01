@@ -106,8 +106,6 @@ try {
 				} else {
 					$res = shell_exec('bash `'.LOTTIE_DIR.'lottie_to_png.sh --output "'.$outpath.'" --width '.$size.' --height '.$size.' --threads 1 "'.$inpath.'"'.(WINDOWS?'':' 2>&1').'`') ?? '';
 				}
-				echo $res;
-				die;
 				unlink($inpath);
 			}
 			if(!file_exists($outpath)) {
