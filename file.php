@@ -77,14 +77,16 @@ try {
 				http_response_code(403);
 				die;
 			}
+			if($size >= 240) $size = 240;
 			if(!file_exists(TGS_TMP_DIR)) mkdir(TGS_TMP_DIR);
 			else {
 				try {
 					$scan = scandir(TGS_TMP_DIR);
+					$time = time();
 					foreach($scan as $n) {
 						if(strpos($n, '.tgs') === false && strpos($n, '.gif') === false && strpos($n, '.png') === false)
 							continue;
-						if(date('d.m.y', filemtime(TGS_TMP_DIR.$n)) == date('d.m.y', time()))
+						if(filectime("./{$n}/") + 30 * 60 > $time))
 							continue;
 						unlink(TGS_TMP_DIR.$n);
 					}
