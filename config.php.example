@@ -13,6 +13,7 @@ define('INSTANCE_PASSWORD', null);
 
 define('FILE_REWRITE', false);
 
+// https://github.com/ed-asriyan/lottie-converter
 define('CONVERT_TGS_STICKERS', false);
 define('LOTTIE_DIR', '');
 define('TGS_TMP_DIR', sys_get_temp_dir().'/mp/');

@@ -77,6 +77,19 @@ try {
 				http_response_code(403);
 				die;
 			}
+			if(!file_exists(TGS_TMP_DIR)) mkdir(TGS_TMP_DIR);
+			else {
+				try {
+					$scan = scandir(TGS_TMP_DIR);
+					foreach($scan as $n) {
+						if(strpos($n, '.tgs') === false && strpos($n, '.gif') === false && strpos($n, '.png') === false)
+							continue;
+						if(date('d.m.y', filemtime(TGS_TMP_DIR.$n)) == date('d.m.y', time()))
+							continue;
+						unlink(TGS_TMP_DIR.$n);
+					}
+				} catch (Exception) {}
+			}
 			$p = substr($p, 3);
 			$png = strpos($p, 'p') === 0;
 			$gif = LOTTIE_TO_GIF;
@@ -89,11 +102,10 @@ try {
 				}
 				$res = null;
 				if($gif) {
-					$res = shell_exec(LOTTIE_DIR.'lottie_to_gif.sh --output "'.$outpath.'" --width 180 --quality 70 --threads 1 --fps 10 "'.$inpath.'"'.(WINDOWS?'':' 2>&1')) ?? '';
+					$res = shell_exec('bash `'.LOTTIE_DIR.'lottie_to_gif.sh --output "'.$outpath.'" --width '.$size.' --height '.$size.' --quality 70 --threads 1 --fps 10 "'.$inpath.'"'.(WINDOWS?'':' 2>&1').'`') ?? '';
 				} else {
-					$res = shell_exec(LOTTIE_DIR.'lottie_to_png.sh --output "'.$outpath.'" --width 180 --threads 1 "'.$inpath.'"'.(WINDOWS?'':' 2>&1')) ?? '';
+					$res = shell_exec('bash `'.LOTTIE_DIR.'lottie_to_png.sh --output "'.$outpath.'" --width '.$size.' --height '.$size.' --threads 1 "'.$inpath.'"'.(WINDOWS?'':' 2>&1').'`') ?? '';
 				}
-				echo 1;
 				echo $res;
 				die;
 				unlink($inpath);
