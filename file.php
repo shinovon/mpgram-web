@@ -77,6 +77,10 @@ try {
 				http_response_code(403);
 				die;
 			}
+			if(($di['MessageMedia']['document']['size'] ?? 0) >= 512*1024) {
+				http_response_code(400);
+				die;
+			}
 			if($size >= 240) $size = 240;
 			if(!file_exists(TGS_TMP_DIR)) mkdir(TGS_TMP_DIR);
 			else {
@@ -86,7 +90,7 @@ try {
 					foreach($scan as $n) {
 						if(strpos($n, '.tgs') === false && strpos($n, '.gif') === false && strpos($n, '.png') === false)
 							continue;
-						if(filectime(TGS_TMP_DIR.$n) + 30 * 60 > $time))
+						if(filectime(TGS_TMP_DIR.$n) + 30 * 60 > $time)
 							continue;
 						unlink(TGS_TMP_DIR.$n);
 					}
