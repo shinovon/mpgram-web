@@ -73,7 +73,7 @@ try {
 		header('Cache-Control: private, max-age=86400');
 		$p = substr($p, 1);
 		if(strpos($p, 'tgs') === 0) {
-			if(!CONVERT_TGS_STICKERS) {
+			if(!defined('CONVERT_TGS_STICKERS') || !CONVERT_TGS_STICKERS) {
 				http_response_code(403);
 				die;
 			}
