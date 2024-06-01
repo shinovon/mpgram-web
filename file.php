@@ -86,7 +86,7 @@ try {
 					foreach($scan as $n) {
 						if(strpos($n, '.tgs') === false && strpos($n, '.gif') === false && strpos($n, '.png') === false)
 							continue;
-						if(filectime("./{$n}/") + 30 * 60 > $time))
+						if(filectime(TGS_TMP_DIR.$n) + 30 * 60 > $time))
 							continue;
 						unlink(TGS_TMP_DIR.$n);
 					}
