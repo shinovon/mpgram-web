@@ -42,8 +42,7 @@ try {
 			}
 			unlink(VOICE_TMP_DIR.$n);
 		}
-	} catch (Exception) {
-	}
+	} catch (Exception) {}
 	
 	$inpath = VOICE_TMP_DIR.\hash('crc32',$user).$cid.'_'.$mid;
 	$outpath = $inpath.'.mp3';

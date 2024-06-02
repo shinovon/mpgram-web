@@ -43,8 +43,8 @@ try {
 	echo '<b>'.MP::x($r['set']['title']).'</b><br>';
 	echo '<a href="addstickers.php?n='.$name.'&u='.urlencode($returnurl).'&c">'.MP::x($lng['install_stickerset']).'</a>';
 	echo '<p>';
-	foreach($r['documents'] as $d) {
-		echo '<img src="file.php?sticker='.$d['id'].'&access_hash='.$d['access_hash'].'&p=rsprev">';
+	foreach($r['documents'] as $v) {
+		echo '<img src="file.php?sticker='.$v['id'].'&access_hash='.$v['access_hash'].'&p=r'.(($v['mime_type'] ?? '') == 'application/x-tgsticker' ? 'tgss&s=100' : 'sprev').'">';
 	}
 	echo '</p>';
 	echo Themes::bodyEnd();

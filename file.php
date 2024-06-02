@@ -98,10 +98,10 @@ try {
 			}
 			$p = substr($p, 3);
 			$png = strpos($p, 'p') === 0;
-			$gif = LOTTIE_TO_GIF;
-			$inpath = TGS_TMP_DIR.\hash('crc32',$user).$cid.'_'.$mid;
-			$outpath = $inpath.($gif?'.gif':'.png');
-			$inpath .= '.tgs';
+			$gif = LOTTIE_TO_GIF && strpos($p, 's') === false;
+			$prefix = TGS_TMP_DIR.\hash('crc32',$user).(isset($_GET['sticker']) ? (int)$_GET['sticker'] : ($cid.'_'.$mid));
+			$outpath = $prefix.($gif?'.gif':'.png');
+			$inpath = $prefix.'.tgs';
 			if(!file_exists($outpath)) {
 				if(!file_exists($inpath)) {
 					$MP->downloadToFile($di, $inpath);
@@ -110,8 +110,31 @@ try {
 				if($gif) {
 					$res = shell_exec('bash `'.LOTTIE_DIR.'lottie_to_gif.sh --output "'.$outpath.'" --width '.$size.' --height '.$size.' --quality 70 --threads 1 --fps 10 "'.$inpath.'"'.(WINDOWS?'':' 2>&1').'`') ?? '';
 				} else {
-					$res = shell_exec('bash `'.LOTTIE_DIR.'lottie_to_png.sh --output "'.$outpath.'" --width '.$size.' --height '.$size.' --threads 1 "'.$inpath.'"'.(WINDOWS?'':' 2>&1').'`') ?? '';
+					$outpath = $prefix;
+					$res = shell_exec('bash `'.LOTTIE_DIR.'lottie_to_png.sh --output "'.$outpath.'" --width '.$size.' --height '.$size.' --quality 70 --threads 1 --fps 10 "'.$inpath.'"'.(WINDOWS?'':' 2>&1').'`') ?? '';
+					if(file_exists($outpath.'/')) {
+						if(file_exists($outpath.'/000.png')) {
+							rename($outpath.'/000.png', $outpath.'.png');
+						}
+						$scan = scandir($outpath.'/');
+						foreach($scan as $n) {
+							if($n == '.' || $n == '..') continue;
+							if(is_dir($outpath.'/'.$n)) {
+								foreach(scandir($outpath.'/'.$n.'/') as $n2) {
+									if($n2 == '.' || $n2 == '..') continue;
+									unlink($outpath.'/'.$n.'/'.$n2);
+								}
+								rmdir($outpath.'/'.$n);
+								continue;
+							}
+							unlink($outpath.'/'.$n);
+						}
+						rmdir($outpath.'/');
+						$outpath.='.png';
+					}
 				}
+			}
+			if(file_exists($inpath)) {
 				unlink($inpath);
 			}
 			if(!file_exists($outpath)) {
@@ -130,8 +153,7 @@ try {
 			
 			header('Content-Type: image/jpeg');
 			$img = imagecreatefromstring(file_get_contents($outpath));
-			header('Content-Type: image/jpeg');
-			imagejpeg($img, null, $q);
+			imagejpeg($img, null, 40);
 			imagedestroy($img);
 			die;
 		}
