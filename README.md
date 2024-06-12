@@ -22,6 +22,7 @@ You can deploy your own instance quickly with Docker Compose - [see how](https:/
 - Install Composer v2+
 - Install MadelineProto and its dependencies with `composer update`
 - Make a background script that restarts php service at least every hour
+- Set `session.gc_maxlifetime = 8640000` in `php.ini`
 - For more details on installing MadelineProto <a href="https://docs.madelineproto.xyz/docs/REQUIREMENTS.html">see here</a>
 
 ### Animated stickers conversion (Optional)
