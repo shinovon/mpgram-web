@@ -13,7 +13,7 @@ define('INSTANCE_PASSWORD', null);
 
 define('FILE_REWRITE', false);
 
-// https://github.com/ed-asriyan/lottie-converter
+// https://github.com/ed-asriyan/lottie-converter (Add "#!/usr/bin/env bash" as first line in its bash scripts!)
 define('CONVERT_TGS_STICKERS', false);
 define('LOTTIE_DIR', '');
 define('TGS_TMP_DIR', sys_get_temp_dir().'/mp/');
