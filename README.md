@@ -2,10 +2,6 @@
 
 Lightweight Telegram web client based on MadelineProto.
 
-Test instance is available at <a href="https://mp.nnchan.ru/">https://mp.nnchan.ru</a> (not guaranteed to run a stable version).
-
-_It is highly recommended to run your own instance (read on)._
-
 ## Setup
 
 - Generate your own API id by creating a Telegram app at <a href="https://my.telegram.org/apps">https://my.telegram.org/apps</a> 
