@@ -888,7 +888,7 @@ class MP {
 	static function startSession() {
 		if(defined('session_started')) return;
 		ini_set('session.cookie_lifetime', 365 * 60 * 60 * 24);
-		ini_set('session.gc_maxlifetime', 365 * 60 * 60 * 24);
+		//ini_set('session.gc_maxlifetime', 365 * 60 * 60 * 24); // must be set in php.ini
 		
 		session_start();
 		define('session_started', true);

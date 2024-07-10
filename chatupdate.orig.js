@@ -25,8 +25,10 @@ function ee(e){
 }
 var r = null;
 var o = "0";
+var t = 0;
+var c=0;
 function h() {
-	if(r.readyState == 4){
+	if(r.readyState == 4 && c < 90){
 		try{
 			var e=r.responseText;
 			if(e!=null&&e.length>1){
@@ -63,10 +65,9 @@ function h() {
 				}
 			}
 		}catch(e){ee(e);}
-		setTimeout("a();",updint);
+		t=setTimeout("a();",updint);
 	}
 }
-var c=0;
 function a(){
 	c++;
 	if(c>70)return;
@@ -79,6 +80,12 @@ function a(){
 	}catch(e){ee(e);}
 }
 try{
-	setTimeout("a()",updint);
-}catch(e){ee(e);
-}
+	t=setTimeout("a()",updint);
+}catch(e){ee(e);}
+try{window.onbeforeunload = function(){
+	c=99;
+	try{
+		if(t != 0) clearTimeout(t);
+		if(r != null)r.abort();
+	}catch(e){}
+}}catch(e){}

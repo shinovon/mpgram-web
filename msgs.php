@@ -8,7 +8,7 @@ if(!$user) die;
 $id = $_GET['id'];
 $timeoff = $_GET['t'] ?? 0;
 $offset = $_GET['o'] ?? -1;
-$timeout = $_GET['timeout'] ?? 30;
+$timeout = $_GET['timeout'] ?? 15;
 $longpoll = isset($_GET['l']);
 $old = isset($_GET['ol']);
 $photosize = $_GET['ps'] ?? 0;
@@ -19,6 +19,8 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 	global $limit;
 	global $lng;
 	global $timeoff;
+	global $old;
+	global $photosize;
 	$r = $MP->messages->getHistory([
 	'peer' => $id,
 	'offset_id' => 0,
@@ -47,7 +49,7 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 	//echo $rm[0]['id'].'||';
 	echo $maxoffset.'||';
 	MP::addUsers($r['users'], $r['chats']);
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true, $ar);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true, $ar, false, $old, $photosize);
 	// Mark as read
 	try {
 		if($ch || (int)$id < 0) {
@@ -69,8 +71,9 @@ try {
 	if($longpoll) {
 		$so = $offset;
 		while(true) {
-			if(microtime(true) - $time >= $timeout) die;
-			$updates = $MP->getUpdates(['offset' => $offset+1, 'limit' => 100, 'timeout' => 10]);
+			flush();
+			if(connection_aborted() || microtime(true) - $time >= $timeout) die;
+			$updates = $MP->getUpdates(['offset' => $offset+1, 'limit' => 100, 'timeout' => 3]);
 			$minid = 0;
 			$maxid = 0;
 			$minmsg = null;

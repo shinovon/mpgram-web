@@ -327,7 +327,22 @@ if(!$ch) {
 	if($msg) {
 		echo '<input type="hidden" name="m" value="'.$msg.'">';
 	}
-	echo '<textarea name="text" value="" style="width: 100%; height: 3em"></textarea><br>';
+	$text = "";
+	if ($edit) {
+		try {
+			$MP = MP::getMadelineAPI($user);
+			$m = null;
+			if ((int)$id < 0) {
+				$m = $MP->channels->getMessages(['channel' => $id, 'id' => [(int)$msg]]);
+			} else {
+				$m = $MP->messages->getMessages(['peer' => $id, 'id' => [(int)$msg]]);
+			}
+			$text = $m['messages'][0]['message'] ?? "";
+		} catch (Exception $e) {
+			echo $e;
+		}
+	}
+	echo '<textarea name="text" value="" style="width: 100%; height: 3em">'.$text.'</textarea><br>';
 	echo '<input type="checkbox" id="format" name="format">';
 	echo '<label for="format">'.MP::x($lng['html_formatting']).'</label>';
 	if(!$edit) {
