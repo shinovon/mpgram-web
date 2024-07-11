@@ -185,16 +185,6 @@ try {
 						continue;
 					}
 				}
-				if(count($f['include_peers']) > 0) {
-					foreach($f['include_peers'] as $p) {
-						$p = MP::getId($p);
-						foreach($all as $d) {
-							if($d['peer'] != $p) continue;
-							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
-							break;
-						}
-					}
-				}
 				if(count($f['exclude_peers']) > 0) {
 					foreach($f['exclude_peers'] as $p) {
 						$p = MP::getId($p);
@@ -215,6 +205,16 @@ try {
 					foreach($dialogs as $idx => $d) {
 						if(!isset($d['unread_count']) || $d['unread_count'] > 0) continue;
 						unset($dialogs[$idx]);
+					}
+				}
+				if(count($f['include_peers']) > 0) {
+					foreach($f['include_peers'] as $p) {
+						$p = MP::getId($p);
+						foreach($all as $d) {
+							if($d['peer'] != $p) continue;
+							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+							break;
+						}
 					}
 				}
 				function cmp($a, $b) {

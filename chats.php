@@ -220,16 +220,6 @@ try {
 						continue;
 					}
 				}
-				if(count($f['include_peers']) > 0) {
-					foreach($f['include_peers'] as $p) {
-						$p = MP::getId($p);
-						foreach($all as $d) {
-							if($d['peer'] != $p) continue;
-							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
-							break;
-						}
-					}
-				}
 				if(count($f['exclude_peers']) > 0) {
 					foreach($f['exclude_peers'] as $p) {
 						$p = MP::getId($p);
@@ -250,6 +240,16 @@ try {
 					foreach($dialogs as $idx => $d) {
 						if(!isset($d['unread_count']) || $d['unread_count'] > 0) continue;
 						unset($dialogs[$idx]);
+					}
+				}
+				if(count($f['include_peers']) > 0) {
+					foreach($f['include_peers'] as $p) {
+						$p = MP::getId($p);
+						foreach($all as $d) {
+							if($d['peer'] != $p) continue;
+							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+							break;
+						}
 					}
 				}
 				function cmp($a, $b) {
@@ -404,10 +404,10 @@ try {
 		header('Location: login.php?revoked=1');
 		die();
 	}
-	if(strpos($e->getMessage(), 'Could not get user info!') !== false) {
-		header('Location: login.php?logout=1');
-		die();
-	}
+	//if(strpos($e->getMessage(), 'Could not get user info!') !== false) {
+	//	header('Location: login.php?logout=1');
+	//	die();
+	//}
 	echo '<b>'.$lng['error'].'!</b><br>';
 	echo "<xmp>$e</xmp><br>";
 	echo '<b><a href="login.php?logout=1">'.MP::x($lng['logout']).'</a><b>';
