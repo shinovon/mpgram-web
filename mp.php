@@ -294,7 +294,7 @@ class MP {
 					echo '</div>';
 				} else {
 					echo "<div class=\"ma\" id=\"msg_{$id}_{$m['id']}\">";
-					if(!$old) echo "<div class=\"mc\">";
+					if(!$old) echo "<div class=\"mca\">";
 				}
 				if($fwname != null) {
 					echo '<div class="mf">'.static::x($lng['fwd_from']).' <b>'.static::dehtml($fwname).'</b></div>';
@@ -355,7 +355,7 @@ class MP {
 					echo '</div>';
 				}
 				if(isset($m['media'])) {
-					echo static::printMessageMedia($MP, $m, $id, $imgs, $lng, false, $photosize);
+					echo static::printMessageMedia($MP, $m, $id, $imgs, $lng, false, $photosize, $out, $old);
 				}
 				if(isset($m['reply_markup'])) {
 					$rows = $m['reply_markup']['rows'] ?? [];
@@ -386,17 +386,19 @@ class MP {
 		}
 	}
 	
-	static function printMessageMedia($MP, $m, $id, $imgs, $lng, $mini=false, $ps=0) {
+	static function printMessageMedia($MP, $m, $id, $imgs, $lng, $mini=false, $ps=0, $out=false, $old=false) {
 		if($ps <= 0) $ps = 180;
 		$media = $m['media'];
 		$reason = null;
 		if(isset($media['photo'])) {
 			if($imgs) {
+				if (!$old && $out) echo "<div class=\"mci\">";
 				if($mini) {
 					echo "<a href=\"chat.php?m={$m['id']}&c={$id}\"><img class=\"mi\" src=\"file.php?m={$m['id']}&c={$id}&p=rmin\"></img></a>";
 				} else {
 					echo "<div><a href=\"file.php?m={$m['id']}&c={$id}&p=rorig\"><img class=\"mi\" src=\"file.php?m={$m['id']}&c={$id}&p=rprev&s={$ps}\"></img></a></div>";
 				}
+				if (!$old && $out) echo "</div>";
 			} else {
 				echo "<div><a href=\"file.php?m={$m['id']}&c={$id}&p=rorig\">".static::x($lng['photo'])."</a></div>";
 			}
@@ -439,7 +441,7 @@ class MP {
 				$audio = false;
 				$smallprev = false;
 				$ie = static::getIEVersion();
-				$png = PNG_STICKERS && ($ie == 0 || $ie > 4);
+				$png = PNG_STICKERS && ($ie == 0 || $ie > 4) && $ps >= 180;
 				switch(strtolower(substr($fext, 1))) {
 					case 'webp':
 						if(strpos($d['name'], 'sticker_') === 0) {

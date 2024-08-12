@@ -4,32 +4,73 @@ require_once 'mp.php';
 class Themes {
 	static $theme = 0;
 	static $bg = 0;
-	static $fill = 0;
+	static $fillMsg = 0;
 	static $round = 1;
 	static $bgsize = 240;
 	static $iev;
+	static $colors = [];
+	static $fillChats = 0;
+	static $chat;
 	
-	static function setTheme($theme) {
-		switch($theme) {
-		case 2:
-			$theme = 1;
-			break;
-		case 3:
-			$theme = 0;
-			break;
+	static function loadColors() {
+		$file = './colors/colors_'.static::$theme.'.json';
+		if(!file_exists($file)) {
+			return false;
 		}
-		static::$theme = $theme;
+		$file = file_get_contents($file);
+		if(!$file) {
+			return false;
+		}
+		$json = json_decode($file, true);
+		if(!$json) {
+			return false;
+		}
+		foreach($json as $k => $v) {
+			static::$colors[$k] = $v;
+		}
+		static::$fillMsg = static::$fillMsg || ($json['fill_messages'] ?? 0);
+		static::$fillChats = static::$fillChats || ($json['fill_chats'] ?? 0);
+		static::$bg = static::$bg || ($json['force_background_image'] ?? 0);
+		return true;
 	}
 	
-	static function setChatTheme($theme) {
+	static function color($d) {
+		if (static::$theme == 4) {
+			$a = dechex(rand(0,0xfff));
+			while (strlen($a) < 3) $a = '0'.$a;
+			return "#{$a}";
+		}
+		if (strpos($d, '!') === 0) {
+			return static::$colors[substr($d, 1)];
+		}
+		return $d;
+	}
+	
+	static function setTheme($theme, $chat=false) {
 		switch($theme) {
 		case 2:
 			$theme = 1;
-			static::$bg = 1;
+			static::$bg = $chat;
 			break;
 		case 3:
 			$theme = 0;
+			static::$bg = $chat;
+			break;
+		case 4:
+			$theme = 4;
+			static::$fillMsg = 1;
+			break;
+		case 5:
+			$theme = 1;
 			static::$bg = 1;
+			break;
+		case 7:
+			$theme = 0;
+			static::$fillMsg = 1;
+			break;
+		case 8:
+			$theme = 1;
+			static::$fillMsg = 1;
 			break;
 		}
 		$bgsize = MP::getSettingInt('bgsize', 0);
@@ -45,7 +86,13 @@ class Themes {
 			static::$bgsize = '';
 			break;
 		}
+		static::$chat = $chat;
 		static::$theme = $theme;
+		static::loadColors();
+	}
+	
+	static function setChatTheme($theme) {
+		static::setTheme($theme, true);
 	}
 	
 	static function bodyStart($a = null) {
@@ -72,13 +119,14 @@ class Themes {
 			margin-right: auto;
 		}
 		' : ''). 'body {
-			'.(static::$iev > 0 ? 'text-align: center;' : ($full ? '' : 'max-width: 540px;
+			'.(static::$iev > 0 ? 'text-align: center;' : ($full ? (static::$chat ? '' : 'max-width: 540px;
+			margin-right: auto;') : 'max-width: 540px;
 			margin-left: auto;
 			margin-right: auto;')).'
 			font-family: system-ui;
-			'.(static::$theme == 0 ?
-			'background: #000;
-			color: #eee;' : 'color: #111;').'
+			'.(static::$theme !== 1 ?
+			'background: '.static::color('!background').';
+			color: '.static::color('!foreground').';' : 'color: '.static::color('!foreground').';').'
 			'.(static::$bg ?
 			'background-attachment: fixed;
 			background-image: url(/img/bg'.static::$bgsize.'.png);
@@ -88,23 +136,22 @@ class Themes {
 			background-repeat: no-repeat;') : '').'
 		}
 		a {
-			'.(static::$theme == 0 ?
-			'color: #eee;' : 'color: #111;').'
+			color: '.static::color('!foreground').';'.'
 			text-decoration: none;
 		}
 		a:hover {
 			text-decoration: underline;
 		}
 		input[type=text], select, textarea {
-			'.(static::$theme == 0 ? 'background-color: black;
-			color: #eee;
-			border-color: #eee;
+			'.(static::$theme != 1 ? 'background-color: '.static::color('!textbox_background').';
+			color: '.static::color('!textbox_text').';
+			border-color: '.static::color('!textbox_border').';
 			' : '').'border-style: solid;
 		}
 		.ct {
 			margin-left: 2px;
 			overflow: hidden;
-			color: '.(static::$theme == 0 ? '#aaa' : '#444').';
+			color: '.static::color('!chat_list_text').';
 		}
 		.m {
 			margin-left: 2px;
@@ -127,19 +174,34 @@ class Themes {
 			padding-right: 4px;
 			').'
 		}
+		.mca {
+			width: auto;
+			overflow: hidden;
+			'.(static::$round ?
+			'border-radius: 6px;
+			padding-top: 4px;
+			padding-left: 6px;
+			padding-bottom: 4px;
+			padding-right: 4px;' :
+			'padding-left: 4px;
+			padding-top: 2px;
+			padding-bottom: 4px;
+			padding-right: 4px;
+			').'
+		}
 		.my {
 			margin-left: auto; 
-			'.(static::$bg || static::$fill ? 'background-color: ' : 'border: 1px solid ').
-			(static::$theme == 0 ? '#333' : '#eee').';
+			'.(static::$bg || static::$fillMsg ? 'background-color: ' : 'border: 1px solid ').
+			static::color('!message_out_background').';
 		}
 		.mo {
-			'.(static::$bg || static::$fill ? 'background-color: ' : 'border: 1px solid ').
-			(static::$theme == 0 ? '#222' : '#eaeaea').';
+			'.(static::$bg || static::$fillMsg ? 'background-color: ' : 'border: 1px solid ').
+			static::color('!message_background').';
 		}
 		.r, .mw {
 			display: block;
 			text-align: left;
-			border-left: 2px solid '.(static::$theme == 0 ? 'white' : '#168acd').';
+			border-left: 2px solid '.static::color('!message_attachment_border').';
 			padding-left: 4px;
 			margin-bottom: 2px;
 			margin-top: 2px;
@@ -148,7 +210,7 @@ class Themes {
 			overflow: hidden;
 		}
 		.rn, .mwt {
-			'.(static::$theme == 0 ? '' : 'color: #37a1de;').
+			color: '.static::color('!message_attachment_title').';'.
 			'overflow: hidden;
 			max-width: 200px;
 			white-space: nowrap;
@@ -162,18 +224,17 @@ class Themes {
 		}
 		.cl {
 			border-spacing: 0;
-			border-color: '.(static::$theme == 0 ? '#222' : '#eee').';
+			border-color: '.static::color('!chat_list_border').';
 			border-collapse: collapse;
 			width: 100%;
 		}
 		.c {
 			min-height: 42px;
 			margin: 0px;'
-			.(static::$bg ? (static::$theme == 0 ?
-			'background: #111;' : 'background: #ddd;') : '').'
+			.(static::$bg || static::$fillChats ? ('background: '.static::color('!chat_list_background').';') : '').'
 		}
 		.cm {
-			color: '.(static::$theme == 0 ? '#ccc' : '#111').';
+			color: '.static::color('!chat_list_time').';
 			display: -webkit-box;
 			text-overflow: ellipsis;
 			overflow: hidden;
@@ -181,6 +242,9 @@ class Themes {
 			-webkit-line-clamp: 2;
 			max-height: 2.5em;
 			line-height: 1.25em;
+		}
+		.ctt {
+			color: '.static::color('!chat_list_time').';
 		}
 		.cava {
 			vertical-align: top;
@@ -194,20 +258,20 @@ class Themes {
 			width: 100%;
 		}
 		.cbd {
-			border-bottom: 1px solid '.(static::$theme == 0 ? '#222' : '#eee').';
+			border-bottom: 1px solid '.static::color('!chat_list_border').';
 		}
-		'.(static::$theme == 0 ? '' : '.ml, .mf, .mn {
-			color: #168acd;
+		'.(static::$theme == 0 ? '' : '.mf, .mn {
+			color: '.static::color('!message_link').';
 		}').
 		'.ma {
 			text-align: center;
 			margin-bottom: 10px;
 		}
 		.cma {
-			color: #168acd;
+			color: '.static::color('!chat_list_action').';
 		}
 		.u {
-			color: '.(static::$theme == 0 ? 'darkgrey' : 'grey').';
+			color: '.static::color('!message_options').';
 		}
 		.in {
 			display: inline;
@@ -217,13 +281,13 @@ class Themes {
 			float: right;
 		}
 		.unr {
-			color: '.(static::$theme == 0 ? '#f77' : '#700').';
+			color: '.static::color('!chat_list_unread').';
 		}
 		input[type="file"] {
-			'.(static::$theme == 0 ? 'color: #eee;' : 'color: #111;').';
+			color: '.static::color('!foreground').';
 		}
 		.ml {
-			color: #37a1de;
+			color: '.static::color('!message_link').';
 		}
 		.ch {
 			position: fixed;
@@ -231,7 +295,7 @@ class Themes {
 			left: 0;
 			width: 100%;
 			z-index: 1;
-			background: '.(static::$theme == 0?'#000':'#fff').';
+			background: '.static::color('!chat_header_background').';
 		}
 		.cb {
 			position: fixed;
@@ -239,7 +303,7 @@ class Themes {
 			left: 0;
 			width: 100%;
 			z-index: 1;
-			background: '.(static::$theme == 0?'#000':'#fff').';
+			background: '.static::color('!chat_header_background').';
 		}
 		.chc {
 			'./*($full ? '' : 'max-width: 540px;
@@ -282,6 +346,9 @@ class Themes {
 		.mi {
 			max-width: 50vw;
 		}
+		.mci {
+			text-align: right;
+		}
 		textarea {
 			resize: none;
 		}
@@ -293,17 +360,17 @@ class Themes {
 			left: 0;
 			width: 100%;
 			bottom: 0;
-			background: #000;
+			background: '.static::color('!textbox_background').';
 			height: 4em;
 		' : '').'}
 		.rc {
 			width: 100%;
 		}
 		.btn {
-			background-color: grey;
-			color: white;
+			background-color: '.static::color('!button_background').';
+			color: '.static::color('!button_text').';
 			padding: 1px;
-			border: solid 1px white;
+			border: solid 1px '.static::color('!button_border').';
 			width: 100%;
 			display: block;
 			text-align: center;
@@ -334,18 +401,22 @@ class Themes {
 			word-break: break-all;
 		}
 		.bth {
-			border: 1px solid '.(static::$theme == 0 ? '#444' : '#aaa').';
+			border: 1px solid '.static::color('!logout_button_border').';
 			padding: 0 2px 0 2px;
 			border-radius: 4px;
-			background: '.(static::$theme == 0 ? '#222' : '#eee').';
+			background: '.static::color('!logout_button_background').';
 		}
 		.ra {
-			color: red;
+			color: '.static::color('!red_text').';
 		}
 		.hb {
 			margin: 2px 0 2px 0;
 		}
 		.hed {
+			background: '.static::color('!chat_list_header_background').';
+		}
+		.fs {
+			color: '.static::color('!chat_list_selected_folder').';
 		}
 		--></style>';
 	}

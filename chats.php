@@ -9,8 +9,9 @@ ini_set('display_startup_errors', 1);
 include 'mp.php';
 
 $timeoff = MP::getSettingInt('timeoff');
-$theme = MP::getSettingInt('theme');
+$theme = MP::getSettingInt('theme', 0, true);
 $lng = MP::initLocale();
+MP::getSettingInt('full', 0, true);
 
 $user = MP::getUser();
 if(!$user) {
@@ -18,7 +19,7 @@ if(!$user) {
 	die;
 }
 
-$count = MP::getSettingInt('chats', 15);
+$count = MP::getSettingInt('chats', 15, true);
 if(isset($_GET['count'])) {
 	$count = (int) $_GET['count'];
 }
@@ -102,23 +103,19 @@ try {
 		])['dialogs']) > 0;
 	if(count($folders) > 1 || $hasArchiveChats) {
 		echo '<div>';
-		echo '<b>'.MP::x($lng['folders']).'</b>: ';
+		//echo MP::x($lng['folders']).': ';
 		foreach($folders as $f) {
 			if(($f['_'] ?? '') == 'dialogFilterDefault' || !isset($f['id'])) {
 				echo '<a href="chats.php">'.MP::x($lng['all_chats']).'</a> ';
 			} else {
 				$sel = $fid == $f['id'];
-				if($sel) echo '<u>';
-				echo '<a href="chats.php?f='.$f['id'].'">'.MP::dehtml($f['title']).'</a>';
-				if($sel) echo '</u>';
+				echo '<a href="chats.php?f='.$f['id'].'"'.($sel?' class="fs"':'').'>'.MP::dehtml($f['title']).'</a>';
 				echo ' ';
 			}
 		}
 		if($hasArchiveChats) {
 			$sel = $fid == 1;
-			if($sel) echo '<u>';
-			echo '<a href="chats.php?f=1">'.MP::x($lng['archived_chats']).'</a>';
-			if($sel) echo '</u>';
+			echo '<a href="chats.php?f=1"'.($sel?' class="fs"':'').'>'.MP::x($lng['archived_chats']).'</a>';
 		}
 		echo '</div>';
 	}
@@ -320,7 +317,7 @@ try {
 					echo '<td class="cava cbd"><img class="ri" src="ava.php?c='.$id.'&p='.($pngava?'rc':'r').'36"></td>';
 				}
 				echo '<td class="ctext cbd">';
-				echo '<a href="'.$cl.'"><b>';
+				echo '<a href="'.$cl.'">';
 				foreach(($r[$id > 0 ? 'users' : 'chats']) as $p) {
 					if($p['id'] != $id) continue;
 					$broadcast = $p['broadcast'] ?? false;
@@ -335,7 +332,7 @@ try {
 					}
 					break;
 				}
-				echo MP::dehtml(MP::removeEmoji($n)).'</b>';
+				echo MP::dehtml(MP::removeEmoji($n));
 				if($unr > 0) {
 					echo ' <b class="unr">+'.$unr.'</b>';
 				}
@@ -354,13 +351,14 @@ try {
 						} else {
 							$t = date('H:i', $msg['date']-$timeoff);
 						}
-						echo '<br><div class="cm">'.$t.' ';
+						echo " <a class=\"ctt\">{$t}</a>";
+						echo '<br><div class="cm">';
 						if(isset($msg['message']) && strlen($msg['message']) > 0) {
 							echo '<a href="'.$cl.'" class="ct">';
 							if(!$broadcast && (($msg['out'] ?? false) || $mfid == $selfid))
-								echo MP::x($lng['you']).': ';
+								echo '<a class="mn">'.MP::x($lng['you']).'</a>: ';
 							elseif($mfn !== null)
-								echo $mfn.': ';
+								echo '<a class="mn">'.$mfn.'</a>: ';
 							$txt = MP::dehtml(trim(str_replace("\r","",str_replace("\n", " ", $msg['message']))));
 							if(MP::utflen($txt) > 250) $txt = MP::utfsubstr($txt, 0, 250).'..';
 							echo $txt;

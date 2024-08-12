@@ -227,6 +227,7 @@ $themes = array(
 0 => $lng['set_theme_dark'],
 1 => $lng['set_theme_light'],
 2 => $lng['set_theme_light_bg'],
+//6 => 'Tint',
 );
 foreach($themes as $k=>$v) {
 	echo '<input type="radio" name="theme"'.($theme==$k ? ' checked' : '').' value="'.$k.'">'.MP::x($v).'<br>';
