@@ -67,6 +67,7 @@ class Themes {
 		case 7:
 			$theme = 0;
 			static::$fillMsg = 1;
+			static::$fillChats = 1;
 			break;
 		case 8:
 			$theme = 1;
@@ -107,6 +108,11 @@ class Themes {
 	}
 	
 	static function head() {
+		$nocss = MP::getSettingInt('nocss', 0, true) == 1;
+		if ($nocss) {
+			return (MP::$enc == null ? '<meta charset="UTF-8">' : '').
+			'<meta name="viewport" content="width=device-width, initial-scale=1">';
+		}
 		static::$iev = MP::getIEVersion();
 		$full = MP::getSettingInt('full', 0) == 1;
 		return (MP::$enc == null ? '<meta charset="UTF-8">' : '').
@@ -416,7 +422,7 @@ class Themes {
 			background: '.static::color('!chat_list_header_background').';
 		}
 		.fs {
-			color: '.static::color('!chat_list_selected_folder').';
+			'.(static::$fillChats?('color: '.static::color('!chat_list_selected_folder').';') : '') .'
 		}
 		--></style>';
 	}

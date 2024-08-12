@@ -859,7 +859,7 @@ class MP {
 				$x = substr($x, 0, strpos($x, ', '));
 			}
 		}
-		if($x && $write) {
+		if(isset($_GET[$name]) && $write) {
 			$_SESSION[$name] = $x;
 			//static::cookie($name, $x, time() + (86400 * 365));
 		}
@@ -880,7 +880,7 @@ class MP {
 			}
 			$x = (int)$x;
 		}
-		if($x && $write) {
+		if(isset($_GET[$name] && $write) {
 			$_SESSION[$name] = $x;
 			//static::cookie($name, $x, time() + (86400 * 365));
 		}
