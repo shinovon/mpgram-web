@@ -11,7 +11,6 @@ include 'mp.php';
 $timeoff = MP::getSettingInt('timeoff');
 $theme = MP::getSettingInt('theme', 0, true);
 $lng = MP::initLocale();
-MP::getSettingInt('full', 0, true);
 
 $user = MP::getUser();
 if(!$user) {

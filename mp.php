@@ -880,7 +880,7 @@ class MP {
 			}
 			$x = (int)$x;
 		}
-		if(isset($_GET[$name] && $write) {
+		if(isset($_GET[$name]) && $write) {
 			$_SESSION[$name] = $x;
 			//static::cookie($name, $x, time() + (86400 * 365));
 		}

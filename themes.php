@@ -114,7 +114,7 @@ class Themes {
 			'<meta name="viewport" content="width=device-width, initial-scale=1">';
 		}
 		static::$iev = MP::getIEVersion();
-		$full = MP::getSettingInt('full', 0) == 1;
+		$full = MP::getSettingInt('full', 0, true) == 1;
 		return (MP::$enc == null ? '<meta charset="UTF-8">' : '').
 		'<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style type="text/css"><!--
