@@ -38,12 +38,12 @@ try {
 		} else {
 			echo file_get_contents('img/us.png');
 		}
-		header('Cache-Control: private, max-age=86400');
+		header('Cache-Control: private, max-age=2592000');
 		die;
 	}
 	$p = $_GET['p'] ?? '';
 	if(strpos($p, 'r') === 0) {
-		header('Cache-Control: private, max-age=86400');
+		header('Cache-Control: private, max-age=2592000');
 		$p = substr($p, 1);
 		$payload = new Amp\ByteStream\Payload($MP->downloadToReturnedStream($di));
 		$img = imagecreatefromstring($payload->buffer());

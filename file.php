@@ -70,7 +70,7 @@ try {
 		$di = $d;
 	}
 	if(strpos($p, 'r') === 0) {
-		header('Cache-Control: private, max-age=86400');
+		header('Cache-Control: private, max-age=2592000');
 		$p = substr($p, 1);
 		if(strpos($p, 'tgs') === 0) {
 			if(!defined('CONVERT_TGS_STICKERS') || !CONVERT_TGS_STICKERS) {
