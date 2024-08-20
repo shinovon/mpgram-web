@@ -35,7 +35,7 @@ if($msg !== null) {
 		if(isset($_GET["format"]) || isset($_POST["format"])) {
 			$MP->messages->sendMessage(['peer' => $id, 'message' => $msg, 'parse_mode' => 'HTML']);
 		} else {
-			$MP->messages->sendMessage(['peer' => $id, 'message' => $msg]);
+			$MP->messages->sendMessage(['peer' => $id, 'message' => $msg, 'parse_mode' => 'markdown']);
 		}
 	} catch (Exception $e) {
 	//	echo $e->getMessage();
