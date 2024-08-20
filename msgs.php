@@ -8,7 +8,7 @@ if(!$user) die;
 $id = $_GET['id'];
 $timeoff = $_GET['t'] ?? 0;
 $offset = $_GET['o'] ?? -1;
-$timeout = $_GET['timeout'] ?? 15;
+$timeout = $_GET['timeout'] ?? 25;
 $longpoll = isset($_GET['l']);
 $old = isset($_GET['ol']);
 $photosize = $_GET['ps'] ?? 0;
@@ -121,11 +121,13 @@ try {
 	$name = null;
 	$pm = false;
 	$ch = false;
+	$ar = null;
 	if(isset($info['Chat'])) {
 		$ch = isset($info['type']) && $info['type'] == 'channel';
 		if(isset($info['Chat']['title'])) {
 			$name = $info['Chat']['title'];
 		}
+		$ar = $info['Chat']['admin_rights'] ?? null;
 	} elseif(isset($info['User']) && isset($info['User']['first_name'])) {
 		$name = $info['User']['first_name'];
 		$pm = true;
@@ -134,7 +136,7 @@ try {
 	unset($info);
 	echo $rm[0]['id'].'||';
 	MP::addUsers($r['users'], $r['chats']);
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true, false, false, $old, $photosize);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true, $ar, false, $old, $photosize);
 	// Mark as read
 	try {
 		if($ch || (int)$id < 0) {

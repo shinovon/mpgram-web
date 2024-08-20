@@ -188,11 +188,13 @@ try {
 	$rm = $r['messages'];
 	echo '<head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
-	echo '<script type="text/javascript"><!--
+	if ($autoscroll) {
+		echo '<script type="text/javascript"><!--
 var reverse = '.($reverse&&$texttop?'true':'false').';';
 echo file_get_contents('chatscroll.js');
 echo '
 //--></script>';
+	}
 	if((!$hasOffset || $endReached) && $autoupd == 1 && count($rm) > 0 && $query === null) {
 		$ii = $rm[0]['id'];
 		if($dynupd == 1) {
@@ -215,10 +217,12 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	}
 	echo '</head>'."\n";
 	$body = false;
-	if($reverse && $dir != 'd') {
-		echo Themes::bodyStart('onload="autoScroll(true, false);"'); $body = true;
-	} elseif(!$reverse && $dir == 'u') {
-		echo Themes::bodyStart('onload="autoScroll(true, true);"'); $body = true;
+	if ($autoscroll) {
+		if($reverse && $dir != 'd') {
+			echo Themes::bodyStart('onload="autoScroll(true, false);"'); $body = true;
+		} elseif(!$reverse && $dir == 'u') {
+			echo Themes::bodyStart('onload="autoScroll(true, true);"'); $body = true;
+		}
 	}
 	if(!$body)
 		if($msgoffsetid > 0)

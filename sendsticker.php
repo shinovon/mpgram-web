@@ -27,10 +27,6 @@ include 'themes.php';
 Themes::setTheme($theme);
 try {
 	$MP = MP::getMadelineAPI($user);
-	echo '<head><title>'.MP::x($lng['send_message']).'</title>';
-	echo Themes::head();
-	echo '</head>';
-	echo Themes::bodyStart();
 	if(isset($_GET['id'])) {
 		$MP = MP::getMadelineAPI($user);
 		$params = ['peer' => $id, 'message' => ''];
@@ -41,7 +37,12 @@ try {
 		$MP->messages->sendMedia($params);
 		header('Location: chat.php?c='.$id);
 		die;
-	} elseif(isset($_GET['set'])) {
+	}
+	echo '<head><title>'.MP::x($lng['send_message']).'</title>';
+	echo Themes::head();
+	echo '</head>';
+	echo Themes::bodyStart();
+	if(isset($_GET['set'])) {
 		echo '<div><a href="sendsticker.php?c='.$id.($reply_to?'&reply_to='.$reply_to:'').'">'.MP::x($lng['back']).'</a></div><br>';
 		$set = $_GET['set'];
 		$sets = $MP->messages->getAllStickers()['sets'];
@@ -58,7 +59,7 @@ try {
 			echo '<a href="sendsticker.php?c='.$id.'&id='.$v['id'].'&access_hash='.$v['access_hash'].($reply_to?'&reply_to='.$reply_to:'').'"><img src="file.php?sticker='.$v['id'].'&access_hash='.$v['access_hash'].'&p=r'.(($v['mime_type'] ?? '') == 'application/x-tgsticker' ? 'tgss&s=100' : 'sprev').'"></a>';
 		}
 	} else {
-	echo '<div><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div><br>';
+		echo '<div><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div><br>';
 		$sets = $MP->messages->getAllStickers()['sets'];
 		foreach($sets as $v) {
 			echo '<a href="sendsticker.php?c='.$id.'&set='.$v['id'].($reply_to?'&reply_to='.$reply_to:'').'">'.MP::x($v['title']).'</a><br>';

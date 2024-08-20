@@ -419,7 +419,7 @@ class Themes {
 			margin: 2px 0 2px 0;
 		}
 		.hed {
-			background: '.static::color('!chat_list_header_background').';
+			'.(static::$bg || static::$fillChats ? ('background: '.static::color('!chat_list_header_background').';') : '').'
 		}
 		.fs {
 			'.(static::$fillChats?('color: '.static::color('!chat_list_selected_folder').';') : '') .'

@@ -1,7 +1,7 @@
 <?php
 session_start();
 function getCaptchaText($length) {
-    $c = '0123456789abcdefghjkmnopqrstuvwxyz';
+    $c = '0123456789';//abcdefghjkmnopqrstuvwxyz';
     $l = strlen($c);
     $s = '';
     for ($i = 0; $i < $length; $i++) {
