@@ -241,13 +241,15 @@ class MP {
 				}
 				$fwid = null;
 				$fwname = null;
+				$fwm = null;
 				if(isset($m['fwd_from'])) {
-					if(isset($m['fwd_from']['from_name'])) {
-						$fwname = $m['fwd_from']['from_name'];
-					} elseif(isset($m['fwd_from']['from_id'])){
-						$fwid = $m['fwd_from']['from_id'];
+					$fwname = $m['fwd_from']['from_name'] ?? null;
+					$fwid = $m['fwd_from']['from_id'] ?? null;
+					if ($fwname === null && $fwid !== null){
 						$fwname = static::getNameFromId($MP, $fwid, true);
 					}
+					$fwm = $m['fwd_from']['saved_from_msg_id'] ?? $m['fwd_from']['channel_post'] ?? null;
+					$fwid = $m['fwd_from']['saved_from_peer'] ?? $fwid ?? null;
 				}
 				$mtime = $m['date']-$timeoff;
 				$mdate = date('d.m.y', $mtime);
@@ -297,7 +299,11 @@ class MP {
 					if(!$old) echo "<div class=\"mca\">";
 				}
 				if($fwname != null) {
-					echo '<div class="mf">'.static::x($lng['fwd_from']).' <b>'.static::dehtml($fwname).'</b></div>';
+					echo '<div class="mf">'.static::x($lng['fwd_from']).' <b>';
+					if ($fwid != null) echo "<a href=\"chat.php?c={$fwid}".($fwm !== null ? "&m={$fwm}" : "")."\">";
+					echo static::dehtml($fwname);
+					if ($fwid != null) echo '</a>';
+					echo '</b></div>';
 				}
 				if(isset($m['reply_to'])) {
 					$replyid = $m['reply_to']['reply_to_msg_id'];
