@@ -122,5 +122,12 @@
 	"set_old_chat": "Legacy chat look",
 	"set_theme_light_bg": "Light with background",
 	"set_chat_photos_size": "Photo preview size",
-	"set_bg_size": "Background image size"
+	"set_bg_size": "Background image size",
+	"votes": [
+		[ "=", 1, "$ vote", "$ votes" ]
+	],
+	"anonymous_poll": "Anonymous Poll",
+	"poll": "Poll",
+	"closed_poll": "Poll results",
+	"no_votes": "No votes"
 }

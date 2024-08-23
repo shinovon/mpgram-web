@@ -396,7 +396,7 @@ class MP {
 		if($ps <= 0) $ps = 180;
 		$media = $m['media'];
 		$reason = null;
-		if(isset($media['photo'])) {
+		if (isset($media['photo'])) {
 			if($imgs) {
 				if (!$old && $out) echo "<div class=\"mci\">";
 				if($mini) {
@@ -408,7 +408,7 @@ class MP {
 			} else {
 				echo "<div><a href=\"file.php?m={$m['id']}&c={$id}&p=rorig\">".static::x($lng['photo'])."</a></div>";
 			}
-		} elseif(isset($media['document'])) {
+		} elseif (isset($media['document'])) {
 			$thumb = isset($media['document']['thumbs']);
 			$d = $MP->getDownloadInfo($m);
 			$fn = $d['name'];
@@ -527,7 +527,7 @@ class MP {
 				echo $e;
 			}
 			echo '</div>';
-		} elseif(isset($media['webpage'])) {
+		} elseif (isset($media['webpage'])) {
 			echo '<div class="mw">';
 			if(isset($media['webpage']['site_name'])) {
 				echo "<a href=\"{$media['webpage']['url']}\">{$media['webpage']['site_name']}</a>";
@@ -538,13 +538,52 @@ class MP {
 				echo "<div class=\"mwt\"><b>{$media['webpage']['title']}</b></div>";
 			}
 			echo '</div>';
-		} elseif(isset($media['geo'])) {
+		} elseif (isset($media['geo'])) {
 			$lat = str_replace(',', '.', strval($media['geo']['lat']));
 			$long = str_replace(',', '.', strval($media['geo']['long']));
 			$lat = substr($lat, 0, 9) ?? $lat;
 			$long = substr($long, 0, 9) ?? $long;
 			
 			echo "<div class=\"mw\"><b>".static::x($lng['media_location'])."</b><br><a href=\"https://maps.google.com/maps?q={$lat},{$long}&ll={$lat},{$long}&z=16\">{$lat}, {$long}</a></div>";
+		} elseif (isset($media['poll'])) {
+			if ($mini) {
+				echo '<div><i>'.static::x($lng['poll']).'</i></div>';
+			} else {
+				$poll = $media['poll'];
+				echo '<div>';
+				$form = !$poll['closed'];
+				if ($form) {
+					echo '<form action="chat.php">';
+					echo "<input type=\"hidden\" name=\"c\" value=\"{$id}\">";
+					echo "<input type=\"hidden\" name=\"m\" value=\"{$m['id']}\">";
+					echo "<input type=\"hidden\" name=\"poll\" value=\"{$poll['id']}\">";
+				}
+				$multiple = $poll['multiple_choice'] ?? false;
+				if ($poll['closed']) {
+					echo static::x($lng['closed_poll']);
+				} else if (!($poll['public_votes'] ?? false)) {
+					echo static::x($lng['anonymous_poll']);
+				} else {
+					echo static::x($lng['poll']);
+				}
+				echo '<br>'.$poll['question'].'<br>';
+				foreach ($media['results']['results'] as $k => $v) {
+					echo "<input type=\"".($multiple?'checkbox':'radio')."\" id=\"{$poll['id']}_{$v['option']}\" name=\"vote\" value=\"{$v['option']}\"".(!$form?' disabled':'').(($v['chosen'] ?? false)?' checked':'').">";
+					echo "<label for=\"{$poll['id']}_{$v['option']}\">{$poll['answers'][$k]['text']}</label><br>";
+				}
+				echo '<br>';
+				if ($form) {
+					echo '<input type="submit"></form>';
+				}
+				$count = $media['results']['total_voters'] ?? 0;
+				
+				if ($count == 0) {
+					echo static::x($lng['no_votes']);
+				} else {
+					echo MPLocale::number('votes', $count);
+				}
+				echo '</div>';
+			}
 		} else {
 			echo '<div><i>'.static::x($lng['media_att']).'</i></div>';
 		}
@@ -730,13 +769,18 @@ class MP {
 			if(strpos($user, ', ') !== false) {
 				$user = substr($user, 0, strpos($user, ', '));
 			}
-	    } elseif(isset($_SESSION) && isset($_SESSION['user'])) {
+		} elseif(isset($_SESSION) && isset($_SESSION['user'])) {
 			$user = $_SESSION['user'];
+		} elseif(isset($_SERVER['HTTP_X_MPGRAM_USER'])) {
+			$user = $_SERVER['HTTP_X_MPGRAM_USER'];
 		} 
-		if(strpos(strval($user), '/') !== false || strpos(strval($user), '.') !== false) {
-			$user = null;
-		}
-		if(empty($user) || strlen($user) < 32 || strlen($user) > 200) {
+		if($user == null || empty($user)
+		|| strlen($user) < 32 || strlen($user) > 200
+		|| strpos($user, '\\') !== false
+		|| strpos($user, '/') !== false
+		|| strpos($user, '.') !== false
+		|| strpos($user, ';') !== false
+		|| strpos($user, ':') !== false) {
 			return false;
 		}
 		if(!file_exists(sessionspath.$user.'.madeline')) {

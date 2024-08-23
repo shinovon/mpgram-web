@@ -48,8 +48,10 @@ $ipass = $_GET['ipass'] ?? $_POST['ipass'] ?? null;
 $nouser = $user == null || $user === false || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
 function removeSession($logout=false) {
 	global $user;
+	$_SESSION = [];
 	MP::delcookie('user');
 	MP::delcookie('code');
+	MP::delcookie('PHPSESSID');
 	try {
 		// Remove all session files
 		if(file_exists(sessionspath.$user.'.madeline')) {
@@ -99,10 +101,10 @@ try {
 	echo '<h1>MPGram Web</h1>';
 }
 
-if((isset($_GET['logout']) || $revoked || $wrong) && !$nouser) {
+if(isset($_GET['logout']) || $revoked || $wrong) {
 	$logout = true;
 	$nouser = true;
-	removeSession(($_GET['logout'] ?? '') == '2');
+	removeSession(($_GET['logout'] ?? '') == '2' && !$nouser);
 	$user = null;
 }
 

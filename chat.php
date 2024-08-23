@@ -98,6 +98,19 @@ try {
 		$MP->channels->leaveChannel(['channel' => $id]);
 		$left = true;
 	}
+	if (isset($_GET['poll'])) {
+		try {
+			$votes = explode('vote=', $_SERVER['QUERY_STRING']);
+			$options = [];
+			foreach ($votes as $vote) {
+				if (strpos($vote, '=') !== false) continue;
+				$i = strpos($vote, '&');
+				if ($i !== false) $vote = substr($vote, 0, $i);
+				array_push($options, $vote);
+			}
+			$MP->messages->sendVote(['peer' => $id, 'msg_id' => $msgoffsetid, 'options' => $options]);
+		} catch (Exception) {}
+	}
 	if($start !== null) {
 		$MP->messages->startBot(['start_param' => $start, 'bot' => $id, 'random_id' => $_GET['rnd']]);
 	}
@@ -369,6 +382,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 			//$MP->messages->readReactions(['peer' => $id, 'top_msg_id' => $maxid]);
 		}
 	} catch (Exception $e) {
+		echo $e;
 	}
 	unset($rm);
 	unset($r);

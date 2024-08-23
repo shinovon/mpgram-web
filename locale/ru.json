@@ -122,5 +122,12 @@
 	"set_old_chat": "Старый вид чата",
 	"set_theme_light_bg": "Светлый с фоном",
 	"set_chat_photos_size": "Размер превью фотографий",
-	"set_bg_size": "Размер фона"
+	"set_bg_size": "Размер фона",
+	"votes": [
+		[ "%", 10, "=", 1, "$ проголосовавший", "$ проголосовавших" ]
+	],
+	"anonymous_poll": "Anonymous Poll",
+	"poll": "Poll",
+	"closed_poll": "Poll results",
+	"no_votes": "No votes"
 }

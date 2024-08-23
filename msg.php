@@ -1,7 +1,7 @@
 <?php
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('error_reporting', E_ERROR);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 
 include 'mp.php';
 MP::startSession();
@@ -13,7 +13,7 @@ if(!$user) {
 
 $theme = MP::getSettingInt('theme');
 $lng = MP::initLocale();
-
+$MP = null;
 
 $id = $_POST['c'] ?? $_GET['c'] ?? die;
 $msg = $_POST['m'] ?? $_GET['m'] ?? null;
@@ -290,14 +290,17 @@ try {
 }
 $title = null;
 try {
+	if (!$MP) {
+		$MP = MP::getMadelineAPI($user);
+	}
 	$title = MP::x($msg ? $lng['reply_to'] : $lng['message_to']);
-	$title .= ' '.MP::dehtml(MP::getNameFromId(MP::getMadelineAPI($user), $id));
+	$title .= ' '.MP::dehtml(MP::getNameFromId($MP, $id));
 } catch (Exception) {}
 echo '<head><title>'.($title ? $title : MP::x($lng['send_message'])).'</title>';
 echo Themes::head();
 echo '</head>';
 echo Themes::bodyStart();
-echo '<div><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div>';
+echo '<div><a class="bth" href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div>';
 if($edit) {
 	echo '<b>'.MP::x($lng['edit']).'</b>:';
 } elseif($msg) {
@@ -330,7 +333,9 @@ if(!$ch) {
 	$text = "";
 	if ($edit) {
 		try {
-			$MP = MP::getMadelineAPI($user);
+			if (!$MP) {
+				$MP = MP::getMadelineAPI($user);
+			}
 			$m = null;
 			if ((int)$id < 0) {
 				$m = $MP->channels->getMessages(['channel' => $id, 'id' => [(int)$msg]]);
@@ -372,5 +377,9 @@ if(!$ch) {
 		echo '</form>';
 	}
 }
+try {
+	if ($MP) {
+		$MP->close();
+	}
+} catch (Exception) {}
 echo Themes::bodyEnd();
-die;
