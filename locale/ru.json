@@ -126,8 +126,8 @@
 	"votes": [
 		[ "%", 10, "=", 1, "$ проголосовавший", "$ проголосовавших" ]
 	],
-	"anonymous_poll": "Anonymous Poll",
-	"poll": "Poll",
-	"closed_poll": "Poll results",
-	"no_votes": "No votes"
+	"anonymous_poll": "Анонимный опрос",
+	"poll": "Опрос",
+	"closed_poll": "Результаты опроса",
+	"no_votes": "Никто не голосовал"
 }
