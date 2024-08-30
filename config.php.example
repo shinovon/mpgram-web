@@ -18,3 +18,5 @@ define('CONVERT_TGS_STICKERS', false);
 define('LOTTIE_DIR', '');
 define('TGS_TMP_DIR', sys_get_temp_dir().'/mp/');
 define('LOTTIE_TO_GIF', true);
+
+define('ENABLE_API', false);
