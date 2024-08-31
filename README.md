@@ -27,6 +27,7 @@ You can deploy your own instance quickly with Docker Compose - [see how](https:/
 
 ### Animated stickers conversion (Optional)
 
+- Install `gifski`
 - Download and unpack: https://github.com/ed-asriyan/lottie-converter/releases
 - Make sure www-data user has rights to it
 - Edit `lottie_to_gif.sh`&`lottie_to_png.sh`, add `#!/usr/bin/env bash` as first line
