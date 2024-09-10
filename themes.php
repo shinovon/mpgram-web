@@ -12,8 +12,8 @@ class Themes {
 	static $fillChats = 0;
 	static $chat;
 	
-	static function loadColors() {
-		$file = './colors/colors_'.static::$theme.'.json';
+	static function loadColors($theme) {
+		$file = './colors/colors_'.$theme.'.json';
 		if(!file_exists($file)) {
 			return false;
 		}
@@ -89,7 +89,8 @@ class Themes {
 		}
 		static::$chat = $chat;
 		static::$theme = $theme;
-		static::loadColors();
+		if ($theme != 0) static::loadColors(0);
+		static::loadColors($theme);
 	}
 	
 	static function setChatTheme($theme) {
@@ -203,6 +204,13 @@ class Themes {
 		.mo {
 			'.(static::$bg || static::$fillMsg ? 'background-color: ' : 'border: 1px solid ').
 			static::color('!message_background').';
+		}
+		.mpc {
+			'.(static::$bg || static::$fillMsg ? 'background-color: ' : 'border: 1px solid ').
+			static::color('!message_background').';
+		}
+		.mpd {
+			background-color: '.static::color('!message_mentioned_background').';
 		}
 		.r, .mw {
 			display: block;

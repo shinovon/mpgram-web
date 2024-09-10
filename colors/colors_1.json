@@ -27,5 +27,6 @@
 	"textbox_text": "#eee",
 	"textbox_border": "#eee",
 	"chat_list_header_background": "#fff",
-	"chat_list_selected_folder": "#aaa"
+	"chat_list_selected_folder": "#aaa",
+	"message_mentioned_background": "#eee"
 }

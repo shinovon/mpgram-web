@@ -332,8 +332,16 @@ try {
 					break;
 				}
 				echo MP::dehtml(MP::removeEmoji($n));
-				if($unr > 0) {
-					echo ' <b class="unr">+'.$unr.'</b>';
+				
+				$mention = false;
+				try {
+					$mention = count($MP->messages->getUnreadMentions(['peer' => $id, 'limit' => 1])['messages']) > 0;
+				} catch (Exception) {}
+				if($unr > 0 || $mention) {
+					echo ' <b class="unr">';
+					if($unr > 0) echo '+'.$unr.' ';
+					if($mention) echo '@';
+					echo '</b>';
 				}
 				echo '</a>';
 				try {

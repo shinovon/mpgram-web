@@ -15,7 +15,7 @@ $updint = MP::getSettingInt('updint', 10);
 $dynupd = MP::getSettingInt('dynupd', 1);
 $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $sym3 = strpos($ua, 'Symbian/3') !== false ? 1 : 0;
-$reverse = MP::getSettingInt('reverse', $sym3) == 1;
+$reverse = MP::getSettingInt('reverse', $sym3, true) == 1;
 $autoscroll = MP::getSettingInt('autoscroll', 1) == 1;
 $full = MP::getSettingInt('full', 0) == 1;
 $texttop = MP::getSettingInt('texttop', $sym3) == 1;
@@ -31,6 +31,7 @@ $msglimit = MP::getSettingInt('limit', 20);
 $msgoffset = 0;
 $msgoffsetid = 0;
 $msgmaxid = 0;
+$thread = null;
 if(isset($_GET['offset'])) {
 	$msgoffset = (int) $_GET['offset'];
 }
@@ -42,6 +43,9 @@ if(isset($_GET['offset_from'])) {
 }
 if(isset($_GET['max_id'])) {
 	$msgmaxid = (int) $_GET['max_id'];
+}
+if(isset($_GET['t'])) {
+	$thread = (int) $_GET['t'];
 }
 $user = MP::getUser();
 if(!$user) {
@@ -80,12 +84,14 @@ try {
 	}
 	$canpost = false;
 	$ar = null;
+	$forum = false;
 	if(isset($info['Chat'])) {
 		$ch = isset($info['type']) && $info['type'] == 'channel';
 		$name = $info['Chat']['title'] ?? null;
 		$ar = $info['Chat']['admin_rights'] ?? null;
 		$canpost = $ar !== null && $ar['post_messages'] ?? false;
 		$left = $info['Chat']['left'] ?? false;
+		$forum = $info['Chat']['forum'] ?? false;
 	} elseif(isset($info['User'])) {
 		$pm = true;
 		$name = MP::getUserName($info['User'], true);
@@ -164,8 +170,9 @@ try {
 		echo '</div>';
 	}
 	$r = null;
-	if($query !== null) {
-		$r = $MP->messages->search([
+	$mentions = null;
+	if($query !== null || $thread !== null) {
+		$p = [
 		'peer' => $id,
 		'offset_id' => $msgoffsetid,
 		'offset_date' => 0,
@@ -173,9 +180,15 @@ try {
 		'limit' => $msglimit,
 		'max_id' => $msgmaxid,
 		'min_id' => 0,
-		'hash' => 0,
-		'q' => $query
-		]);
+		'hash' => 0
+		];
+		if ($query !== null) {
+			$p['q'] = $query;
+		}
+		if ($thread !== null) {
+			$p['top_msg_id'] = $thread;
+		}
+		$r = $MP->messages->search($p);
 	} else {
 		$r = $MP->messages->getHistory([
 		'peer' => $id,
@@ -187,6 +200,26 @@ try {
 		'min_id' => 0,
 		'hash' => 0]);
 	}
+	if ($query === null) {
+		$p = ['peer' => $id,
+		'offset_id' => $msgoffsetid,
+		'offset_date' => 0,
+		'add_offset' => $msgoffset,
+		'limit' => $msglimit,
+		'max_id' => $msgmaxid,
+		'min_id' => 0];
+		if ($thread !== null) {
+			$p['top_msg_id'] = $thread;
+		}
+		$mentions = $MP->messages->getUnreadMentions($p)['messages'];
+	}
+	$top = 0;
+	if ($forum && $thread != null) {
+		try {
+			$topic = $MP->channels->getForumTopics(['channel' => $id, 'limit' => 20])['topics'][0];
+			$top = $topic['top_message'];
+		} catch (Exception $e) {}
+	}
 	MP::addUsers($r['users'], $r['chats']);
 	$id_offset = null;
 	if(isset($r['offset_id_offset'])) {
@@ -195,10 +228,12 @@ try {
 			$id_offset = $id_offset+$msgoffset+1;
 		}
 	}
+	$rm = $r['messages'];
+	$firstid = $rm[0]['id'] ?? 0;
+	$lastid = $rm[count($rm)-1]['id'] ?? 0;
 	$endReached = $id_offset === 0 || ($id_offset === null && $msgoffset <= 0);
 	$hasOffset = $msgoffset > 0 || $msgoffsetid > 0;
 	$dir = $_GET['d'] ?? null;
-	$rm = $r['messages'];
 	echo '<head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
 	if ($autoscroll) {
@@ -331,38 +366,53 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	unset($info);
 	$sname = $name ?? '';
 	if(MP::utflen($sname) > 30) $sname = MP::utfsubstr($sname, 0, 30);
+	$navurl = $file.'?c='.$id
+	.($query !== null ? '&q='.urlencode($query) : '')
+	.($thread != null ? '&t='.$thread : '');
 	if(!$reverse) {
 		printInputField();
-		if($hasOffset && !$endReached) {
+		if($hasOffset && !$endReached && ($thread == null || $firstid != $top)) {
 			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
-				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=u">'.MP::x($lng['history_up']).'</a></p>';
+				echo '<p><a href="'.$navurl.'&d=u">'.MP::x($lng['history_up']).'</a></p>';
 			} else {
-				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=u&offset_from='.$rm[0]['id'].'&offset='.(-$msglimit-1).'">'.MP::x($lng['history_up']).'</a></p>';
+				echo '<p><a href="'.$navurl.'&d=u&offset_from='.$firstid.'&offset='.(-$msglimit-1).'">'.MP::x($lng['history_up']).'</a></p>';
 			}
 		}
 	} else {
-		if(count($rm) >= $msglimit) {
-			echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=u&offset_from='.$rm[count($rm)-1]['id'].'&reverse=1">'.MP::x($lng['history_up']).'</a></p>';
+		if(count($rm) >= $msglimit && ($thread == null || $lastid != $thread)) {
+			echo '<p><a href="'.$navurl.'&d=u&offset_from='.$lastid.'&reverse=1">'.MP::x($lng['history_up']).'</a></p>';
 		}
 		$rm = array_reverse($rm);
 	}
-	if(!$texttop && !$reverse) echo '</p><p>';
+	if(!$texttop && !$reverse) echo '<p></p>';
+	if ($forum && $thread == null) {
+		echo '<div>';
+		try {
+			$topics = $MP->channels->getForumTopics(['channel' => $id, 'limit' => 20])['topics'];
+			foreach ($topics as $topic) {
+				echo "<a href=\"{$file}?c={$id}&t={$topic['id']}"
+				.($topic['read_inbox_max_id'] != $topic['top_message']?'&m='.$topic['read_inbox_max_id']:'')
+				."\">{$topic['title']}</a> ";
+			}
+		} catch (Exception $e) {}
+		echo '</div><p></p>';
+	}
 	echo '<div id="msgs">';
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true, $ar, $query !== null, $old, $photosize);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true, $ar, $query !== null, $old, $photosize, true, $mentions);
 	echo '</div>';
 	if(!$reverse) {
-		if(count($rm) >= $msglimit) {
+		if(count($rm) >= $msglimit && ($thread == null || $lastid != $thread)) {
 			if($endReached && $autoupd)
-				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&offset='.$msglimit.'&d=d">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="'.$navurl.'&offset='.$msglimit.'&d=d">'.MP::x($lng['history_down']).'</a></p>';
 			else
-				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=d&offset_from='.$rm[count($rm)-1]['id'].'">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="'.$navurl.'&d=d&offset_from='.$lastid.'">'.MP::x($lng['history_down']).'</a></p>';
 		}
 	} else {
-		if($hasOffset && !$endReached) {
+		if($hasOffset && !$endReached && ($thread == null || $firstid != $top)) {
 			if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
-				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=d">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="'.$navurl.'&d=d">'.MP::x($lng['history_down']).'</a></p>';
 			} else {
-				echo '<p><a href="'.$file.'?c='.$id.($query !== null ? '&q='.urlencode($query) : '').'&d=d&offset_from='.$rm[count($rm)-1]['id'].'&offset='.(-$msglimit-1).'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
+				echo '<p><a href="'.$navurl.'&d=d&offset_from='.$firstid.'&offset='.(-$msglimit-1).'&reverse=1">'.MP::x($lng['history_down']).'</a></p>';
 			}
 		}
 		printInputField();
@@ -372,14 +422,17 @@ setTimeout("location.reload(true);",'.$updint.'000);
 	// Mark as read
 	try {
 		if($query === null && count($rm) > 0) {
-			$maxid = $endReached ? 0 : ($reverse ? $rm[count($rm)-1]['id'] : $rm[0]['id']);
-			if($ch || (int)$id < 0) {
+			$maxid = ($reverse ? $rm[count($rm)-1]['id'] : $rm[0]['id']);
+			if ($thread != null) {
+				$MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => $thread]);
+				//$MP->messages->readMentions(['peer' => $id, 'top_msg_id' => $thread]);
+			} else if($ch || (int)$id < 0) {
 				$MP->channels->readHistory(['channel' => $id, 'max_id' => $maxid]);
 			} else {
 				$MP->messages->readHistory(['peer' => $id, 'max_id' => $maxid]);
 			}
-			$MP->messages->readMentions(['peer' => $id, 'top_msg_id' => $maxid]);
-			//$MP->messages->readReactions(['peer' => $id, 'top_msg_id' => $maxid]);
+			//$MP->messages->readMentions(['peer' => $id]);
+			//$MP->messages->readReactions(['peer' => $id]);
 		}
 	} catch (Exception $e) {
 		echo $e;

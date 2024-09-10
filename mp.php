@@ -197,8 +197,15 @@ class MP {
 		return $txt;
 	}
 	
-	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false, $old=false, $photosize=0, $showdate=true) {
+	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false, $old=false, $photosize=0, $showdate=true, $mentions=null) {
 		$lastdate = date('d.m.y', time()-$timeoff);
+		if ($mentions != null) {
+			$tmp = [];
+			foreach ($mentions as $m) {
+				array_push($tmp, $m['id']);
+			}
+			$mentions = $tmp;
+		}
 		foreach($rm as $m) {
 			try {
 				$mname1 = null;
@@ -261,6 +268,7 @@ class MP {
 					$fwname = static::utfsubstr($fwname, 0, 30);
 				$href = "msg.php?c={$id}&m={$m['id']}";
 				$out = $m['out'] ?? false;
+				$mentioned = $mentions != null && array_search($m['id'], $mentions) !== false;
 				if($search) {
 					$href = "chat.php?c={$id}&m={$m['id']}";
 				} else {
@@ -275,8 +283,8 @@ class MP {
 					$href = "msg.php?c={$id}&m={$m['id']}{$mparams}";
 				}
 				if(!isset($m['action'])) {
-					echo "<div class=\"m\" id=\"msg_{$id}_{$m['id']}\">";
-					if(!$old) echo "<div class=\"mc".($out && !$search ?' my':' mo')."\">";
+					echo "<div class=\"m".($mentioned?' mpd':'')."\" id=\"msg_{$id}_{$m['id']}\">";
+					if(!$old) echo "<div class=\"mc".($out && !$search ?' my':($mentioned?' mpc':' mo'))."\">";
 					echo "<div class=\"mh\" onclick=\"location.href='{$href}';\">";
 					if(!$pm && $uid != null && $l) {
 						echo "<b><a href=\"chat.php?c={$uid}\" class=\"mn\" {$color}>".static::dehtml($mname).'</a></b>';
@@ -285,7 +293,7 @@ class MP {
 					}
 					echo ' '.date("H:i", $mtime);
 					
-					if($m['media_unread']) {
+					if($mentioned || $m['media_unread']) {
 						echo ' •';
 					}
 					if($search) { // replace "message options" link to "go to message" in history search
@@ -362,6 +370,7 @@ class MP {
 						echo str_replace("\n", "<br>", static::dehtml($text));
 					}
 					echo '</div>';
+					gc_collect_cycles();
 				}
 				if(isset($m['media'])) {
 					echo static::printMessageMedia($MP, $m, $id, $imgs, $lng, false, $photosize, $out, $old);
