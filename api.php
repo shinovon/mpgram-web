@@ -7,7 +7,8 @@ require_once("api_values.php");
 require_once("config.php");
 
 define("def", 1);
-define("api_version", 2);
+define("api_version", 4);
+define("api_version_min", 2);
 
 use danog\MadelineProto\Magic;
 
@@ -133,6 +134,7 @@ function setupMadelineProto($user=null) {
 	$app = new \danog\MadelineProto\Settings\AppInfo;
 	$app->setApiId(api_id);
 	$app->setApiHash(api_hash);
+	$app->setShowPrompt(false);
 	
 	$app->setAppVersion($_SERVER['HTTP_X_MPGRAM_APP_VERSION'] ?? 'api');
 	if (isset($_SERVER['HTTP_X_MPGRAM_DEVICE'])) {
@@ -377,7 +379,7 @@ try {
 	}
 	checkParamEmpty('v');
 	$v = (int) $PARAMS['v'];
-	if($v != api_version && $v != api_version + 1) {
+	if($v < api_version_min || $v > api_version) {
 		error(['message' => "Unsupported API version"]);
 	}
 	$METHOD = $PARAMS['method'];
@@ -647,19 +649,41 @@ try {
 		$r = $MP->getSelf();
 		json(parseUser($r));
 		break;
+/*
 	case 'getUser':
-		checkParamEmpty('id');
-		checkAuth();
-		setupMadelineProto();
-		$r = $MP->getInfo($PARAMS['id'])['User'];
-		json(parseUser($r));
-		break;
 	case 'getChat':
+		break;
+*/
+	case 'getPeer':
 		checkParamEmpty('id');
 		checkAuth();
 		setupMadelineProto();
-		$r = $MP->getInfo($PARAMS['id'])['Chat'];
-		json(parseChat($r));
+		$r = $MP->getInfo($PARAMS['id']);
+		if (isset($r['User']) && (!isset($PARAMS['type']) || $PARAMS['type'] == 'user')) {
+			json(parseUser($r['User']));
+		} elseif (isset($r['Chat']) && (!isset($PARAMS['type']) || $PARAMS['type'] == 'chat')) {
+			json(parseChat($r['Chat']));
+		} else {
+			error(['message'=>'']);
+		}
+		break;
+	case 'getPeers':
+		checkParamEmpty('id');
+		checkAuth();
+		setupMadelineProto();
+		$users = ['0'=>0];
+		$chats = ['0'=>0];
+		foreach (explode(',', $PARAMS['id'])) as $id) {
+			$id = (int) trim($id);
+			if ($id == 0) error(['message'=>'Invalid id']);
+			$r = $MP->getInfo($PARAMS['id'])
+			if (isset($r['User'])) {
+				$users[strval($id)] = parseUser($r['User']));
+			} elseif (isset($r['Chat'])) {
+				$chats[strval($id)] = parseChat($r['Chat']));
+			}
+		}
+		json(['users' => $users, 'chats' => $chats]);
 		break;
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
