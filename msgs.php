@@ -13,6 +13,10 @@ $longpoll = isset($_GET['l']);
 $old = isset($_GET['ol']);
 $photosize = $_GET['ps'] ?? 0;
 $lng = MP::initLocale();
+$thread = null;
+if (isset($_GET['th'])) {
+	$thread = (int) $_GET['th'];
+}	
 
 function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 	global $id;
@@ -21,16 +25,45 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 	global $timeoff;
 	global $old;
 	global $photosize;
-	$r = $MP->messages->getHistory([
-	'peer' => $id,
-	'offset_id' => 0,
-	'offset_date' => 0,
-	'add_offset' => 0,
-	'limit' => 20,
-	'max_id' => $maxmsg['id']+1,
-	'min_id' => $minmsg['id']-1,
-	'hash' => 0]);
+	global $thread;
+	$r = null;
+	if ($thread != null) {
+		$r = $MP->messages->search([
+		'peer' => $id,
+		'offset_id' => 0,
+		'offset_date' => 0,
+		'add_offset' => 0,
+		'limit' => 20,
+		'max_id' => $maxmsg['id']+1,
+		'min_id' => $minmsg['id']-1,
+		'top_msg_id' => $thread,
+		'hash' => 0]);
+	} else {
+		$r = $MP->messages->getHistory([
+		'peer' => $id,
+		'offset_id' => 0,
+		'offset_date' => 0,
+		'add_offset' => 0,
+		'limit' => 20,
+		'max_id' => $maxmsg['id']+1,
+		'min_id' => $minmsg['id']-1,
+		'hash' => 0]);
+	}
 	$rm = $r['messages'];
+	$mentions = null;
+	try {
+		$p = ['peer' => $id,
+		'offset_id' => 0,
+		'offset_date' => 0,
+		'add_offset' => 0,
+		'limit' => 20,
+		'max_id' => $maxmsg['id']+1,
+		'min_id' => $minmsg['id']-1];
+		if ($thread !== null) {
+			$p['top_msg_id'] = $thread;
+		}
+		$mentions = $MP->messages->getUnreadMentions($p)['messages'];
+	} catch (Exception) {}
 	$info = $MP->getInfo($id);
 	$name = null;
 	$pm = false;
@@ -46,19 +79,21 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 	}
 	$channel = isset($info['channel_id']);
 	unset($info);
-	//echo $rm[0]['id'].'||';
 	echo $maxoffset.'||';
+	if (count($rm) == 0) die;
+	$maxid = $rm[0]['id'];
 	MP::addUsers($r['users'], $r['chats']);
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true, $ar, false, $old, $photosize);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true, $ar, false, $old, $photosize, true, $mentions, $thread);
 	// Mark as read
 	try {
-		if($ch || (int)$id < 0) {
+		if ($thread != null) {
+			$MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => $thread]);
+		} else if($ch || (int)$id < 0) {
 			$MP->channels->readHistory(['channel' => $id, 'max_id' => $maxmsg['id']]);
 		} else {
 			$MP->messages->readHistory(['peer' => $id, 'max_id' => $maxmsg['id']]);
 		}
-	} catch (Exception $e) {
-	}
+	} catch (Exception $e) {}
 }
 
 header('Content-Type: text/html; charset=utf-8');
@@ -106,17 +141,45 @@ try {
 		}
 		return;
 	}
-	$r = $MP->messages->getHistory([
-	'peer' => $id,
-	'offset_id' => 0,
-	'offset_date' => 0,
-	'add_offset' => 0,
-	'limit' => $limit,
-	'max_id' => 0,
-	'min_id' => $i,
-	'hash' => 0]);
+	$r = null;
+	if ($thread != null) {
+		$r = $MP->messages->search([
+		'peer' => $id,
+		'offset_id' => 0,
+		'offset_date' => 0,
+		'add_offset' => 0,
+		'limit' => $limit,
+		'max_id' => 0,
+		'min_id' => $i,
+		'top_msg_id' => $thread,
+		'hash' => 0]);
+	} else {
+		$r = $MP->messages->getHistory([
+		'peer' => $id,
+		'offset_id' => 0,
+		'offset_date' => 0,
+		'add_offset' => 0,
+		'limit' => $limit,
+		'max_id' => 0,
+		'min_id' => $i,
+		'hash' => 0]);
+	}
 	$rm = $r['messages'];
 	if(count($rm) == 0 || !isset($rm[0])) die;
+	$mentions = null;
+	try {
+		$p = ['peer' => $id,
+		'offset_id' => 0,
+		'offset_date' => 0,
+		'add_offset' => 0,
+		'limit' => $limit,
+		'max_id' => 0,
+		'min_id' => $i];
+		if ($thread !== null) {
+			$p['top_msg_id'] = $thread;
+		}
+		$mentions = $MP->messages->getUnreadMentions($p)['messages'];
+	} catch (Exception) {}
 	$info = $MP->getInfo($id);
 	$name = null;
 	$pm = false;
@@ -134,18 +197,20 @@ try {
 	}
 	$channel = isset($info['channel_id']);
 	unset($info);
-	echo $rm[0]['id'].'||';
+	$maxid = $rm[0]['id'];
+	echo $maxid.'||';
 	MP::addUsers($r['users'], $r['chats']);
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true, $ar, false, $old, $photosize);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, true, $name, $timeoff, $channel, true, $ar, false, $old, $photosize, true, $mentions, $thread);
 	// Mark as read
 	try {
-		if($ch || (int)$id < 0) {
-			$MP->channels->readHistory(['channel' => $id, 'max_id' => 0]);
+		if ($thread != null) {
+			$MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => $thread]);
+		} else if($ch || (int)$id < 0) {
+			$MP->channels->readHistory(['channel' => $id, 'max_id' => $maxid]);
 		} else {
-			$MP->messages->readHistory(['peer' => $id, 'max_id' => 0]);
+			$MP->messages->readHistory(['peer' => $id, 'max_id' => $maxid]);
 		}
-	} catch (Exception $e) {
-	}
+	} catch (Exception $e) {}
 	unset($rm);
 	unset($r);
 	MP::gc();

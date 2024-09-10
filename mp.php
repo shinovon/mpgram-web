@@ -197,7 +197,7 @@ class MP {
 		return $txt;
 	}
 	
-	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false, $old=false, $photosize=0, $showdate=true, $mentions=null) {
+	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false, $old=false, $photosize=0, $showdate=true, $mentions=null, $thread=null) {
 		$lastdate = date('d.m.y', time()-$timeoff);
 		if ($mentions != null) {
 			$tmp = [];
@@ -316,7 +316,7 @@ class MP {
 				if(isset($m['reply_to'])) {
 					$replyid = $m['reply_to']['reply_to_msg_id'] ?? null;
 					$replypeer = $m['reply_to']['reply_to_peer_id'] ?? $id;
-					if($replyid) {
+					if($replyid && $replyid != $thread) {
 						$replymsg = null;
 						try {
 							if($replypeer < 0) {

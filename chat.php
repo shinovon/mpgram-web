@@ -251,7 +251,7 @@ var reverse = '.($reverse?'true':'false').';
 var autoscroll = '.($autoscroll?'true':'false').';
 var longpoll = '.($longpoll?'true':'false').';
 var updint = '.($longpoll?'1000':$updint.'000').';
-var url = "'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&lang='.$lng['lang'].'&t='.$timeoff.($longpoll?'&l':'').($old?'&ol':'').'";
+var url = "'.MP::getUrl().'msgs.php?user='.$user.'&id='.$id.'&lang='.$lng['lang'].'&t='.$timeoff.($longpoll?'&l':'').($old?'&ol':'').($thread != null ? '&th='.$thread : '').'";
 var msglimit = '.$msglimit.';
 var msg = "'.$ii.'";';
 echo file_get_contents('chatupdate.js');
@@ -400,7 +400,7 @@ setTimeout("location.reload(true);",'.$updint.'000);
 		echo '</div><p></p>';
 	}
 	echo '<div id="msgs">';
-	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true, $ar, $query !== null, $old, $photosize, true, $mentions);
+	MP::printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name, $timeoff, $channel, true, $ar, $query !== null, $old, $photosize, true, $mentions, $thread);
 	echo '</div>';
 	if(!$reverse) {
 		if(count($rm) >= $msglimit && ($thread == null || $lastid != $thread)) {
