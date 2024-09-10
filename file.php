@@ -1,4 +1,8 @@
 <?php
+ini_set('error_reporting', E_ERROR);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+
 set_time_limit(300);
 use Amp\Success;
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
@@ -70,6 +74,11 @@ try {
 		$di = $d;
 	}
 	if(strpos($p, 'r') === 0) {
+		if(($info['size'] ?? 0) > 25 * 1024 * 1024) { // 25 mb
+			http_response_code(400);
+			echo 'File is too large!';
+			die;
+		}
 		header('Cache-Control: private, max-age=2592000');
 		$p = substr($p, 1);
 		if(strpos($p, 'tgs') === 0) {
