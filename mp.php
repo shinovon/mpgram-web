@@ -306,14 +306,17 @@ class MP {
 					echo '</b></div>';
 				}
 				if(isset($m['reply_to'])) {
-					$replyid = $m['reply_to']['reply_to_msg_id'];
+					$replyid = $m['reply_to']['reply_to_msg_id'] ?? null;
+					$replypeer = $m['reply_to']['reply_to_peer_id'] ?? $id;
 					if($replyid) {
 						$replymsg = null;
-						if($chid) {
-							$replymsg = $MP->channels->getMessages(['channel' => $id, 'id' => [$replyid]]);
-						} else {
-							$replymsg = $MP->messages->getMessages(['peer' => $id, 'id' => [$replyid]]);
-						}
+						try {
+							if($replypeer < 0) {
+								$replymsg = $MP->channels->getMessages(['channel' => $replypeer, 'id' => [$replyid]]);
+							} else {
+								$replymsg = $MP->messages->getMessages(['peer' => $replypeer, 'id' => [$replyid]]);
+							}
+						} catch (Exception) {}
 						if($replymsg && isset($replymsg['messages']) && isset($replymsg['messages'][0])) {
 							$replymsg = $replymsg['messages'][0];
 							echo '<div class="r">';
@@ -341,7 +344,7 @@ class MP {
 								if(strlen($replytext) > 50)
 									$replytext = static::utfsubstr($replytext, 0, 50);
 								echo '<div class="rt">';
-								echo '<a href="chat.php?c='.$id.'&m='.$replyid.'">';
+								echo '<a href="chat.php?c='.$replypeer.'&m='.$replyid.'">';
 								echo static::dehtml(str_replace("\n", " ", $replytext));
 								echo '</a>';
 								echo '</div>';
@@ -567,7 +570,7 @@ class MP {
 					echo static::x($lng['poll']);
 				}
 				echo '<br>'.$poll['question'].'<br>';
-				foreach ($media['results']['results'] as $k => $v) {
+				foreach ($media['results']['results'] ?? $poll['answers'] as $k => $v) {
 					echo "<input type=\"".($multiple?'checkbox':'radio')."\" id=\"{$poll['id']}_{$v['option']}\" name=\"vote\" value=\"{$v['option']}\"".(!$form?' disabled':'').(($v['chosen'] ?? false)?' checked':'').">";
 					echo "<label for=\"{$poll['id']}_{$v['option']}\">{$poll['answers'][$k]['text']}</label><br>";
 				}
@@ -603,6 +606,7 @@ class MP {
 	
 	static function utfsubstr($s, $offset, $length = null) {
 		$s = iconv('utf-8', 'utf-16le', $s);
+		//$s = mb_substr($s, $offset, $length, 'utf-16le');
 		$s = $length !== null ? substr($s, $offset*2, $length*2) : substr($s, $offset*2);
 		return iconv('utf-16le', 'utf-8', $s);
 	}
@@ -794,6 +798,7 @@ class MP {
 		$app = new \danog\MadelineProto\Settings\AppInfo;
 		$app->setApiId(api_id);
 		$app->setApiHash(api_hash);
+		$app->setShowPrompt(false);
 		try {
 			if(ini_get('browscap') && isset($_SERVER['HTTP_USER_AGENT'])) {
 				$ua = $_SERVER['HTTP_USER_AGENT'];
@@ -871,17 +876,17 @@ class MP {
 		} catch (Exception) {}
 		$app->setAppVersion('web');
 		$sets->setAppInfo($app);
-		$peer = new \danog\MadelineProto\Settings\Peer;
+		$peer = $sets->getPeer();
 		$peer->setFullFetch(false);
 		$peer->setCacheAllPeersOnStartup(false);
-		$sets->setPeer($peer);
 		$db = $sets->getDb();
 		$db->setEnableMinDb(false);
 		$db->setEnableUsernameDb(true);
 		$db->setEnableFullPeerDb(false);
 		$db->setEnablePeerInfoDb(true);
 		$c = $sets->getConnection();
-		$c->setTimeout(10);
+		$c->setTimeout(5);
+		$c->setRetry(false);
 		return $sets;
 	}
 	
