@@ -385,14 +385,16 @@ setTimeout("location.reload(true);",'.$updint.'000);
 		$rm = array_reverse($rm);
 	}
 	if(!$texttop && !$reverse) echo '<p></p>';
-	if ($forum && $thread == null) {
+	if ($forum) {
 		echo '<div>';
 		try {
 			$topics = $MP->channels->getForumTopics(['channel' => $id, 'limit' => 20])['topics'];
 			foreach ($topics as $topic) {
 				echo "<a href=\"{$file}?c={$id}&t={$topic['id']}"
 				.($topic['read_inbox_max_id'] != $topic['top_message']?'&m='.$topic['read_inbox_max_id']:'')
-				."\">{$topic['title']}</a> ";
+				."\""
+				.($topic['id'] == $thread ?' class="fs"':'')
+				.">{$topic['title']}</a> &nbsp;";
 			}
 		} catch (Exception $e) {}
 		echo '</div><p></p>';
