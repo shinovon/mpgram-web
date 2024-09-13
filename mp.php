@@ -252,8 +252,12 @@ class MP {
 				if(isset($m['fwd_from'])) {
 					$fwname = $m['fwd_from']['from_name'] ?? null;
 					$fwid = $m['fwd_from']['from_id'] ?? null;
-					if ($fwname === null && $fwid !== null){
-						$fwname = static::getNameFromId($MP, $fwid, true);
+					try {
+						if ($fwname === null && $fwid !== null){
+							$fwname = static::getNameFromId($MP, $fwid, true);
+						}
+					} catch (Exception) {
+						$fwname = 'Unknown';
 					}
 					$fwm = $m['fwd_from']['saved_from_msg_id'] ?? $m['fwd_from']['channel_post'] ?? null;
 					$fwid = $m['fwd_from']['saved_from_peer'] ?? $fwid ?? null;
@@ -894,7 +898,7 @@ class MP {
 		$db->setEnableFullPeerDb(false);
 		$db->setEnablePeerInfoDb(true);
 		$c = $sets->getConnection();
-		$c->setTimeout(5);
+		$c->setTimeout(10);
 		$c->setRetry(false);
 		return $sets;
 	}
