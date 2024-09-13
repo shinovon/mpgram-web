@@ -105,12 +105,12 @@ try {
 		//echo MP::x($lng['folders']).': ';
 		foreach($folders as $f) {
 			if(($f['_'] ?? '') == 'dialogFilterDefault' || !isset($f['id'])) {
-				echo '<a href="chats.php">'.MP::x($lng['all_chats']).'</a> ';
+				echo '<a href="chats.php">'.MP::x($lng['all_chats']);
 			} else {
 				$sel = $fid == $f['id'];
-				echo '<a href="chats.php?f='.$f['id'].'"'.($sel?' class="fs"':'').'>'.MP::dehtml($f['title']).'</a>';
-				echo ' ';
+				echo '<a href="chats.php?f='.$f['id'].'"'.($sel?' class="fs"':'').'>'.MP::dehtml($f['title']);
 			}
+			echo '</a> ';
 		}
 		if($hasArchiveChats) {
 			$sel = $fid == 1;
@@ -306,10 +306,11 @@ try {
 				$id = $d['peer'] ?? $d;
 				$n = null;
 				$cl = 'chat.php?c='.$id;
-				$unr = $d['unread_count'];
+				$unr = $d['unread_count'] ?? 0;
 				$broadcast = false;
+				$maxid = $d['read_inbox_max_id'] ?? 0;
 				if($unr > $msglimit) {
-					$cl .= '&m='.$d['read_inbox_max_id'].'&offset='.(-$msglimit-1);
+					$cl .= '&m='.$maxid.'&offset='.(-$msglimit-1);
 				}
 				echo '<tr class="c" onclick="location.href=\''.$cl.'\';">';
 				if($avas) {
@@ -335,7 +336,7 @@ try {
 				
 				$mention = false;
 				try {
-					$mention = count($MP->messages->getUnreadMentions(['peer' => $id, 'limit' => 1])['messages']) > 0;
+					$mention = count($MP->messages->getUnreadMentions(['peer' => $id, 'limit' => 1, 'min_id' => $maxid])['messages']) > 0;
 				} catch (Exception) {}
 				if($unr > 0 || $mention) {
 					echo ' <b class="unr">';
