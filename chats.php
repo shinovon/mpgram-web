@@ -38,15 +38,13 @@ try {
 		$x = false;
 		try {
 			$x = file_get_contents('./lastclean');
-		} catch (Exception) {
-		}
+		} catch (Exception) {}
 		if(!$x || (time() - (int)$x) > 30 * 60) {
 			exec("kill -9 `ps -ef | grep -v grep | grep 'MadelineProto worker' | awk '{print $2}'` > /dev/null &");
 			file_put_contents('./lastclean', time());
 		}
 	}
-} catch (Exception) {
-}
+} catch (Exception) {}
 
 header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store, must-revalidate');
@@ -77,8 +75,9 @@ try {
 	}
 	echo '</head>';
 	echo Themes::bodyStart();
-	$selfid = MP::getSelfId($MP);
-	$selfname = MP::dehtml(MP::getSelfName($MP));
+	$self = $MP->getSelf();
+	$selfid = $self['id'];
+	$selfname = MP::dehtml(MP::getUserName($self, true));
 	$hasArchiveChats = false;
 	$fid = 0;
 	if(isset($_GET['f'])) {
@@ -334,10 +333,7 @@ try {
 				}
 				echo MP::dehtml(MP::removeEmoji($n));
 				
-				$mention = false;
-				try {
-					$mention = count($MP->messages->getUnreadMentions(['peer' => $id, 'limit' => 1, 'min_id' => $maxid])['messages']) > 0;
-				} catch (Exception) {}
+				$mention = $d['unread_mentions_count'] > 0;
 				if($unr > 0 || $mention) {
 					echo ' <b class="unr">';
 					if($unr > 0) echo '+'.$unr.' ';
@@ -404,7 +400,7 @@ try {
 	}
 	echo Themes::bodyEnd();
 	unset($MP);
-	MP::gc();
+	die;
 } catch (Exception $e) {
 	if(strpos($e->getMessage(), 'SESSION_REVOKED') !== false || strpos($e->getMessage(), 'session created on newer PHP') !== false) {
 		header('Location: login.php?revoked=1');
