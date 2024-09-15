@@ -596,7 +596,15 @@ class MP {
 				echo '<br>';
 				foreach ($media['results']['results'] ?? $poll['answers'] as $k => $v) {
 					echo "<input type=\"".($multiple?'checkbox':'radio')."\" id=\"{$poll['id']}_{$v['option']}\" name=\"vote\" value=\"{$v['option']}\"".(!$form?' disabled':'').(($v['chosen'] ?? false)?' checked':'').">";
-					echo "<label for=\"{$poll['id']}_{$v['option']}\">{$poll['answers'][$k]['text']}</label><br>";
+					$t = $poll['answers'][$k]['text'];
+					if (isset($t['text'])) {
+						if (isset($t['entities']) && count($t['entities']) > 0) {
+							$t = static::wrapRichText($t['text'], $t['entities']);
+						} else {
+							$t = str_replace("\n", "<br>", static::dehtml($t['text']));
+						}
+					}
+					echo "<label for=\"{$poll['id']}_{$v['option']}\">{$t}</label><br>";
 				}
 				echo '<br>';
 				if ($form) {
