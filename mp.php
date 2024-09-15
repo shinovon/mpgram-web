@@ -582,7 +582,18 @@ class MP {
 				} else {
 					echo static::x($lng['poll']);
 				}
-				echo '<br>'.$poll['question'].'<br>';
+				$q = $poll['question'];
+				echo '<br>';
+				if (isset($q['text'])) {
+					if (isset($q['entities']) && count($q['entities']) > 0) {
+						echo static::wrapRichText($q['text'], $q['entities']);
+					} else {
+						echo str_replace("\n", "<br>", static::dehtml($q['text']));
+					}
+				} else {
+					echo str_replace("\n", "<br>", static::dehtml($q));
+				}
+				echo '<br>';
 				foreach ($media['results']['results'] ?? $poll['answers'] as $k => $v) {
 					echo "<input type=\"".($multiple?'checkbox':'radio')."\" id=\"{$poll['id']}_{$v['option']}\" name=\"vote\" value=\"{$v['option']}\"".(!$form?' disabled':'').(($v['chosen'] ?? false)?' checked':'').">";
 					echo "<label for=\"{$poll['id']}_{$v['option']}\">{$poll['answers'][$k]['text']}</label><br>";
