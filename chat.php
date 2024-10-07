@@ -130,7 +130,7 @@ try {
 			async(
 				$MP->messages->getBotCallbackAnswer(...),
 				['peer' => $id, 'msg_id' => $msgoffsetid, 'data' => base64_decode($botcallback)]
-			)->await(Tools::getTimeoutCancellation(0.1));
+			)->await(Tools::getTimeoutCancellation(0.5));
 		} catch (Exception) {}
 	}
 	function printInputField() {
