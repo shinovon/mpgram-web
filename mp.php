@@ -387,7 +387,7 @@ class MP {
 						foreach($row['buttons'] ?? [] as $button) {
 							$s = '';
 							if(isset($button['data'])) {
-								$s = 'href="botcallback.php?m='.$m['id'].'&c='.$id.'&d='.urlencode(base64_encode($button['data'])).'"';
+								$s = 'href="chat.php?m='.$m['id'].'&c='.$id.'&cb='.urlencode(base64_encode($button['data'])).'"';
 							} elseif(isset($button['url'])) {
 								$s = 'href="'.static::wrapUrl($button['url']).'"';
 							}

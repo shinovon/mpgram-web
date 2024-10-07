@@ -7,6 +7,10 @@ ini_set('display_startup_errors', 1);
 
 include 'mp.php';
 
+use function Amp\async;
+use function Amp\Future\await;
+use danog\MadelineProto\Tools;
+
 $iev = MP::getIEVersion();
 $timeoff = MP::getSettingInt('timeoff');
 $theme = MP::getSettingInt('theme');
@@ -59,6 +63,7 @@ header('Cache-Control: private, no-cache, no-store');
 $id = $_GET['c'] ?? $_GET['peer'] ?? die;
 
 $start = $_GET['start'] ?? null;
+$botcallback = $_GET['cb'] ?? null;
 $file = htmlentities($_SERVER['PHP_SELF']);
 
 $query = $_GET['q'] ?? null;
@@ -119,6 +124,14 @@ try {
 	}
 	if($start !== null) {
 		$MP->messages->startBot(['start_param' => $start, 'bot' => $id, 'random_id' => $_GET['rnd']]);
+	}
+	if ($botcallback != null) {
+		try {
+			async(
+				$MP->messages->getBotCallbackAnswer(...),
+				['peer' => $id, 'msg_id' => $msgoffsetid, 'data' => base64_decode($botcallback)]
+			)->await(Tools::getTimeoutCancellation(0.1));
+		} catch (Exception) {}
 	}
 	function printInputField() {
 		global $full;

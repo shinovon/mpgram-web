@@ -75,6 +75,8 @@ function removeSession($logout=false) {
 }
 
 function htmlStart() {
+	if (defined('HTML_STARTED')) return;
+	define('HTML_STARTED', 1);
 	global $lng;
 	header("Content-Type: text/html; charset=utf-8");
 	echo '<head><title>'.MP::x($lng['login']).'</title>';
@@ -207,7 +209,6 @@ if($phone !== null) {
 		$SESSION['user'] = $user = rtrim(strtr(base64_encode(hash('sha384', sha1(md5($phone.rand(0,1000).random_bytes(6))).random_bytes(30), true)), '+/', '-_'), '=');
 		MP::cookie('user', $user, time() + (86400 * 365));
 		$MP = MP::getMadelineAPI($user, true);
-		htmlStart();
 	} else {
 		if(isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {
 			unset($_SESSION['captcha_entered']);
@@ -326,6 +327,7 @@ if($phone !== null) {
 		try {
 			$MP->auth->resendCode(['phone' => $phone, 'phone_code_hash' => $hash]);
 		} catch (Exception $e) {
+			htmlStart();
 			echo $e->getMessage();
 			echo Themes::bodyEnd();
 			die;
@@ -338,12 +340,14 @@ if($phone !== null) {
 				header('Location: login.php?wrong=number');
 				die;
 			} else {
+				htmlStart();
 				echo $e->getMessage();
 				echo Themes::bodyEnd();
 				die;
 			}
 		}
 	}
+	htmlStart();
 	echo MP::x($lng['phone_code']).':<br>';
 	echo '<form action="login.php"';
 	if($post) echo ' method="post"';
