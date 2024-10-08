@@ -56,6 +56,7 @@ if(!$user) {
 	header('Location: login.php?logout=1');
 	die;
 }
+MP::startSession();
 
 header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store');
@@ -64,6 +65,7 @@ $id = $_GET['c'] ?? $_GET['peer'] ?? die;
 
 $start = $_GET['start'] ?? null;
 $botcallback = $_GET['cb'] ?? null;
+$random = $_GET['r'] ?? null;
 $file = htmlentities($_SERVER['PHP_SELF']);
 
 $query = $_GET['q'] ?? null;
@@ -123,14 +125,19 @@ try {
 		} catch (Exception) {}
 	}
 	if($start !== null) {
-		$MP->messages->startBot(['start_param' => $start, 'bot' => $id, 'random_id' => $_GET['rnd']]);
+		$MP->messages->startBot(['start_param' => $start, 'bot' => $id, 'random_id' => $random]);
 	}
-	if ($botcallback != null) {
+	$alert = null;
+	if ($botcallback != null && ($random == null || !isset($_SESSION['random']) || $_SESSION['random'] != $random)) {
+		if ($random != null) $_SESSION['random'] = $random;
 		try {
-			async(
+			$a = async(
 				$MP->messages->getBotCallbackAnswer(...),
 				['peer' => $id, 'msg_id' => $msgoffsetid, 'data' => base64_decode($botcallback)]
 			)->await(Tools::getTimeoutCancellation(0.5));
+			if (($a['alert'] ?? false) && isset($a['message'])) {
+				$alert = $a['message'];
+			}
 		} catch (Exception) {}
 	}
 	function printInputField() {
@@ -273,6 +280,11 @@ echo '
 		} else {
 			echo '<script type="text/javascript"><!--
 setTimeout("location.reload(true);",'.$updint.'000);
+//--></script>';
+		}
+		if ($alert != null) {
+echo '<script type="text/javascript"><!--
+alert("'.str_replace('"', '\"', $alert).'");
 //--></script>';
 		}
 	}

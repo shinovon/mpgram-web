@@ -381,13 +381,16 @@ class MP {
 				}
 				if(isset($m['reply_markup'])) {
 					$rows = $m['reply_markup']['rows'] ?? [];
+					$rnd = urlencode(base64_encode(random_bytes(8)));
 					echo '<table>';
 					foreach($rows as $row) {
 						echo '<tr><table class="rt rc"><tr>';
 						foreach($row['buttons'] ?? [] as $button) {
 							$s = '';
 							if(isset($button['data'])) {
-								$s = 'href="chat.php?m='.$m['id'].'&c='.$id.'&cb='.urlencode(base64_encode($button['data'])).'"';
+								$s = 'href="chat.php?m='.$m['id'].'&c='.$id
+								.'&cb='.urlencode(base64_encode($button['data']))
+								.'&r='.$rnd.'"';
 							} elseif(isset($button['url'])) {
 								$s = 'href="'.static::wrapUrl($button['url']).'"';
 							}
@@ -764,11 +767,11 @@ class MP {
 							$s = $path[0];
 							if(strpos($s, '?start=') !== false) {
 								$s = str_replace('?start=', "&start=", $s);
-								$s .= '&rnd='.rand(0, 100000);
+								$s .= '&r='.rand(0, 100000);
 							} elseif(strpos($s, '?') !== false) {
 								$i = strpos($s, '?');
 								$s = substr($s, 0, $i).'&'.substr($s, $i+1);
-								$s .= '&rnd='.rand(0, 100000);
+								$s .= '&r='.rand(0, 100000);
 							}
 							$url = static::getURL().'chat.php?c='.$s;
 						}

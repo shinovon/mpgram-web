@@ -24,7 +24,6 @@ set_error_handler('exceptions_error_handler');
 try {
 	$MP = MP::getMadelineAPI($user);
 	$MP->messages->getBotCallbackAnswer(['peer' => $id, 'msg_id' => $msg, 'data' => base64_decode($data)]);
-} catch (Exception $e) {
-}
-header('Location: chat.php?c='.$id);
+} catch (Exception) {}
+header('Location: chat.php?c='.$id.'&m='.$msg);
 die;
