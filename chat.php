@@ -452,13 +452,14 @@ alert("'.str_replace('"', '\"', $alert).'");
 			$maxid = ($reverse ? $rm[count($rm)-1]['id'] : $rm[0]['id']);
 			if ($thread != null) {
 				$MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => $thread]);
-				//$MP->messages->readMentions(['peer' => $id, 'top_msg_id' => $thread]);
+				$MP->messages->readMentions(['peer' => $id, 'top_msg_id' => $thread]);
 			} else if($ch || (int)$id < 0) {
 				$MP->channels->readHistory(['channel' => $id, 'max_id' => $maxid]);
+				$MP->messages->readMentions(['peer' => $id]);
 			} else {
 				$MP->messages->readHistory(['peer' => $id, 'max_id' => $maxid]);
+				$MP->messages->readMentions(['peer' => $id]);
 			}
-			//$MP->messages->readMentions(['peer' => $id]);
 			//$MP->messages->readReactions(['peer' => $id]);
 		}
 	} catch (Exception $e) {

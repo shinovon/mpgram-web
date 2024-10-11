@@ -334,7 +334,7 @@ try {
 				echo MP::dehtml(MP::removeEmoji($n));
 				
 				$mention = $d['unread_mentions_count'] > 0;
-				if($unr > 0 || $mention) {
+				if($unr > 0/*|| $mention*/) {
 					echo ' <b class="unr">';
 					if($unr > 0) echo '+'.$unr.' ';
 					if($mention) echo '@';
