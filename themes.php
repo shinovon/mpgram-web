@@ -130,7 +130,7 @@ class Themes {
 			margin-right: auto;') : 'max-width: 540px;
 			margin-left: auto;
 			margin-right: auto;')).'
-			font-family: system-ui;
+			font-family: sans-serif, system-ui;
 			'.(static::$theme !== 1 ?
 			'background: '.static::color('!background').';
 			color: '.static::color('!foreground').';' : 'color: '.static::color('!foreground').';').'
