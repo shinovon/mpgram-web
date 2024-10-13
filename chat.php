@@ -81,6 +81,31 @@ Themes::setChatTheme($theme);
 
 try {
 	$MP = MP::getMadelineAPI($user);
+	if (strpos($id, '+') === 0) {
+		$id = substr($id, 1);
+		$invite = $MP->messages->checkChatInvite(hash: $id);
+		if (isset($_GET['join'])) {
+			$MP->messages->importChatInvite(hash: $id);
+			$id = $invite['chat']['id'];
+			header("Location: chat.php?c={$id}");
+			die;
+		}
+		if ($invite['_'] == 'chatInviteAlready') {
+			$id = $invite['chat']['id'];
+			header("Location: chat.php?c={$id}");
+			die;
+		}
+		//if ($invite['_'] != 'chatInvitePeek') { // TODO
+		echo '<head><title>'.MP::dehtml($invite['chat']['title']).'</title>';
+		echo Themes::head();
+		echo '</head>';
+		echo Themes::bodyStart();
+		echo MP::dehtml($invite['chat']['title']).'<br><br>';
+		echo '<a href="chat.php?join&c='.urlencode($id).'">';
+		echo MP::x($lng['join']).'</a>';
+		echo Themes::bodyEnd();
+		die;
+	}
 	$info = $MP->getInfo($id);
 	$name = null;
 	$pm = false;
