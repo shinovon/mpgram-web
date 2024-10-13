@@ -1,0 +1,17 @@
+--- vendor/danog/madelineproto/src/MTProtoTools/Files.php	2024-09-14 18:15:12.086109963 +0200
++++ vendor/danog/madelineproto/src/MTProtoTools/Files.php	2024-09-14 18:17:07.395451604 +0200
+@@ -669,12 +669,9 @@
+     /**
+      * Gets info of the propic of a user.
+      */
+-    public function getPropicInfo($data): ?Photo
++    public function getPropicInfo($data): array
+     {
+-        if (!$this->getSettings()->getDb()->getEnableFullPeerDb()) {
+-            throw new AssertionError("getPropicInfo cannot be used if the full peer database is disabled!");
+-        }
+-        return $this->getPwrChat($data, false)['photo'] ?? null;
++        return $this->getDownloadInfo($this->peerDatabase->get($this->getId($data)));
+     }
+     /**
+      * Extract file info from bot API message.

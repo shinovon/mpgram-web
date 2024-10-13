@@ -21,6 +21,11 @@ You can deploy your own instance quickly with Docker Compose - [see how](https:/
 - Download and set [browscap](https://browscap.org/) database in `php.ini` to get better logged in device names
 - Install Composer v2+
 - Install MadelineProto and its dependencies with `composer update`
+- Apply MadelineProto patches:
+```
+patch -p0 < patches/InternalDoc.php.patch
+patch -p0 < patches/Files.php.patch
+```
 - Make a background script that restarts php service at least every hour
 - Set `session.gc_maxlifetime = 8640000` in `php.ini`
 - For more details on installing MadelineProto <a href="https://docs.madelineproto.xyz/docs/REQUIREMENTS.html">see here</a>

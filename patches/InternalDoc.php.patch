@@ -1,0 +1,11 @@
+--- vendor/danog/madelineproto/src/InternalDoc.php	2024-09-14 18:15:12.082109916 +0200
++++ vendor/danog/madelineproto/src/InternalDoc.php	2024-09-14 18:17:57.592035611 +0200
+@@ -1055,7 +1055,7 @@
+     /**
+      * Gets info of the propic of a user.
+      */
+-    final public function getPropicInfo($data): ?\danog\MadelineProto\EventHandler\Media\Photo
++    final public function getPropicInfo($data): array
+     {
+         return $this->wrapper->getAPI()->getPropicInfo($data);
+     }
