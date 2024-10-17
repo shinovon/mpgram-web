@@ -548,8 +548,8 @@ class MP {
 			echo '</div>';
 		} elseif (isset($media['webpage'])) {
 			echo '<div class="mw">';
+			$url = static::dehtml(static::wrapUrl($media['webpage']['url']));
 			if(isset($media['webpage']['site_name'])) {
-				$url = static::dehtml(static::wrapUrl($media['webpage']['url']));
 				echo "<a href=\"{$url}\">".static::dehtml($media['webpage']['site_name'])."</a>";
 			} elseif(isset($media['webpage']['url'])) {
 				echo "<a href=\"{$url}\">".static::dehtml($media['webpage']['url'])."</a>";
