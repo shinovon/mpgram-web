@@ -18,6 +18,9 @@ if(!$user) {
 	die;
 }
 
+header('Content-Type: text/html; charset='.MP::$enc);
+header('Cache-Control: private, no-cache, no-store');
+
 $id = $_GET['c'] ?? $_GET['peer'] ?? die;
 $filter = $_GET['f'] ?? 'photos';
 $filter = strtoupper(substr($filter, 0, 1)).\substr($filter, 1);

@@ -16,7 +16,7 @@ $lng = MP::initLocale();
 $id = $_POST['c'] ?? $_GET['c'] ?? die;
 $reply_to = $_POST['reply_to'] ?? $_GET['reply_to'] ?? null;
 
-header("Content-Type: text/html; charset=utf-8");
+header('Content-Type: text/html; charset='.MP::$enc);
 header("Cache-Control: private, no-cache, no-store");
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {

@@ -17,7 +17,7 @@ $name = $_POST['n'] ?? $_GET['n'] ?? die;
 $stickerset = ['_' => 'inputStickerSetShortName', 'short_name' => $name];
 $returnurl = $_POST['u'] ?? $_GET['u'] ?? null;
 
-header("Content-Type: text/html; charset=utf-8");
+header('Content-Type: text/html; charset='.MP::$enc);
 header("Cache-Control: private, no-cache, no-store");
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {

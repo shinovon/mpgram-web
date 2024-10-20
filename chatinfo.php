@@ -15,7 +15,7 @@ $pngava = MP::getSettingInt('pngava', 0);
 
 $id = $_POST['c'] ?? $_GET['c'] ?? die;
 
-header("Content-Type: text/html; charset=utf-8");
+header('Content-Type: text/html; charset='.MP::$enc);
 header("Cache-Control: private, no-cache, no-store");
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
