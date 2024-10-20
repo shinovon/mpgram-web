@@ -119,7 +119,16 @@ class MP {
 
 	static function getEncoding() {
 		$iev = static::getIEVersion();
-		if($iev != 0 && $iev < 5) {
+		$opera = static::getOperaVersion();
+		$e = static::getSetting('encoding', null, true);
+		if ($e) {
+			mb_convert_encoding('test', $e);
+			return $e;
+		}
+		if (($iev != 0 && $iev < 5)
+			|| ($opera != 0 && $opera <= 5)
+			|| strpos(static::$useragent, 'EPOC') !== false
+			|| strpos(static::$useragent, 'Profile/MIDP-1.0') !== false) {
 			return static::getSetting('lang') == 'ru' ? 'windows-1251' : 'windows-1252';
 		}
 		return 'utf-8';
@@ -990,7 +999,7 @@ class MP {
 	static function getIEVersion() {
 		if(!static::$iev)
 		try {
-			$ua = $_SERVER['HTTP_USER_AGENT'] ?? null;
+			$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
 			static::$useragent = $ua;
 			if(strpos($ua, 'MSIE ') !== false) {
 				$i = strpos($ua, 'MSIE ')+5;
@@ -998,6 +1007,30 @@ class MP {
 			}
 		} catch (Exception) {}
 		return static::$iev;
+	}
+
+	static function getOperaVersion() {
+		try {
+			$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+			static::$useragent = $ua;
+			if(strpos($ua, 'Opera/v') !== false) {
+				$i = strpos($ua, 'Opera/v')+7;
+				return (int)substr($ua, $i, $i+1);
+			}
+			if(strpos($ua, 'Opera/') !== false) {
+				$i = strpos($ua, 'Opera/')+6;
+				return (int)substr($ua, $i, $i+1);
+			}
+			if(strpos($ua, 'Opera v') !== false) {
+				$i = strpos($ua, 'Opera v')+7;
+				return (int)substr($ua, $i, $i+1);
+			}
+			if(strpos($ua, 'Opera ') !== false) {
+				$i = strpos($ua, 'Opera ')+6;
+				return (int)substr($ua, $i, $i+1);
+			}
+		} catch (Exception) {}
+		return 0;
 	}
 
 	static function cookie($n, $v, $e = null) {
@@ -1048,7 +1081,7 @@ class MP {
 	
 	public static function initLocale() {
 		$xlang = $lang = static::getSetting('lang');
-		$lang ??= isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? (strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en') : 'ru';
+		$lang ??= isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en';
 		include 'locale.php';
 		MPLocale::init();
 		if(!MPLocale::load($lang)) {

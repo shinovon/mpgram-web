@@ -1,5 +1,9 @@
 <?php
-session_start();
+
+include 'mp.php';
+
+MP::startSession();
+
 require_once 'vendor/autoload.php';
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;

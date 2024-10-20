@@ -96,7 +96,7 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
 	} catch (Exception $e) {}
 }
 
-header('Content-Type: text/html; charset=utf-8');
+header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store');
 header("Access-Control-Allow-Origin: *", true);
 

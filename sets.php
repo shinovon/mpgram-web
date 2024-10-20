@@ -171,7 +171,7 @@ if($set) {
 
 $lng = MP::initLocale();
 
-header('Content-Type: text/html; charset=utf-8');
+header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store');
 
 include 'themes.php';

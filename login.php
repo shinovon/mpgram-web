@@ -78,7 +78,7 @@ function htmlStart() {
 	if (defined('HTML_STARTED')) return;
 	define('HTML_STARTED', 1);
 	global $lng;
-	header("Content-Type: text/html; charset=utf-8");
+	header("Content-Type: text/html; charset=".MP::$enc);
 	echo '<head><title>'.MP::x($lng['login']).'</title>';
 	echo Themes::head();
 	// определение часового пояса

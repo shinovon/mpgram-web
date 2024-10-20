@@ -29,7 +29,7 @@ $candelete = isset($_POST['d']) || isset($_GET['d']);
 $canban = isset($_POST['b']) || isset($_GET['b']);
 $canedit = isset($_POST['e']) || isset($_GET['e']);
 
-header("Content-Type: text/html; charset=utf-8");
+header('Content-Type: text/html; charset='.MP::$enc);
 header("Cache-Control: private, no-cache, no-store");
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {

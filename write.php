@@ -15,7 +15,7 @@ $id = $_POST['c'] ?? $_GET['c'] ?? die;
 $msg = $_POST["msg"] ?? $_GET["msg"] ?? null;
 $random = $_POST['r'] ?? $_GET['r'] ?? null;
 
-header("Content-Type: text/html; charset=utf-8");
+header('Content-Type: text/html; charset='.MP::$enc);
 header("Cache-Control: private, no-cache, no-store");
 
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
