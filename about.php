@@ -2,9 +2,9 @@
 
 include 'redirect.php';
 
+include 'mp.php';
 header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store');
-include 'mp.php';
 $theme = MP::getSettingInt('theme', 0);
 include 'themes.php';
 Themes::setTheme($theme);

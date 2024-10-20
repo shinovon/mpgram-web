@@ -1080,7 +1080,7 @@ class MP {
 	}
 	
 	public static function initLocale() {
-		$xlang = $lang = static::getSetting('lang');
+		$xlang = $lang = static::getSetting('lang', null, true);
 		$lang ??= isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en';
 		include 'locale.php';
 		MPLocale::init();
