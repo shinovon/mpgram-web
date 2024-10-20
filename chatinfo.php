@@ -28,9 +28,6 @@ try {
 
 	$lng = MP::initLocale();
 
-	header('Content-Type: text/html; charset=utf-8');
-	header('Cache-Control: private, no-cache, no-store');
-
 	include 'themes.php';
 	Themes::setTheme($theme);
 
