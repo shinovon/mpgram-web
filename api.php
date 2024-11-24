@@ -26,7 +26,7 @@ function json($json) {
 	if(isset($PARAMS['pretty']) || isset($PARAMS['json'])) {
 		header("Content-Type: application/json");
 	}
-	$c = JSON_UNESCAPED_SLASHES | (isset($_SERVER['HTTP_X_MPGRAM_UNICODE']) ? JSON_UNESCAPED_UNICODE : 0);
+	$c = JSON_UNESCAPED_SLASHES | (isset($_SERVER['HTTP_X_MPGRAM_UNICODE']) || isset($PARAMS['utf']) ? JSON_UNESCAPED_UNICODE : 0);
 	if(isset($PARAMS['pretty'])) {
 		$c |= JSON_PRETTY_PRINT;
 	}
@@ -673,14 +673,14 @@ try {
 		setupMadelineProto();
 		$users = ['0'=>0];
 		$chats = ['0'=>0];
-		foreach (explode(',', $PARAMS['id'])) as $id) {
+		foreach (explode(',', $PARAMS['id']) as $id) {
 			$id = (int) trim($id);
 			if ($id == 0) error(['message'=>'Invalid id']);
-			$r = $MP->getInfo($PARAMS['id'])
+			$r = $MP->getInfo($PARAMS['id']);
 			if (isset($r['User'])) {
-				$users[strval($id)] = parseUser($r['User']));
+				$users[strval($id)] = parseUser($r['User']);
 			} elseif (isset($r['Chat'])) {
-				$chats[strval($id)] = parseChat($r['Chat']));
+				$chats[strval($id)] = parseChat($r['Chat']);
 			}
 		}
 		json(['users' => $users, 'chats' => $chats]);
