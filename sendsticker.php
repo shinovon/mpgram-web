@@ -38,7 +38,7 @@ try {
 		header('Location: chat.php?c='.$id);
 		die;
 	}
-	echo '<head><title>'.MP::x($lng['send_message']).'</title>';
+	echo '<html><head><title>'.MP::x($lng['send_message']).'</title>';
 	echo Themes::head();
 	echo '</head>';
 	echo Themes::bodyStart();

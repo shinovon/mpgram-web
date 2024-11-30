@@ -9,7 +9,7 @@ $theme = MP::getSettingInt('theme', 0);
 include 'themes.php';
 Themes::setTheme($theme);
 $lng = MP::initLocale();
-echo MP::x('<head><title>'.$lng['about'].'</title>');
+echo MP::x('<html><head><title>'.$lng['about'].'</title>');
 echo Themes::head();
 echo '</head>';
 echo Themes::bodyStart();

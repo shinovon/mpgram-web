@@ -96,7 +96,7 @@ try {
 			die;
 		}
 		//if ($invite['_'] != 'chatInvitePeek') { // TODO
-		echo '<head><title>'.MP::dehtml($invite['chat']['title']).'</title>';
+		echo '<html><head><title>'.MP::dehtml($invite['chat']['title']).'</title>';
 		echo Themes::head();
 		echo '</head>';
 		echo Themes::bodyStart();
@@ -186,7 +186,7 @@ try {
 			echo '<input type="submit" value="'.MP::x($lng['join']).'">';
 			echo '</form>';
 		} elseif(!$ch || $canpost) {
-			$post = strpos($ua, 'Series60/3') === false;
+			$post = strpos($ua, 'Series60/3') === false && strpos($ua, 'EPOC') === false;
 			$opera = strpos($ua, 'Opera') !== false || ($iev != 0 && $iev <= 7);
 			$watchos = strpos($ua, 'Watch OS') !== false;
 			echo '<form action="write.php"'.($post ? ' method="post"' : '').' class="in">';

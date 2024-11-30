@@ -298,7 +298,7 @@ try {
 	$title = MP::x($msg ? $lng['reply_to'] : $lng['message_to']);
 	$title .= ' '.MP::dehtml(MP::getNameFromId($MP, $id));
 } catch (Exception) {}
-echo '<head><title>'.($title ? $title : MP::x($lng['send_message'])).'</title>';
+echo '<html><head><title>'.($title ? $title : MP::x($lng['send_message'])).'</title>';
 echo Themes::head();
 echo '</head>';
 echo Themes::bodyStart();

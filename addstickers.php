@@ -36,7 +36,7 @@ try {
 	}
 	if(!$returnurl) $returnurl = $_SERVER['HTTP_REFERER'] ?? '';
 	$r = $MP->messages->getStickerSet(['stickerset' => $stickerset]);
-	echo '<head><title>'.MP::x($r['set']['title']).'</title>';
+	echo '<html><head><title>'.MP::x($r['set']['title']).'</title>';
 	echo Themes::head();
 	echo '</head>';
 	echo Themes::bodyStart();

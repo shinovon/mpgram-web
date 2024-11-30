@@ -105,7 +105,7 @@ class Themes {
 	}
 	
 	static function bodyEnd() {
-		return (static::$iev > 0 ? '</div>' : '').'</body>';
+		return (static::$iev > 0 ? '</div>' : '').'</body></html>';
 	}
 	
 	static function head() {

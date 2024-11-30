@@ -43,7 +43,7 @@ Themes::setTheme($theme);
 $avas = false;
 try {
 	$MP = MP::getMadelineAPI($user);
-	echo '<head><title>'.MP::x($lng['chats']).'</title>';
+	echo '<html><head><title>'.MP::x($lng['chats']).'</title>';
 	echo Themes::head();
 	echo '</head>';
 	echo Themes::bodyStart();

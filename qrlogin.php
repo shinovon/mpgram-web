@@ -1,5 +1,4 @@
 <?php
-
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -43,7 +42,7 @@ function base64_encode_url($string) {
 function htmlStart() {
 	global $lng;
 	header("Content-Type: text/html; charset=utf-8");
-	echo '<head><title>'.MP::x($lng['login']).'</title>';
+	echo '<html><head><title>'.MP::x($lng['login']).'</title>';
 	echo Themes::head();
 	echo '</head>';
 	echo Themes::bodyStart();

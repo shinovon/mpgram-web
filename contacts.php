@@ -38,7 +38,7 @@ Themes::setTheme($theme);
 $avas = false;
 try {
 	$MP = MP::getMadelineAPI($user);
-	echo '<head><title>'.MP::x($lng['contacts']).'</title>';
+	echo '<html><head><title>'.MP::x($lng['contacts']).'</title>';
 	echo Themes::head();
 	echo '</head>';
 	echo Themes::bodyStart();

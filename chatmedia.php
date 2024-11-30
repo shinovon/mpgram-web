@@ -79,7 +79,7 @@ try {
 	$endReached = $id_offset === 0 || ($id_offset === null && $msgoffset <= 0);
 	$hasOffset = $msgoffset > 0 || $msgoffsetid > 0;
 	$rm = $r['messages'];
-	echo '<head><title>'.MP::dehtml($name).'</title>';
+	echo '<html><head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
 	echo '</head>';
 	echo Themes::bodyStart();

@@ -54,7 +54,7 @@ Themes::setTheme($theme);
 
 try {
 	$MP = MP::getMadelineAPI($user);
-	echo '<head><title>'.MP::x($lng['chats']).'</title>';
+	echo '<html><head><title>'.MP::x($lng['chats']).'</title>';
 	echo Themes::head();
 	$iev = MP::getIEVersion();
 	if($iev == 0 || $iev > 4) {
@@ -76,6 +76,7 @@ try {
 	echo '</head>';
 	echo Themes::bodyStart();
 	$self = $MP->getSelf();
+	if (!$self) throw new Exception("Could not get user info!");
 	$selfid = $self['id'];
 	$selfname = MP::dehtml(MP::getUserName($self, true));
 	$hasArchiveChats = false;

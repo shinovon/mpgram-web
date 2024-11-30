@@ -26,7 +26,7 @@ header('Cache-Control: private, no-cache, no-store, must-revalidate');
 include 'themes.php';
 Themes::setTheme($theme);
 
-echo '<head><title>'.MP::x($lng['search']).'</title>';
+echo '<html><head><title>'.MP::x($lng['search']).'</title>';
 echo Themes::head();
 echo '</head>';
 echo Themes::bodyStart();

@@ -176,7 +176,7 @@ header('Cache-Control: private, no-cache, no-store');
 
 include 'themes.php';
 Themes::setTheme($theme);
-echo '<head><title>'.MP::x($lng['settings']).'</title>';
+echo '<html><head><title>'.MP::x($lng['settings']).'</title>';
 echo Themes::head();
 echo '</head>';
 echo Themes::bodyStart();

@@ -58,7 +58,7 @@ try {
 		}
 	}
 
-	echo '<head><title>'.MP::dehtml($name).'</title>';
+	echo '<html><head><title>'.MP::dehtml($name).'</title>';
 	echo Themes::head();
 	echo '</head>';
 	echo Themes::bodyStart();
