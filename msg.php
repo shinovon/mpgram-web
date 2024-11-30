@@ -103,7 +103,9 @@ try {
 			$reason = 'PHP Error: ' . $_FILES['file']['error'];
 		}
 		if(isset($_FILES['file']) && $_FILES['file']['size'] != 0) {
-			if($_FILES['file']['size'] > 10 * 1024 * 1024) {
+			$max = 20 * 1024 * 1024;
+			if (defined('UPLOAD_SIZE_LIMIT')) $max = UPLOAD_SIZE_LIMIT;
+			if($_FILES['file']['size'] > $max) {
 				$reason = 'File is too large!';
 			} else {
 				$file = $_FILES['file']['tmp_name'];

@@ -1,16 +1,23 @@
 <?php
+// dir where sessions will save
 define('sessionspath', 's/');
+// transparent stickers
 define('PNG_STICKERS', true);
+// always redirect http to https
 define('FORCE_HTTPS', false);
+// redirect http to https for chrome user-agent
 define('CHROME_HTTPS', false);
 
+// ffmpeg
 define('CONVERT_VOICE_MESSAGES', false);
 define('VOICE_TMP_DIR', sys_get_temp_dir().'/mp/');
 define('FFMPEG_DIR', '');
 
+// login.php
 define('LOGIN_CAPTCHA', true);
 define('INSTANCE_PASSWORD', null);
 
+// Use file/ instead of file.php, see rewrite rule in .htaccess
 define('FILE_REWRITE', false);
 
 // https://github.com/ed-asriyan/lottie-converter (Add "#!/usr/bin/env bash" as first line in its bash scripts!)
@@ -19,4 +26,12 @@ define('LOTTIE_DIR', '');
 define('TGS_TMP_DIR', sys_get_temp_dir().'/mp/');
 define('LOTTIE_TO_GIF', true);
 
+// api.php
 define('ENABLE_API', false);
+
+// file.php limit
+define('DOWNLOAD_SIZE_LIMIT', 1024 * 1024 * 1024);
+// file.php image resize or conversion limit
+define('IMAGE_SIZE_LIMIT', 30 * 1024 * 1024);
+// msg.php file upload limit
+define('UPLOAD_SIZE_LIMIT', 20 * 1024 * 1024);

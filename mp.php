@@ -208,6 +208,7 @@ class MP {
 	
 	static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false, $old=false, $photosize=0, $showdate=true, $mentions=null, $thread=null) {
 		$lastdate = date('d.m.y', time()-$timeoff);
+		$selfid = static::getSelfId($MP);
 		if ($mentions != null) {
 			$tmp = [];
 			foreach ($mentions as $m) {
@@ -228,7 +229,7 @@ class MP {
 				$mname = null;
 				$l = false;
 				if($m['out'] && !$ch && !$search) {
-					$uid = static::getSelfId($MP);
+					$uid = $selfid;
 					$mname = $lng['you'];
 				} elseif(($pm || $ch) && $name && !$search) {
 					$uid = $id;
@@ -287,6 +288,7 @@ class MP {
 				} else {
 					$mparams = '';
 					if($out) $mparams .= '&o';
+					else if ($id == $selfid) $mparams .= '&d';
 					if($ch) $mparams .= '&ch';
 					if($ar !== null) {
 						if(!$ch && !$out && $ar['ban_users'] ?? false) $mparams .= '&b';
@@ -475,7 +477,10 @@ class MP {
 				$audio = false;
 				$smallprev = false;
 				$ie = static::getIEVersion();
-				$png = PNG_STICKERS && ($ie == 0 || $ie > 4) && $ps >= 180;
+				$opera = static::getOperaVersion();
+				$png = PNG_STICKERS && $ps >= 180
+				&& ($ie == 0 || $ie > 4)
+				&& ($opera == 0 || $opera > 5);
 				switch(strtolower(substr($fext, 1))) {
 					case 'webp':
 						if(strpos($d['name'], 'sticker_') === 0) {

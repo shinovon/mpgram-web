@@ -49,7 +49,9 @@ try {
 		$di = $MP->getDownloadInfo($msg['media']);
 	}
 	
-	if(($info['size'] ?? 0) > 1024 * 1024 * 1024) { // 1 gb
+	$max = 1024 * 1024 * 1024; // 1 gb
+	if (defined('DOWNLOAD_SIZE_LIMIT')) $max = DOWNLOAD_SIZE_LIMIT;
+	if(($info['size'] ?? 0) > $max) {
 		http_response_code(400);
 		echo 'File is too large!';
 		die;
@@ -74,7 +76,9 @@ try {
 		$di = $d;
 	}
 	if(strpos($p, 'r') === 0) {
-		if(($info['size'] ?? 0) > 25 * 1024 * 1024) { // 25 mb
+		$max = 30 * 1024 * 1024; // 30 mb
+		if (defined('IMAGE_SIZE_LIMIT')) $max = IMAGE_SIZE_LIMIT;
+		if(($info['size'] ?? 0) > $max) {
 			http_response_code(400);
 			echo 'File is too large!';
 			die;
