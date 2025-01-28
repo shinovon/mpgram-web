@@ -17,7 +17,7 @@ $ua = '';
 $iev = MP::getIEVersion();
 if($iev > 0 && $iev < 4) $theme = 1;
 $theme = MP::getSettingInt('theme', $theme, true);
-$post = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false) || ($iev < 4 && $iev == 0);
+$post = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false) && ($iev < 4 && $iev == 0);
 
 $lng = MP::initLocale();
 //MP::cookie('theme', $theme, time() + (86400 * 365));
@@ -79,7 +79,7 @@ function htmlStart() {
 	define('HTML_STARTED', 1);
 	global $lng;
 	header("Content-Type: text/html; charset=".MP::$enc);
-	echo '<head><title>'.MP::x($lng['login']).'</title>';
+	echo '<html><head><title>'.MP::x($lng['login']).'</title>';
 	echo Themes::head();
 	// определение часового пояса
 	$iev = MP::getIEVersion();
@@ -280,6 +280,13 @@ if($phone !== null) {
 					} elseif(isset($a['_']) && $a['_'] === 'account.needSignup') {
 						htmlStart();
 						echo MP::x($lng['need_signup']);
+						//echo '<form action="signin.php"';
+						//if($post) echo ' method="post"';
+						//echo '>';
+						//echo 'First name:<br><input type="text" name="first"><br>';
+						//echo 'Last name:<br><input type="text" name="last">';
+						//echo '<input type="submit">';
+						//echo '</form>';
 						echo Themes::bodyEnd();
 						die;
 					} else {
@@ -366,6 +373,7 @@ if($phone !== null) {
 	//if($revoked) {
 	//	echo MP::x('<b>Ваша сессия истекла!</b><br>');
 	//}
+	//if(isset($_GET['asd']) || $ipass || true) {
 	echo MP::x($lng['phone_number']).':<br>';
 	echo '<form action="login.php"';
 	if($post) echo ' method="post"';
@@ -378,11 +386,14 @@ if($phone !== null) {
 	if($wrong) {
 		echo '<b>'.MP::x($lng['wrong_number_format']).'</b><br>';
 	} else {
-		echo '<a href="qrlogin.php">'.MP::x($lng['qr_login']).'</a> (experimental)';
+	//	echo '<a href="qrlogin.php">'.MP::x($lng['qr_login']).'</a> (experimental)';
 	}
 	echo '<br><div>';
 	echo '<a href="about.php">'.MP::x($lng['about']).'</a> <a href="login.php?lang=en">English</a> <a href="login.php?lang=ru">'.MP::x('Русский').'</a>';
 	//echo ' <a href="sets.php">'.$lng['settings'].'</a>';
 	echo '</div>';
+	//} else {
+	//	echo "This instance is closed. Consider hosting your own: <br>https://github.com/shinovon/mpgram-web<br><p><small style=\"color: grey\"><small><small>or type login.php?asd in the url if only you understand the risks</small></small></small></p>";
+	//}
 	echo Themes::bodyEnd();
 }

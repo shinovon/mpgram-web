@@ -655,10 +655,8 @@ class MP {
 	}
 	
 	static function utfsubstr($s, $offset, $length = null) {
-		$s = iconv('utf-8', 'utf-16le', $s);
-		//$s = mb_substr($s, $offset, $length, 'utf-16le');
-		$s = $length !== null ? substr($s, $offset*2, $length*2) : substr($s, $offset*2);
-		return iconv('utf-16le', 'utf-8', $s);
+		$s = mb_convert_encoding($s, 'UTF-16');
+		return mb_convert_encoding(substr($s, $offset << 1, $length === null ? null : ($length << 1)), 'UTF-8', 'UTF-16');
 	}
 	
 	static function wrapRichNestedText($text, $entity, $allEntities) {

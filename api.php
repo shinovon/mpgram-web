@@ -213,8 +213,8 @@ function parsePeer($peer) {
 function parseDialog($rawDialog) {
 	$dialog = array();
 	$dialog['id'] = strval(getId($rawDialog['peer']));
-	$dialog['unread_count'] = $rawDialog['unread_count'] ?? 0;
-	$dialog['pinned'] = $rawDialog['pinned'] ?? null;
+	if ($rawDialog['unread_count'] ?? 0 > 0) $dialog['unread_count'] = $rawDialog['unread_count'];
+	if ($rawDialog['pinned'] ?? false) $dialog['pinned'] = true;
 	return $dialog;
 }
 
@@ -450,7 +450,7 @@ try {
 				if ($ma === null || $mb === null || $ma['date'] == $mb['date']) {
 					return 0;
 				}
-				if($a['pinned'] && !$b['pinned']) {
+				if(($a['pinned'] ?? false) && !($b['pinned'] ?? false)) {
 					return -1;
 				}
 				return ($ma['date'] > $mb['date']) ? -1 : 1;
