@@ -51,6 +51,7 @@ Fully supported:
 - Internet Explorer 6.0 and above
 - Opera 9.0 and above
 - Nokia Browser for Symbian (S60v3 FP1 and above)
+- BlackBerry OS7 and Blackberry 10 browser
 - S40 6th Edition
 - Mozilla Firefox 2.0
 - WebPositive
