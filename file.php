@@ -200,21 +200,21 @@ try {
 			imagedestroy($img);
 			die;
 		} else {
-			$w = imagesx($img);
-			$h = imagesy($img);
+			$ow = imagesx($img);
+			$oh = imagesy($img);
+			$w = $ow;
+			$h = $oh;
 			$q = 50;
 			if($p == 'orig') {
 				$q = 80;
 			} elseif($p == 'prev') {
+				$h = $size;
+				$w = ($ow / $oh) * $h;
 				if($w > $size) {
-					$h = ($h/$w)*$size;
 					$w = $size;
-					$img = resize($img, $w, $h);
-				} elseif($h > $size) {
-					$w = ($w/$h)*$size;
-					$h = $size;
-					$img = resize($img, $w, $h);
+					$h = ($oh / $ow) * $w;
 				}
+				$img = resize($img, $w, $h);
 			} elseif($p == 'min') {
 				$q = 30;
 				if($h > 90) {
@@ -273,7 +273,7 @@ try {
 			unset($di['name']);
 			unset($di['ext']);
 		}
-		header('Cache-Control: no-cache, no-store');
+		header('Cache-Control: private, no-cache, no-store');
 		$MP->downloadToBrowser($di);
 	}
 } catch (Exception $e) {

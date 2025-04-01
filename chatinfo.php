@@ -79,7 +79,7 @@ try {
 		echo '<p>'.MP::x($lng['chat_about']).':<br>'.MP::dehtml($desc).'</p>';
 	}
 	if($type == 'user') {
-		$desc = $MP->getFullInfo($id)['full']['about'] ?? null;
+		$desc = $fullinfo['about'] ?? null;
 		if(isset($chat['phone'])) {
 			echo '<p>'.MP::x($lng['chat_phone']).':<br>+'.MP::dehtml($chat['phone']).'</p>';
 		}

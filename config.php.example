@@ -28,6 +28,7 @@ define('LOTTIE_TO_GIF', true);
 
 // api.php
 define('ENABLE_API', false);
+define('ENABLE_LOGIN_API', false);
 
 // file.php limit
 define('DOWNLOAD_SIZE_LIMIT', 1024 * 1024 * 1024);

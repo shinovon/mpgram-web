@@ -32,6 +32,10 @@ try {
 		$di = $MP->getPropicInfo($info);
 	} catch (Exception) {}
 	if($di === null) {
+		if (isset($_GET['a'])) {
+			http_response_code(404);
+			die;
+		}
 		header('Content-Type: image/png');
 		if((int) $cid < 0) {
 			echo file_get_contents('img/gr.png');

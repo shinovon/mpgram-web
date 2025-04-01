@@ -7,7 +7,7 @@ require_once("api_values.php");
 require_once("config.php");
 
 define("def", 1);
-define("api_version", 4);
+define("api_version", 5);
 define("api_version_min", 2);
 
 use danog\MadelineProto\Magic;
@@ -30,6 +30,11 @@ function json($json) {
 	if(isset($PARAMS['pretty'])) {
 		$c |= JSON_PRETTY_PRINT;
 	}
+	$time = time();
+	$sv = api_version;
+	header("X-Server-Time: {$time}");
+	header("X-Server-Api-Version: {$sv}");
+	header("Content-Type: application/json");
 	echo json_encode($json, $c);
 	define("json", 1);
 }
@@ -40,10 +45,10 @@ function error($error) {
 	die();
 }
 
-function checkField($field) {
+function checkField($field, $def = def) {
 	global $PARAMS;
 	if(!isset($PARAMS['fields'])) {
-		return def;
+		return $def;
 	}
 	return in_array($field, explode(',',$PARAMS['fields']));
 }
@@ -65,6 +70,18 @@ function checkParamEmpty($param) {
 	if(isParamEmpty($param)) {
 		error(['message'=>"Required parameter '$param' is not set"]);
 	}
+}
+
+function getParam($param, $def=false) {
+	global $PARAMS;
+	if (!isset($PARAMS[$param])) {
+		if ($def === false) {
+			error(['message'=>"Required parameter '$param' is not set"]);
+		}
+		return $def;
+	}
+	
+	return $PARAMS[$param];
 }
 
 function addParamToArray(&$array, $param, $type = null) {
@@ -101,7 +118,7 @@ function checkAuth() {
 		define('user_checked', 1);
 	} else return;
 	global $PARAMS;
-	$user = $PARAMS['user'] ?? $_SERVER['HTTP_X_MPGRAM_USER'] ?? null;
+	$user = $_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user'] ?? null;
 	
 	if($user == null || empty($user)
 		|| strlen($user) < 32 || strlen($user) > 200
@@ -110,12 +127,10 @@ function checkAuth() {
 		|| strpos($user, '.') !== false
 		|| strpos($user, ';') !== false
 		|| strpos($user, ':') !== false
+		|| strpos($user, ' ') !== false
 		|| !file_exists(sessionspath.$user.'.madeline')) {
-		if ($PARAMS['method'] == 'checkAuth') {
-			error(['message'=>'Invalid authorization']);
-		} else {
-			error(['message'=>'Authorization is required for this method']);
-		}
+		http_response_code(401);
+		error(['message'=>'Invalid authorization']);
 	}
 }
 
@@ -127,7 +142,7 @@ function setupMadelineProto($user=null) {
 	}
 	if(!$user) {
 		checkAuth();
-		$user = $PARAMS['user'] ?? $_SERVER['HTTP_X_MPGRAM_USER'];
+		$user = $_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user'];
 	}
 	require_once 'vendor/autoload.php';
 	$sets = new \danog\MadelineProto\Settings;
@@ -144,12 +159,17 @@ function setupMadelineProto($user=null) {
 		$app->setSystemVersion($_SERVER['HTTP_X_MPGRAM_SYSTEM']);
 	}
 	$sets->setAppInfo($app);
-	$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline', $sets);
+	try {
+		$MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline', $sets);
+	} catch (Exception $e) {
+		http_response_code(401);
+		error(['message' => "Failed to load session", 'stack_trace' => strval($e)]);
+	}
 }
 
 function getId($a) {
 	if(is_int($a)) return $a;
-	return $a['user_id'] ?? (isset($a['chat_id']) ? -$a['chat_id'] : (isset($a['channel_id']) ? (Magic::ZERO_CHANNEL_ID - $a['channel_id']) : null));
+	return $a['user_id'] ?? (isset($a['chat_id']) ? $a['chat_id'] : (isset($a['channel_id']) ? ($a['channel_id']) : null));
 }
 
 function getAllDialogs($limit = 0, $folder_id = -1) {
@@ -206,6 +226,31 @@ function getAllDialogs($limit = 0, $folder_id = -1) {
 	return $r;
 }
 
+function utflen($str) {
+	return mb_strlen($str, 'utf-8');
+}
+
+function utfsubstr($s, $offset, $length = null) {
+	$s = mb_convert_encoding($s, 'UTF-16');
+	return mb_convert_encoding(substr($s, $offset << 1, $length === null ? null : ($length << 1)), 'UTF-8', 'UTF-16');
+}
+
+function findPeer($id, $r) {
+	if ((int) $id < 0) {
+		if (!isset($r['chats'])) return null;
+		foreach($r['chats'] as $u) {
+			if($u['id'] != $id) continue;
+			return $u;
+		}
+	} else if (isset($r['users'])) {
+		foreach($r['users'] as $u) {
+			if($u['id'] != $id) continue;
+			return $u;
+		}
+	}
+	return null;
+}
+
 function parsePeer($peer) {
 	return getId($peer);
 }
@@ -213,29 +258,42 @@ function parsePeer($peer) {
 function parseDialog($rawDialog) {
 	$dialog = array();
 	$dialog['id'] = strval(getId($rawDialog['peer']));
-	if ($rawDialog['unread_count'] ?? 0 > 0) $dialog['unread_count'] = $rawDialog['unread_count'];
-	if ($rawDialog['pinned'] ?? false) $dialog['pinned'] = true;
+	if ($rawDialog['unread_count'] ?? 0 > 0) $dialog['unread'] = $rawDialog['unread_count'];
+	if ($rawDialog['pinned'] ?? false) $dialog['pin'] = true;
 	return $dialog;
 }
 
 function parseUser($rawUser) {
+	global $v;
 	if (!$rawUser) {
 		return false;
 	}
 	$user = array();
 	$user['id'] = strval($rawUser['id']);
-	$user['first_name'] = $rawUser['first_name'] ?? null;
-	$user['last_name'] = $rawUser['last_name'] ?? null;
-	$user['username'] = $rawUser['username'] ?? null;
+	$user[$v < 5 ? 'first_name' : 'fn'] = $rawUser['first_name'] ?? null;
+	$user[$v < 5 ? 'last_name' : 'ln'] = $rawUser['last_name'] ?? null;
+	if ((isset($rawUser['username']) && $rawUser['username'] !== null) || $v < 5) $user[$v < 5 ? 'username' : 'name'] = $rawUser['username'] ?? null;
+	if ($v >= 5) {
+		if (isset($rawUser['photo'])) $user['p'] = true;
+		if ($rawUser['contact'] ?? false) $user['k'] = true;
+		if ($rawUser['bot'] ?? false) $user['b'] = true;
+	}
 	return $user;
 }
 
 function parseChat($rawChat) {
+	global $v;
 	$chat = array();
 	$chat['type'] = $rawChat['_'];
 	$chat['id'] = strval($rawChat['id']);
-	$chat['title'] = $rawChat['title'] ?? null;
-	$chat['username'] = $rawChat['username'] ?? null;
+	$chat[$v < 5 ? 'title' : 't'] = $rawChat['title'] ?? null;
+	if ((isset($rawUser['username']) && $rawUser['username'] !== null) || $v < 5) $chat[$v < 5 ? 'username' : 'name'] = $rawChat['username'] ?? null;
+	if ($v >= 5) {
+		if (isset($rawChat['photo'])) $chat['p'] = true;
+		if ($rawChat['broadcast'] ?? false) $chat['c'] = true;
+		if ($rawChat['forum'] ?? false) $chat['f'] = true;
+		if ($rawChat['left'] ?? false) $chat['l'] = true;
+	}
 	return $chat;
 }
 
@@ -249,12 +307,24 @@ function getCaptchaText($length) {
 	return $s;
 }
 
-function parseMessage($rawMessage, $media=false) {
+function parseMessage($rawMessage, $media=false, $short=false) {
+	global $v;
 	$message = array();
-	//$message = $rawMessage;
+	//$message['raw'] = $rawMessage;
 	$message['id'] = $rawMessage['id'] ?? null;
 	$message['date'] = $rawMessage['date'] ?? null;
-	if (isset($rawMessage['message'])) $message['text'] = $rawMessage['message'];
+	if (isset($rawMessage['message'])) {
+		$t = $rawMessage['message'];
+		if ($short) {
+			if (utflen($t) > 150) {
+				$t = trim(utfsubstr($t, 0, 150)).'..';
+			}
+		} else if ($v >= 5 && isset($rawMessage['entities']) && count($rawMessage['entities']) != 0) {
+			$message['entities'] = $rawMessage['entities'];
+		}
+		$message['text'] = $t;
+		
+	}
 	if (isset($rawMessage['out'])) $message['out'] = $rawMessage['out'];
 	if (isset($rawMessage['peer_id'])) {
 		$message['peer_id'] = parsePeer($rawMessage['peer_id']);
@@ -282,7 +352,7 @@ function parseMessage($rawMessage, $media=false) {
 	if (isset($rawMessage['media'])) {
 		if (!$media) {
 			// media is disabled
-			$message['media'] = ['_' => 0];
+			$message['media'] = $v < 5 ? ['_' => 0] : null;
 		} else {
 			$rawMedia = $rawMessage['media'];
 			$media = [];
@@ -296,7 +366,7 @@ function parseMessage($rawMessage, $media=false) {
 				if (isset($rawMedia['document']['date'])) $media['date'] = $rawMedia['document']['date'];
 				$media['size'] = $rawMedia['document']['size'] ?? null;
 				$media['mime'] = $rawMedia['document']['mime_type'] ?? null;
-				$media['thumb'] = isset($media['document']['thumbs']);
+				$media['thumb'] = isset($rawMedia['document']['thumbs']);
 				if(isset($rawMedia['document']['attributes'])) {
 				foreach($rawMedia['document']['attributes'] as $attr) {
 					if($attr['_'] == 'documentAttributeFilename') {
@@ -330,6 +400,7 @@ function parseMessage($rawMessage, $media=false) {
 				$media['voted'] = $media['results']['total_voters'] ?? 0;
 			} else {
 				// TODO
+				$media['type'] = $rawMedia['undefined'];
 				$media['_'] = $rawMedia['_'];
 			}
 			$message['media'] = $media;
@@ -346,16 +417,48 @@ function parseMessage($rawMessage, $media=false) {
 	if (isset($rawMessage['reply_to'])) {
 		$rawReply = $rawMessage['reply_to'];
 		$reply = [];
-		$reply['msg'] = $rawReply['reply_to_msg_id'] ?? null;
+		$reply[$v < 5 ? 'msg' : 'id'] = $rawReply['reply_to_msg_id'] ?? null;
 		if (isset($rawReply['reply_to_peer_id'])) $reply['peer'] = $rawReply['reply_to_peer_id'];
 		if (isset($rawReply['quote_text'])) $reply['quote'] = $rawReply['quote_text'];
+		if ($v >= 5 && !$short && isset($reply['peer'])) {
+			$rawReplyMsg = null;
+			try {
+				global $MP;
+				if ((int) $reply['peer'] < 0) {
+					$rawReplyMsg = $MP->channels->getMessages(['channel' => $reply['peer'], 'id' => [$reply['id']]]);
+				} else {
+					$rawReplyMsg = $MP->messages->getMessages(['peer' => $reply['peer'], 'id' => [$reply['id']]]);
+				}
+				if($rawReplyMsg && isset($rawReplyMsg['messages']) && isset($rawReplyMsg['messages'][0])) {
+					$reply['msg'] = parseMessage($rawReplyMsg['messages'][0], false, true);
+				}
+			} catch (Exception) {}
+		}
 		$message['reply'] = $reply;
+	}
+	if ($v >= 5) {
+		if (isset($rawMessage['grouped_id'])) $message['group'] = $rawMessage['grouped_id'];
 	}
 	//$message['raw'] = $rawMessage;
 	return $message;
 }
 
 try {
+	if (!defined('ENABLE_API') || !ENABLE_API) {
+		error(['message' => "API is disabled"]);
+	}
+	if(defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
+		$ipass = $_SERVER['HTTP_X_MPGRAM_INSTANCE_PASSWORD'] ?? null;
+		if ($ipass != null) {
+			if ($ipass != INSTANCE_PASSWORD) {
+				http_response_code(403);
+				error(['message' => "Wrong password"]);
+			}
+		} else {
+			http_response_code(403);
+			error(['message' => "Password is required"]);
+		}
+	}
 	$MP = null;
 	// Parameters
 	$PARAMS = array();
@@ -371,9 +474,6 @@ try {
 	if(isset($_COOKIE['user'])) {
 		$PARAMS['user'] = $_COOKIE['user'];
 	}
-	if (!defined('ENABLE_API') || !ENABLE_API) {
-		error(['message' => "API is disabled"]);
-	}
 	if(!isset($PARAMS['method'])) {
 		error(['message' => "No method set"]);
 	}
@@ -384,11 +484,168 @@ try {
 	}
 	$METHOD = $PARAMS['method'];
 	switch($METHOD) {
-/*
 	case 'getCaptchaImg':
-	case 'initLogin':
+		if (!defined('ENABLE_LOGIN_API') || !ENABLE_LOGIN_API) {
+			http_response_code(403);
+			error(['message' => "Login API is disabled"]);
+		}
+		checkParamEmpty('captcha_id');
+		session_id('API'.$PARAMS['captcha_id']);
+		session_start(['use_cookies' => '0']);
+		if(empty($_SESSION['captcha_key'])) {
+			error('Captcha id expired');
+		}
+		$c = getCaptchaText(rand(6, 10));
+		$_SESSION['captcha_key'] = $c;
+		$img = imagecreatetruecolor(150, 50);
+		imagefill($img, 0, 0, -1);
+		imagestring($img, rand(4, 10), rand(0, 50), rand(0, 25), $c, 0x000000);
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header('Content-type: image/png');
+		imagepng($img);
+		imagedestroy($img);
 		break;
-*/
+	case 'phoneLogin':
+		if ($PARAMS['user'] != null) {
+			error(['message' => 'Authorized']);
+		}
+	case 'initLogin':
+		if ($v != api_version) {
+			http_response_code(403);
+			error(['message' => "Unsupported API version"]);
+		}
+		if (!defined('ENABLE_LOGIN_API') || !ENABLE_LOGIN_API) {
+			http_response_code(403);
+			error(['message' => "Login API is disabled"]);
+		}
+		if(!isset($PARAMS['captcha_id']) || !isset($PARAMS['captcha_key'])) {
+			$id = md5(random_bytes(32));
+			session_id('API'.$id);
+			session_start(['use_cookies' => '0']);
+			$c = getCaptchaText(rand(6, 10));
+			$_SESSION['captcha_key'] = $c; 
+			json(['res' => 'need_captcha', 'captcha_id' => $id]);
+			die();
+		}
+		checkParamEmpty('phone');
+		session_id('API'.$PARAMS['captcha_id']);
+		session_start(['use_cookies' => '0']);
+		if(!isset($_SESSION['captcha_key']) || empty($_SESSION['captcha_key'])) {
+			unset($_SESSION['captcha_key']);
+			$id = md5(random_bytes(32));
+			session_id('API'.$id);
+			session_start(['use_cookies' => '0']);
+			$c = getCaptchaText(rand(6, 10));
+			$_SESSION['captcha_key'] = $c; 
+			json(['res' => 'captcha_expired', 'captcha_id' => $id]);
+			die();
+		}
+		if(strtolower($PARAMS['captcha_key']) != $_SESSION['captcha_key']) {
+			unset($_SESSION['captcha_key']);
+			$id = md5(random_bytes(32));
+			session_id('API'.$id);
+			session_start(['use_cookies' => '0']);
+			$c = getCaptchaText(rand(6, 10));
+			$_SESSION['captcha_key'] = $c; 
+			json(['res' => 'wrong_captcha', 'captcha_id' => $id]);
+			die();
+		}
+		unset($_SESSION['captcha_key']);
+		
+		$phone = getParam('phone');
+		$user = $_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user'] ?? null;
+		// generate user id
+		if($user === null) {
+			$user = rtrim(strtr(base64_encode(hash('sha384', sha1(md5($phone.rand(0,1000).random_bytes(6))).random_bytes(30), true)), '+/', '-_'), '=');
+		}
+		setupMadelineProto($user);
+		try {
+			$a = $MP->phoneLogin($phone);
+			json(['user' => $user, 'res' => 'code_sent', 'phone_code_hash' => $a['phone_code_hash'] ?? null]);
+		} catch (Exception $e) {
+			if(strpos($e->getMessage(), 'PHONE_NUMBER_INVALID') !== false) {
+				json(['user' => $user, 'res' => 'phone_number_invalid']);
+			} else {
+				json(['user' => $user, 'result' => 'exception', 'message' => $e->getMessage()]);
+			}
+		}
+		break;
+	case 'resendCode':
+		if ($v != api_version) {
+			http_response_code(403);
+			error(['message' => "Unsupported API version"]);
+		}
+		if (!defined('ENABLE_LOGIN_API') || !ENABLE_LOGIN_API) {
+			http_response_code(403);
+			error(['message' => "Login API is disabled"]);
+		}
+		checkParamEmpty('code');
+		checkAuth();
+		setupMadelineProto();
+		
+		$MP->auth->resendCode(['phone' => $phone, 'phone_code_hash' => $hash]);
+		json(['res' => 1]);
+		break;
+	case 'completePhoneLogin':
+		if ($v != api_version) {
+			http_response_code(403);
+			error(['message' => "Unsupported API version"]);
+		}
+		if (!defined('ENABLE_LOGIN_API') || !ENABLE_LOGIN_API) {
+			http_response_code(403);
+			error(['message' => "Login API is disabled"]);
+		}
+		checkParamEmpty('code');
+		checkAuth();
+		setupMadelineProto();
+		try {
+			$a = $MP->completePhoneLogin($PARAMS['code']);
+			$hash = $a['phone_code_hash'] ?? null;
+			if(isset($a['_']) && $a['_'] === 'account.noPassword') {
+				json(['res' => 'no_password', 'phone_code_hash' => $hash]);
+			} elseif(isset($a['_']) && $a['_'] === 'account.password') {
+				json(['res' => 'password', 'phone_code_hash' => $hash]);
+			} elseif(isset($a['_']) && $a['_'] === 'account.needSignup') {
+				json(['res' => 'need_signup', 'phone_code_hash' => $hash]);
+			} else {
+				json(['res' => 1, 'phone_code_hash' => $hash]);
+			}
+		} catch (Exception $e) {
+			if(strpos($e->getMessage(), 'PHONE_CODE_INVALID') !== false) {
+				json(['res' => 'phone_code_invalid']);
+			} elseif(strpos($e->getMessage(), 'PHONE_CODE_EXPIRED') !== false) {
+				json(['res' => 'phone_code_expired']);
+			} elseif(strpos($e->getMessage(), 'AUTH_RESTART') !== false) {
+				json(['res' => 'auth_restart']);
+			} else {
+				error(['message' => $e->getMessage()]);
+			}
+		}
+		break;
+	case 'complete2faLogin':
+		// TODO password encryption
+		if ($v != api_version) {
+			http_response_code(403);
+			error(['message' => "Unsupported API version"]);
+		}
+		if (!defined('ENABLE_LOGIN_API') || !ENABLE_LOGIN_API) {
+			http_response_code(403);
+			error(['message' => "Login API is disabled"]);
+		}
+		checkParamEmpty('password');
+		checkAuth();
+		setupMadelineProto();
+		try {
+			$MP->complete2faLogin($PARAMS['password']);
+			json(['res' => 1]);
+		} catch(Exception $e) {
+			if(strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
+				json(['res' => 'password_hash_invalid']);
+			} else {
+				error(['message' => $e->getMessage()]);
+			}
+		}	
+		break;
 	case 'getServerTimeOffset':
 		$dtz = new DateTimeZone(date_default_timezone_get());
 		$t = new DateTime('now', $dtz);
@@ -396,13 +653,19 @@ try {
 		json(['res' => $tof]);
 		break;
 	// Authorized methods
-/*
-	case 'logout':
-	case 'completePhoneLogin':
-	case 'complete2faLogin':
 	case 'completeSignup':
+		//checkParamEmpty('first_name');
+		//checkParamEmpty('last_name');
+		//checkAuth();
+		//setupMadelineProto();
+		//try {
+		//	$MP->completeSignup($PARAMS['first_name'], $PARAMS['last_name']);
+		//	json(['result' => 1]);
+		//} catch(Exception $e) {
+		//	json(['result' => 'exception', 'message' => $e->getMessage()]);
+		//}
+		json(['res' => 0]);
 		break;
-*/
 	case 'checkAuth':
 		checkAuth();
 		setupMadelineProto();
@@ -411,12 +674,181 @@ try {
 	case 'getDialogs':
 		checkAuth();
 		setupMadelineProto();
-		$p = array();
+		
+		function cmp($a, $b) {
+			global $rawData;
+			$ma = $a['message'] ?? null;
+			$mb = $b['message'] ?? null;
+			if ($ma == null || $mb == null) {
+				foreach($rawData['messages'] as $m) {
+					if(parsePeer($m['peer_id']) == ($a['id'] ?? $a['peer'])) {
+						$ma = $m;
+					}
+					if(parsePeer($m['peer_id']) == ($b['id'] ?? $b['peer'])) {
+						$mb = $m;
+					}
+					if($ma !== null && $mb !== null) break;
+				}
+			}
+			if ($ma === null || $mb === null || $ma['date'] == $mb['date']) {
+				return 0;
+			}
+			if(($a['pinned'] ?? false) && !($b['pinned'] ?? false)) {
+				return -1;
+			}
+			return ($ma['date'] > $mb['date']) ? -1 : 1;
+		}
+		
+		$f = $v < 5 ? null : getParam('f', null);
+		$rawData = null;
+		
+		$p = [];
 		addParamToArray($p, 'offset_id', 'int');
 		addParamToArray($p, 'offset_date', 'int');
 		addParamToArray($p, 'offset_peer');
 		addParamToArray($p, 'limit', 'int');
-		$rawData = $MP->messages->getDialogs($p);
+		$sort = $v < 5 || $f === null;
+		if ($f !== null) {
+			if ((int) $f == 1) {
+				$p['folder_id'] = 1;
+				$rawData = $MP->messages->getDialogs($p);
+			} else if ((int) $f > 1) {
+				$sort = false;
+				$fid = (int) $f;
+				$folders = $MP->messages->getDialogFilters();
+				if (($folders['_'] ?? '') == 'messages.dialogFilters')
+					$folders = $folders['filters'];
+				$folder = null;
+				foreach($folders as $f) {
+					if(!isset($f['id']) || $f['id'] != $fid) continue;
+					$folder = $f;
+					break;
+				}
+				if ($folder == null) {
+					error(['message' => 'Folder not found']);
+				}
+				unset($folders);
+				$rawData = getAllDialogs();
+				$dialogs = [];
+				$all = $rawData['dialogs'];
+				foreach($rawData['messages'] as $m) {
+					foreach($all as $k => $d) {
+						if($m['peer_id'] != $d['peer']) continue;
+						$all[$k]['message'] = $m;
+						break;
+					}
+				}
+				if($f['contacts'] || $f['non_contacts']) {
+					$contacts = $MP->contacts->getContacts()['contacts'];
+					foreach($all as $d) {
+						if($d['peer'] < 0) continue;
+						$found = false;
+						foreach($contacts as $c) {
+							if($d['peer'] != getId($c)) continue;
+							$found = true;
+							if($f['contacts']) array_push($dialogs, $d);
+							break;
+						}
+						if($found || $f['non_contacts']) continue;
+						if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+					}
+					unset($contacts);
+				}
+				if($f['groups']) {
+					foreach($all as $d) {
+						$peer = $d['peer'];
+						if($peer > 0) continue;
+						foreach($rawData['chats'] as $c) {
+							if($c['id'] != $peer) continue;
+							if(!($c['broadcast'] ?? false) && !in_array($d, $dialogs))
+								array_push($dialogs, $d);
+							break;
+						}
+					}
+				}
+				if($f['broadcasts']) {
+					foreach($all as $d) {
+						$peer = $d['peer'];
+						if($peer > 0) continue;
+						foreach($rawData['chats'] as $c) {
+							if($c['id'] != $peer) continue;
+							if(($c['broadcast'] ?? false) && !in_array($d, $dialogs))
+								array_push($dialogs, $d);
+							break;
+						}
+					}
+				}
+				if($f['bots']) {
+					foreach($all as $d) {
+						$peer = $d['peer'];
+						if($peer < 0) continue;
+						foreach($rawData['users'] as $u) {
+							if($u['id'] != $peer) continue;
+							if(($u['bot'] ?? false) && !in_array($d, $dialogs))
+								array_push($dialogs, $d);
+							break;
+						}
+						continue;
+					}
+				}
+				if(count($f['exclude_peers']) > 0) {
+					foreach($f['exclude_peers'] as $p) {
+						$p = getId($p);
+						foreach($dialogs as $idx => $d) {
+							if($d['peer'] != $p) continue;
+							unset($dialogs[$idx]);
+							break;
+						}
+					}
+				}
+				if($f['exclude_archived']) {
+					foreach($dialogs as $idx => $d) {
+						if(!isset($d['folder_id']) || $d['folder_id'] != 1) continue;
+						unset($dialogs[$idx]);
+					}
+				}
+				if($f['exclude_read']) {
+					foreach($dialogs as $idx => $d) {
+						if(!isset($d['unread_count']) || $d['unread_count'] > 0) continue;
+						unset($dialogs[$idx]);
+					}
+				}
+				if(count($f['include_peers']) > 0) {
+					foreach($f['include_peers'] as $p) {
+						$p = getId($p);
+						foreach($all as $d) {
+							if($d['peer'] != $p) continue;
+							if(!in_array($d, $dialogs)) array_push($dialogs, $d);
+							break;
+						}
+					}
+				}
+				usort($dialogs, 'cmp');
+				if(count($f['pinned_peers']) > 0) {
+					$pinned = array();
+					foreach($f['pinned_peers'] as $p) {
+						$p = getId($p);
+						foreach($all as $d) {
+							if($d['peer'] != $p) continue;
+							if(in_array($d, $dialogs)) {
+								unset($dialogs[array_search($d, $dialogs)]);
+							}
+							array_push($pinned, $d);
+							break;
+						}
+					}
+					$dialogs = array_merge($pinned, $dialogs);
+					unset($pinned);
+				}
+				$rawData['dialogs'] = $dialogs;
+				unset($all);
+			} else {
+				$p['folder_id'] = (int) $f;
+				$rawData = $MP->messages->getDialogs($p);
+			}
+		} else {
+			$rawData = $MP->messages->getDialogs($p);
+		}
 		$res = array();
 		if(checkField('raw') === true) {
 			$res['raw'] = $rawData;
@@ -424,9 +856,9 @@ try {
 		$dialogPeers = array();
 		$senderPeers = array();
 		$mesages = array();
-		if(checkField('dialogs')) {
+		if(checkField('dialogs', true)) {
 			foreach($rawData['messages'] as $rawMessage) {
-				$message = parseMessage($rawMessage, $PARAMS['include_media'] ?? false);
+				$message = parseMessage($rawMessage, $PARAMS['media'] ?? false, $v < 5 ? false : ($PARAMS['text'] ?? true));
 				$messages[strval($message['peer_id'])] = $message;
 			}
 			$res['dialogs'] = array();
@@ -434,28 +866,7 @@ try {
 				$dialog = parseDialog($rawDialog);
 				array_push($res['dialogs'], $dialog);
 			}
-			function cmp($a, $b) {
-				global $rawData;
-				$ma = null;
-				$mb = null;
-				foreach($rawData['messages'] as $m) {
-					if(parsePeer($m['peer_id']) == $a['id']) {
-						$ma = $m;
-					}
-					if(parsePeer($m['peer_id']) == $b['id']) {
-						$mb = $m;
-					}
-					if($ma !== null && $mb !== null) break;
-				}
-				if ($ma === null || $mb === null || $ma['date'] == $mb['date']) {
-					return 0;
-				}
-				if(($a['pinned'] ?? false) && !($b['pinned'] ?? false)) {
-					return -1;
-				}
-				return ($ma['date'] > $mb['date']) ? -1 : 1;
-			}
-			usort($res['dialogs'], 'cmp');
+			if ($sort) usort($res['dialogs'], 'cmp');
 			for($i = count($rawData['dialogs'])-1; $i >= 0; $i--) {
 				if(!checkCount($i)) {
 					unset($res['dialogs'][$i]);
@@ -473,7 +884,7 @@ try {
 				}
 			}
 		}
-		if(checkField('users')) {
+		if(checkField('users', true)) {
 			$res['users'] = array();
 			$res['users']['0'] = 0;
 			foreach($rawData['users'] as $rawUser) {
@@ -482,7 +893,7 @@ try {
 				$res['users'][$id] = parseUser($rawUser);
 			}
 		}
-		if(checkField('chats')) {
+		if(checkField('chats', true)) {
 			$res['chats'] = array();
 			$res['chats']['0'] = 0;
 			foreach($rawData['chats'] as $rawChat) {
@@ -491,13 +902,30 @@ try {
 				$res['chats'][$id] = parseChat($rawChat);
 			}
 		}
-		if(checkField('messages')) {
-			$res['messages'] = array();
-			$res['messages']['0'] = 0;
-			foreach($messages as $message) {
-				$id = $message['peer_id'];
-				if(count($dialogPeers) != 0 && !in_array($id, $dialogPeers)) continue;
-				$res['messages'][$id] = $message;
+		if(checkField('messages', true)) {
+			if ($v < 5) {
+				$res['messages'] = array();
+				$res['messages']['0'] = 0;
+				foreach($messages as $message) {
+					$id = $message['peer_id'];
+					if(count($dialogPeers) != 0 && !in_array($id, $dialogPeers)) continue;
+					$res['messages'][$id] = $message;
+				}
+			} else {
+				$l = count($res['dialogs']);
+				foreach($messages as $message) {
+					$id = $message['peer_id'];
+					if(count($dialogPeers) != 0 && !in_array($id, $dialogPeers)) continue;
+					$idx = null;
+					for ($i = 0; $i < $l; $i++) {
+						if ($res['dialogs'][$i]['id'] != strval($id)) continue;
+						$idx = $i;
+						break;
+					}
+					if ($idx === null) continue;
+					unset($message['peer_id']);
+					$res['dialogs'][$idx]['msg'] = $message;
+				}
 			}
 		}
 		json($res);
@@ -580,7 +1008,7 @@ try {
 				$res['chats'][$id] = parseChat($rawChat);
 			}
 		}
-		if(checkField('messages')) {
+		if(checkField('messages', false) && $v < 5) {
 			$res['messages'] = array();
 			$res['messages']['0'] = 0;
 			foreach($messages as $message) {
@@ -606,10 +1034,11 @@ try {
 		$rawData = $MP->messages->getHistory($p);
 		$res = array();
 		$res['count'] = $rawData['count'];
+		if (isset($rawData['offset_id_offset'])) $res['off'] = $rawData['offset_id_offset'];
 		if(checkField('messages')) {
 			$res['messages'] = array();
 			foreach($rawData['messages'] as $rawMessage) {
-				array_push($res['messages'], parseMessage($rawMessage, $PARAMS['include_media'] ?? false));
+				array_push($res['messages'], parseMessage($rawMessage, $PARAMS['media'] ?? false));
 			}
 		}
 		if(checkField('users')) {
@@ -639,14 +1068,22 @@ try {
 		setupMadelineProto();
 		$p = array();
 		addParamToArray($p, 'peer');
-		$p['message'] = $PARAMS['text'];
+		$p['message'] = getParam('text');
+		if (!isParamEmpty('reply')) {
+			$p['reply_to_msg_id'] = getParam('reply');
+		}
 		$r = $MP->messages->sendMessage($p);
 		json(['res' => '1']);
 		break;
 	case 'getSelf':
+	case 'me':
 		checkAuth();
 		setupMadelineProto();
 		$r = $MP->getSelf();
+		if (!$r) {
+			http_response_code(401);
+			error(['message' => 'Could not get user info']);
+		}
 		json(parseUser($r));
 		break;
 /*
@@ -658,7 +1095,7 @@ try {
 		checkParamEmpty('id');
 		checkAuth();
 		setupMadelineProto();
-		$r = $MP->getInfo($PARAMS['id']);
+		$r = $MP->getInfo(getParam('id'));
 		if (isset($r['User']) && (!isset($PARAMS['type']) || $PARAMS['type'] == 'user')) {
 			json(parseUser($r['User']));
 		} elseif (isset($r['Chat']) && (!isset($PARAMS['type']) || $PARAMS['type'] == 'chat')) {
@@ -673,7 +1110,7 @@ try {
 		setupMadelineProto();
 		$users = ['0'=>0];
 		$chats = ['0'=>0];
-		foreach (explode(',', $PARAMS['id']) as $id) {
+		foreach (explode(',', getParam('id')) as $id) {
 			$id = (int) trim($id);
 			if ($id == 0) error(['message'=>'Invalid id']);
 			$r = $MP->getInfo($PARAMS['id']);
@@ -685,6 +1122,181 @@ try {
 		}
 		json(['users' => $users, 'chats' => $chats]);
 		break;
+	case 'updates':
+		// TODO
+		checkAuth();
+		setupMadelineProto();
+		$timeout = (int) getParam('timeout', '10');
+		$offset = (int) getParam('offset');
+		$peer = (int) getParam('peer', '0');
+		$message = (int) getParam('message', '0'); 
+		$types = isParamEmpty('types') ? false : explode(',', getParam('types'));
+		$exclude = isParamEmpty('exclude') ? false : explode(',', getParam('exclude'));
+		
+		$time = microtime(true);
+		$so = $offset;
+		$i = $message;
+		$res = array();
+		while (true) {
+			flush();
+			if(connection_aborted() || microtime(true) - $time >= $timeout) break;
+			$updates = $MP->getUpdates(['offset' => $offset+1, 'limit' => 100, 'timeout' => 2]);
+			foreach ($updates as $update) {
+				if ($update['update_id'] == $so) continue;
+				$type = $update['update']['_'];
+				$offset = $update['update_id'];
+				if ($types && !in_array($type, $types)) continue;
+				if ($exclude && in_array($type, $exclude)) continue;
+				if ($peer && ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage')) {
+					$msg = $update['update']['message'];
+					if($msg['peer_id'] != $id) continue;
+					if($msg['id'] < $i) continue;
+					if($msg['id'] == $i) continue;
+					if($minid == 0) {
+						$minid = $update['update_id'];
+						$minmsg = $msg;
+					}
+					$maxid = $update['update_id'];
+					$maxmsg = $msg;
+				}
+				if ($peer) continue;
+				array_push($res, $update);
+			}
+			if ($res) break;
+			
+		}
+		if (!$res) {
+			json(['res' => 0]);
+		} else {
+			json(['res' => $res]);
+		}
+		break;
+	// v5
+	case 'getFullInfo':
+		checkParamEmpty('id');
+		checkAuth();
+		setupMadelineProto();
+		$r = $MP->getFullInfo(getParam('id')) ?? null;
+		if ($r) {
+			json($r);
+		} else {
+			error(['message'=>'']);
+		}
+		break;
+	case 'getFolders':
+		checkAuth();
+		setupMadelineProto();
+		$folders = $MP->messages->getDialogFilters();
+		if(($folders['_'] ?? '') == 'messages.dialogFilters')
+			$folders = $folders['filters'];
+		$hasArchiveChats = count($MP->messages->getDialogs([
+			'limit' => 1, 
+			'exclude_pinned' => true,
+			'folder_id' => 1
+			])['dialogs']) > 0;
+		if(count($folders) == 0 && !$hasArchiveChats) {
+			json(['res' => 0]);
+			break;
+		}
+		$res = ['archive' => $hasArchiveChats];
+		if (count($folders) > 0) {
+			$res['folders'] = [];
+			foreach($folders as $f) {
+			if(($f['_'] ?? '') == 'dialogFilterDefault' || !isset($f['id'])) {
+				array_push($res['folders'], ['id' => 0]);
+			} else {
+				array_push($res['folders'], ['id' => $f['id'], 't' => $f['title']]);
+			}
+		}
+		}
+		json($res);
+		break;
+	case 'read':
+		checkAuth();
+		setupMadelineProto();
+		
+		$id = getParam('id');
+		$maxid = (int) getParam('max');
+		$thread = getParam('thread', null);
+		
+		if ($thread != null) {
+			$MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => $thread]);
+			$MP->messages->readMentions(['peer' => $id, 'top_msg_id' => $thread]);
+		} else if($ch || (int)$id < 0) {
+			$MP->channels->readHistory(['channel' => $id, 'max_id' => $maxid]);
+			$MP->messages->readMentions(['peer' => $id]);
+		} else {
+			$MP->messages->readHistory(['peer' => $id, 'max_id' => $maxid]);
+			$MP->messages->readMentions(['peer' => $id]);
+		}
+		break;
+	case 'startBot':
+		checkAuth();
+		setupMadelineProto();
+		
+		$id = getParam('id');
+		$start = getParam('start', null);
+		$random = getParam('random', null);
+		$MP->messages->startBot(['start_param' => $start, 'bot' => $id, 'random_id' => $random]);
+	
+		json(['res' => 1]);
+		break;
+	case 'getContacts':
+		checkAuth();
+		setupMadelineProto();
+		
+		$rawData = $MP->contacts->getContacts();
+		$res = [];
+		foreach ($rawData['contacts'] as $contact) {
+			array_push($res, parseUser(findPeer(getId($contact), $rawData)));
+		}
+		json(['res' => $res]);
+		break;
+	case 'joinChannel':
+		checkAuth();
+		setupMadelineProto();
+		$MP->channels->joinChannel(['channel' => getParam('id')]);
+		json(['res' => 1]);
+		break;
+	case 'leaveChannel':
+		checkAuth();
+		setupMadelineProto();
+		$MP->channels->leaveChannel(['channel' => getParam('id')]);
+		json(['res' => 1]);
+		break;
+	case 'checkChatInvite':
+		checkAuth();
+		setupMadelineProto();
+		json(['res' => $MP->messages->checkChatInvite(hash: getParam('id'))]);
+		break;
+	case 'importChatInvite':
+		checkAuth();
+		setupMadelineProto();
+		$MP->messages->importChatInvite(hash: getParam('id'));
+		json(['res' => 1]);
+		break;
+	case 'editMessage':
+		checkParamEmpty('peer');
+		checkParamEmpty('text');
+		checkParamEmpty('id');
+		checkAuth();
+		setupMadelineProto();
+		$p = array();
+		addParamToArray($p, 'peer');
+		addParamToArray($p, 'id', 'int');
+		$p['message'] = getParam('text');
+		$r = $MP->messages->editMessage($p);
+		json(['res' => '1']);
+		break;
+	case 'deleteMessage': // TODO
+		checkParamEmpty('peer');
+		checkParamEmpty('id');
+		checkAuth();
+		setupMadelineProto();
+		$p = array();
+		json(['res' => '0']);
+		break;
+	// TODO topics, getBotCallbackAnswer, sendVote
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
 	}

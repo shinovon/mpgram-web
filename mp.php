@@ -682,7 +682,6 @@ class MP {
 	
 	static function wrapRichText($text, $entities) {
 		$len = count($entities);
-		$html = [];
 		$lastOffset = 0;
 		$html = '';
 		for($i = 0; $i < $len; $i++) {
@@ -774,7 +773,7 @@ class MP {
 					break;
 				default:
 					if(count($path) == 2 && strlen($path[1] > 0)) {
-						$url = static::getURL().'chat.php?c='.$path[0].'&m='.$path[1];
+						$url = static::getURL().'chat.php?c='.urlencode($path[0]).'&m='.$path[1];
 					} elseif(count($path) == 1) {
 						if(strpos($path[0], 'iv?') !== 0) {
 							$s = $path[0];
@@ -786,7 +785,7 @@ class MP {
 								$s = substr($s, 0, $i).'&'.substr($s, $i+1);
 								$s .= '&r='.rand(0, 100000);
 							}
-							$url = static::getURL().'chat.php?c='.urlencode($s);
+							$url = static::getURL().'chat.php?c='.$s;
 						}
 					}
 					break;
