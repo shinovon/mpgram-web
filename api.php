@@ -504,6 +504,7 @@ try {
 		}
 		$c = getCaptchaText(rand(6, 10));
 		$_SESSION['captcha_key'] = $c;
+		session_write_close();
 		$img = imagecreatetruecolor(150, 50);
 		imagefill($img, 0, 0, -1);
 		imagestring($img, rand(4, 10), rand(0, 50), rand(0, 25), $c, 0x000000);
@@ -532,6 +533,7 @@ try {
 			$c = getCaptchaText(rand(6, 10));
 			$_SESSION['captcha_key'] = $c; 
 			json(['res' => 'need_captcha', 'captcha_id' => $id]);
+			session_write_close();
 			die();
 		}
 		checkParamEmpty('phone');
@@ -545,6 +547,7 @@ try {
 			$c = getCaptchaText(rand(6, 10));
 			$_SESSION['captcha_key'] = $c; 
 			json(['res' => 'captcha_expired', 'captcha_id' => $id]);
+			session_write_close();
 			die();
 		}
 		if(strtolower($PARAMS['captcha_key']) != $_SESSION['captcha_key']) {
@@ -555,9 +558,11 @@ try {
 			$c = getCaptchaText(rand(6, 10));
 			$_SESSION['captcha_key'] = $c; 
 			json(['res' => 'wrong_captcha', 'captcha_id' => $id]);
+			session_write_close();
 			die();
 		}
 		unset($_SESSION['captcha_key']);
+		session_write_close();
 		
 		$phone = getParam('phone');
 		$user = $_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user'] ?? null;
@@ -1040,7 +1045,7 @@ try {
 		addParamToArray($p, 'min_id', 'int');
 		$rawData = $MP->messages->getHistory($p);
 		$res = array();
-		$res['count'] = $rawData['count'];
+		if (isset($rawData['count'])) $res['count'] = $rawData['count'];
 		if (isset($rawData['offset_id_offset'])) $res['off'] = $rawData['offset_id_offset'];
 		if(checkField('messages')) {
 			$res['messages'] = array();
