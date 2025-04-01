@@ -1032,6 +1032,7 @@ try {
 		json($res);
 		break;
 	case 'getHistory':
+	case 'searchMessages':
 		checkParamEmpty('peer');
 		checkAuth();
 		setupMadelineProto();
@@ -1043,7 +1044,12 @@ try {
 		addParamToArray($p, 'limit', 'int');
 		addParamToArray($p, 'max_id', 'int');
 		addParamToArray($p, 'min_id', 'int');
-		$rawData = $MP->messages->getHistory($p);
+		addParamToArray($p, 'q');
+		addParamToArray($p, 'top_msg_id');
+		if (!isParamEmpty('filter')) {
+			$p['filter'] = ['_' => 'inputMessagesFilter'.getParam('filter')];
+		}
+		$rawData = $METHOD == 'searchMessages' ? $MP->messages->search($p) : $MP->messages->getHistory($p);
 		$res = array();
 		if (isset($rawData['count'])) $res['count'] = $rawData['count'];
 		if (isset($rawData['offset_id_offset'])) $res['off'] = $rawData['offset_id_offset'];
@@ -1300,7 +1306,7 @@ try {
 		$r = $MP->messages->editMessage($p);
 		json(['res' => '1']);
 		break;
-	case 'deleteMessage': // TODO
+	case 'deleteMessage':
 		checkParamEmpty('peer');
 		checkParamEmpty('id');
 		checkAuth();
@@ -1314,7 +1320,7 @@ try {
 		}
 		json(['res' => '1']);
 		break;
-	case 'resolvePhone': // TODO
+	case 'resolvePhone':
 		checkAuth();
 		setupMadelineProto();
 		json(['res' => $MP->contacts->resolvePhone(phone: getParam('phone'))]);
