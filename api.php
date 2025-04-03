@@ -47,6 +47,9 @@ function error($error) {
 
 function checkField($field, $def = def) {
 	global $PARAMS;
+	if (($field == 'users' || $field == 'chats') && isset($PARAMS['exclude_profiles'])) {
+		return false;
+	}
 	if(!isset($PARAMS['fields'])) {
 		return $def;
 	}
@@ -277,6 +280,10 @@ function parseUser($rawUser) {
 		if (isset($rawUser['photo'])) $user['p'] = true;
 		if ($rawUser['contact'] ?? false) $user['k'] = true;
 		if ($rawUser['bot'] ?? false) $user['b'] = true;
+		if (checkField('status') && isset($rawUser['status'])) {
+			$user['s'] = $rawUser['status']['_'] == 'userStatusOnline';
+			$user['w'] = $u['status']['was_online'] ?? 0;
+		}
 	}
 	return $user;
 }
@@ -406,7 +413,7 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 				$media['voted'] = $media['results']['total_voters'] ?? 0;
 			} else {
 				// TODO
-				$media['type'] = $rawMedia['undefined'];
+				$media['type'] = 'undefined';
 				$media['_'] = $rawMedia['_'];
 			}
 			$message['media'] = $media;
@@ -865,6 +872,7 @@ try {
 		if(checkField('raw') === true) {
 			$res['raw'] = $rawData;
 		}
+		if (isset($rawData['count'])) $res['count'] = $rawData['count'];
 		$dialogPeers = array();
 		$senderPeers = array();
 		$mesages = array();
@@ -1033,23 +1041,29 @@ try {
 		break;
 	case 'getHistory':
 	case 'searchMessages':
+	case 'getMessages':
 		checkParamEmpty('peer');
 		checkAuth();
 		setupMadelineProto();
 		$p = array();
 		addParamToArray($p, 'peer');
-		addParamToArray($p, 'offset_id', 'int');
-		addParamToArray($p, 'offset_date', 'int');
-		addParamToArray($p, 'add_offset', 'int');
-		addParamToArray($p, 'limit', 'int');
-		addParamToArray($p, 'max_id', 'int');
-		addParamToArray($p, 'min_id', 'int');
-		addParamToArray($p, 'q');
-		addParamToArray($p, 'top_msg_id');
-		if (!isParamEmpty('filter')) {
-			$p['filter'] = ['_' => 'inputMessagesFilter'.getParam('filter')];
+		if ($METHOD == 'getMessages') {
+			$p['id'] = explode(',', getParam('id'));
+			$rawData = $MP->messages->getMessages($p);
+		} else {
+			addParamToArray($p, 'offset_id', 'int');
+			addParamToArray($p, 'offset_date', 'int');
+			addParamToArray($p, 'add_offset', 'int');
+			addParamToArray($p, 'limit', 'int');
+			addParamToArray($p, 'max_id', 'int');
+			addParamToArray($p, 'min_id', 'int');
+			addParamToArray($p, 'q');
+			addParamToArray($p, 'top_msg_id');
+			if (!isParamEmpty('filter')) {
+				$p['filter'] = ['_' => 'inputMessagesFilter'.getParam('filter')];
+			}
+			$rawData = $METHOD == 'searchMessages' ? $MP->messages->search($p) : $MP->messages->getHistory($p);
 		}
-		$rawData = $METHOD == 'searchMessages' ? $MP->messages->search($p) : $MP->messages->getHistory($p);
 		$res = array();
 		if (isset($rawData['count'])) $res['count'] = $rawData['count'];
 		if (isset($rawData['offset_id_offset'])) $res['off'] = $rawData['offset_id_offset'];
@@ -1150,6 +1164,7 @@ try {
 		$message = (int) getParam('message', '0'); 
 		$types = isParamEmpty('types') ? false : explode(',', getParam('types'));
 		$exclude = isParamEmpty('exclude') ? false : explode(',', getParam('exclude'));
+		$limit = (int) getParam('limit', '100');
 		
 		$time = microtime(true);
 		$so = $offset;
@@ -1158,7 +1173,7 @@ try {
 		while (true) {
 			flush();
 			if(connection_aborted() || microtime(true) - $time >= $timeout) break;
-			$updates = $MP->getUpdates(['offset' => $offset+1, 'limit' => 100, 'timeout' => 2]);
+			$updates = $MP->getUpdates(['offset' => $offset+1, 'limit' => $limit, 'timeout' => 1]);
 			foreach ($updates as $update) {
 				if ($update['update_id'] == $so) continue;
 				$type = $update['update']['_'];
@@ -1181,7 +1196,6 @@ try {
 				array_push($res, $update);
 			}
 			if ($res) break;
-			
 		}
 		if (!$res) {
 			json(['res' => 0]);
