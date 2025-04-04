@@ -1183,7 +1183,6 @@ try {
 		json(['res' => $res]);
 		break;
 	case 'updates':
-		// TODO
 		checkAuth();
 		setupMadelineProto();
 		$timeout = (int) getParam('timeout', '10');
@@ -1417,6 +1416,15 @@ try {
 		}
 		if (isset($rawData['count'])) $res['count'] = $rawData['count'];
 		json(['res' => $res]);
+		break;
+	case 'setTyping':
+		checkAuth();
+		setupMadelineProto();
+		
+		$MP->messages->setTyping(['peer' => (int) getParam('peer'),
+		'action' => ['_' => 'sendMessage'.getParam('action').'Action']]);
+		
+		json(['res' => 1]);
 		break;
 	// TODO topics, getBotCallbackAnswer, sendVote
 	default:
