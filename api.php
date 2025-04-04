@@ -282,7 +282,7 @@ function parseUser($rawUser) {
 		if ($rawUser['bot'] ?? false) $user['b'] = true;
 		if (checkField('status') && isset($rawUser['status'])) {
 			$user['s'] = $rawUser['status']['_'] == 'userStatusOnline';
-			$user['w'] = $u['status']['was_online'] ?? 0;
+			$user['w'] = $rawUser['status']['was_online'] ?? 0;
 		}
 	}
 	return $user;
@@ -1279,8 +1279,9 @@ try {
 		
 		$rawData = $MP->contacts->getContacts();
 		$res = [];
+		$res['users'] = [];
 		foreach ($rawData['contacts'] as $contact) {
-			array_push($res, parseUser(findPeer(getId($contact), $rawData)));
+			array_push($res['users'], parseUser(findPeer(getId($contact), $rawData)));
 		}
 		json(['res' => $res]);
 		break;
@@ -1338,6 +1339,22 @@ try {
 		checkAuth();
 		setupMadelineProto();
 		json(['res' => $MP->contacts->resolvePhone(phone: getParam('phone'))]);
+		break;
+	case 'getParticipants':
+		checkAuth();
+		setupMadelineProto();
+		$p = ['channel' => getParam('peer'), 'filter' => ['_' => 'channelParticipants'.getParam('filter', 'Recent')]];
+		addParamToArray($p, 'offset', 'int');
+		addParamToArray($p, 'limit', 'int');
+		$rawData = $MP->channels->getParticipants($p);
+		$res = [];
+		$res['users'] = [];
+		foreach ($rawData['participants'] as $p) {
+			$r = parseUser(findPeer(getId($p), $rawData));
+			array_push($res['users'], $r);
+		}
+		if (isset($rawData['count'])) $res['count'] = $rawData['count'];
+		json(['res' => $res]);
 		break;
 	// TODO topics, getBotCallbackAnswer, sendVote
 	default:
