@@ -38,6 +38,7 @@ try {
 		header('Location: chat.php?c='.$id);
 		die;
 	}
+	$MP->messages->setTyping(['peer' => $id, 'action' => ['_' => 'sendMessageChooseStickerAction']]);
 	echo '<html><head><title>'.MP::x($lng['send_message']).'</title>';
 	echo Themes::head();
 	echo '</head>';

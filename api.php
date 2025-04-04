@@ -47,7 +47,7 @@ function error($error) {
 
 function checkField($field, $def = def) {
 	global $PARAMS;
-	if (($field == 'users' || $field == 'chats') && isset($PARAMS['exclude_profiles'])) {
+	if (($field == 'users' || $field == 'chats') && isset($PARAMS['exclude_peers'])) {
 		return false;
 	}
 	if(!isset($PARAMS['fields'])) {
@@ -1154,6 +1154,34 @@ try {
 		}
 		json(['users' => $users, 'chats' => $chats]);
 		break;
+	case 'getLastUpdate':
+		checkAuth();
+		setupMadelineProto();
+		
+		$last = $MP->getUpdates(['offset' => -1]);
+		$last = end($last);
+		
+		$res = $last;
+		
+		if (isset($PARAMS['peer']) && isset($PARAMS['id'])) {
+			$peer = (int) getParam('peer');
+			$id = (int) getParam('id');
+			$updates = $MP->getUpdates([]);
+			foreach ($updates as $update) {
+				$type = $update['update']['_'];
+				if ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage') {
+					if ($msg['peer_id'] != $peer) continue;
+					if ($msg['id'] < $i) continue;
+					if ($msg['id'] == $i) {
+						$res = $update;
+						break;
+					}
+				}
+			}
+		}
+		
+		json(['res' => $res]);
+		break;
 	case 'updates':
 		// TODO
 		checkAuth();
@@ -1165,41 +1193,75 @@ try {
 		$types = isParamEmpty('types') ? false : explode(',', getParam('types'));
 		$exclude = isParamEmpty('exclude') ? false : explode(',', getParam('exclude'));
 		$limit = (int) getParam('limit', '100');
+		$userPeer = $peer > 0;
+		$chatPeer = $peer < 0;
+		$media = !isParamEmpty('media');
+		$autoread = !isParamEmpty('read');
 		
 		$time = microtime(true);
 		$so = $offset;
 		$i = $message;
+		$maxmsg = 0;
 		$res = array();
 		while (true) {
 			flush();
-			if(connection_aborted() || microtime(true) - $time >= $timeout) break;
-			$updates = $MP->getUpdates(['offset' => $offset+1, 'limit' => $limit, 'timeout' => 1]);
+			if (connection_aborted() || microtime(true) - $time >= $timeout) break;
+			$updates = $MP->getUpdates(['offset' => $offset, 'limit' => $limit, 'timeout' => 1]);
 			foreach ($updates as $update) {
 				if ($update['update_id'] == $so) continue;
 				$type = $update['update']['_'];
-				$offset = $update['update_id'];
+				$offset = $update['update_id'] + 1;
 				if ($types && !in_array($type, $types)) continue;
 				if ($exclude && in_array($type, $exclude)) continue;
-				if ($peer && ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage')) {
+				if ($peer && ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage'
+				|| $type == 'updateEditMessage' || $type == 'updateEditChannelMessage')) {
 					$msg = $update['update']['message'];
-					if($msg['peer_id'] != $id) continue;
-					if($msg['id'] < $i) continue;
-					if($msg['id'] == $i) continue;
-					if($minid == 0) {
-						$minid = $update['update_id'];
-						$minmsg = $msg;
-					}
-					$maxid = $update['update_id'];
-					$maxmsg = $msg;
+					if ($msg['peer_id'] != $peer) continue;
+					if ($msg['id'] < $i) continue;
+					if ($msg['id'] == $i) continue;
+					$maxmsg = $msg['id'];
+					$update['update']['message'] = parseMessage($update['update']['message'], $media);
+					array_push($res, $update);
 				}
+				if ($userPeer && ($type == 'updateUserStatus' || $type == 'updateUserTyping')) {
+					if ($update['update']['user_id'] != $peer) continue;
+					if (isset($update['update']['from_id'])) {
+						$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+					}
+					array_push($res, $update);
+				}
+				if ($chatPeer && ($type == 'updateDeleteChannelMessages' || $type == 'updateChannelUserTyping')) {
+					if ($update['update']['channel_id'] != $peer) continue;
+					if (isset($update['update']['from_id'])) {
+						$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+					}
+					array_push($res, $update);
+				}
+				if ($chatPeer && $type == 'updateChatUserTyping') {
+					if ($update['update']['chat_id'] != $peer) continue;
+					if (isset($update['update']['from_id'])) {
+						$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+					}
+					array_push($res, $update);
+				}
+				
 				if ($peer) continue;
 				array_push($res, $update);
 			}
 			if ($res) break;
 		}
 		if (!$res) {
-			json(['res' => 0]);
+			json(['res' => []]);
 		} else {
+			if ($autoread && $maxmsg != 0) {
+				try {
+					if ($chatPeer) {
+						$MP->channels->readHistory(['channel' => $peer, 'max_id' => $maxmsg]);
+					} else {
+						$MP->messages->readHistory(['peer' => $peer, 'max_id' => $maxmsg]);
+					}
+				} catch (Exception) {}
+			}
 			json(['res' => $res]);
 		}
 		break;
@@ -1247,14 +1309,14 @@ try {
 		checkAuth();
 		setupMadelineProto();
 		
-		$id = getParam('id');
+		$id = getParam('peer');
 		$maxid = (int) getParam('max');
 		$thread = getParam('thread', null);
 		
 		if ($thread != null) {
 			$MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => (int) $thread]);
 			$MP->messages->readMentions(['peer' => $id, 'top_msg_id' => (int) $thread]);
-		} else if($ch || (int)$id < 0) {
+		} else if ((int) $id < 0) {
 			$MP->channels->readHistory(['channel' => $id, 'max_id' => $maxid]);
 			$MP->messages->readMentions(['peer' => $id]);
 		} else {
