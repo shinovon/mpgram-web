@@ -421,9 +421,12 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 	}
 	if (isset($rawMessage['action'])) {
 		$rawAction = $rawMessage['action'];
-		$action = ['_' => $rawAction['_']];
+		$action = ['_' => substr($rawAction['_'], 13)];
 		if (isset($rawAction['user_id']) || isset($rawAction['users'])) {
-			$action['user'] = $rawAction['user_id'] ?? $a['users'][0] ?? null;
+			$action['user'] = $rawAction['user_id'] ?? $rawAction['users'][0] ?? null;
+		}
+		if (isset($rawAction['title'])) {
+			$action['t'] = $rawAction['title'];
 		}
 		$message['act'] = $action;
 	}
@@ -1064,6 +1067,7 @@ try {
 			}
 			$rawData = $METHOD == 'searchMessages' ? $MP->messages->search($p) : $MP->messages->getHistory($p);
 		}
+		//$autoread = !isParamEmpty('read'); // TODO
 		$res = array();
 		if (isset($rawData['count'])) $res['count'] = $rawData['count'];
 		if (isset($rawData['offset_id_offset'])) $res['off'] = $rawData['offset_id_offset'];
@@ -1158,26 +1162,29 @@ try {
 		checkAuth();
 		setupMadelineProto();
 		
-		$last = $MP->getUpdates(['offset' => -1]);
-		$last = end($last);
-		
-		$res = $last;
+		$res = null;
 		
 		if (isset($PARAMS['peer']) && isset($PARAMS['id'])) {
 			$peer = (int) getParam('peer');
 			$id = (int) getParam('id');
-			$updates = $MP->getUpdates([]);
+			$updates = $MP->getUpdates(['timeout' => 1]);
 			foreach ($updates as $update) {
 				$type = $update['update']['_'];
 				if ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage') {
+					$msg = $update['update']['message'];
 					if ($msg['peer_id'] != $peer) continue;
-					if ($msg['id'] < $i) continue;
-					if ($msg['id'] == $i) {
+					if ($msg['id'] < $id) continue;
+					if ($msg['id'] == $id) {
 						$res = $update;
 						break;
 					}
+					$res = $update;
 				}
 			}
+			//if ($res === null) $res = end($updates);
+		} else {
+			$res = $MP->getUpdates(['offset' => -1]);
+			$res = end($res);
 		}
 		
 		json(['res' => $res]);
@@ -1409,9 +1416,11 @@ try {
 		addParamToArray($p, 'limit', 'int');
 		$rawData = $MP->channels->getParticipants($p);
 		$res = [];
+		$res['raw'] = $rawData;
 		$res['users'] = [];
 		foreach ($rawData['participants'] as $p) {
 			$r = parseUser(findPeer(getId($p), $rawData));
+			if (isset($p['admin_rights'])) $r['a'] = true;
 			array_push($res['users'], $r);
 		}
 		if (isset($rawData['count'])) $res['count'] = $rawData['count'];
@@ -1424,6 +1433,13 @@ try {
 		$MP->messages->setTyping(['peer' => (int) getParam('peer'),
 		'action' => ['_' => 'sendMessage'.getParam('action').'Action']]);
 		
+		json(['res' => 1]);
+		break;
+	case 'updateStatus':
+		checkAuth();
+		setupMadelineProto();
+		
+		$MP->account->updateStatus(['offline' => !isParamEmpty('off')]);
 		json(['res' => 1]);
 		break;
 	// TODO topics, getBotCallbackAnswer, sendVote

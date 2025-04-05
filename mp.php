@@ -189,7 +189,7 @@ class MP {
 				case 'historyclear':
 					$txt = static::x($lng['action_historyclear']);
 					break;
-				case 'chatjoinedbyreqeuset':
+				case 'chatjoinedbyrequest':
 					$txt = "<a href=\"chat.php?c={$mfid}\" class=\"mn\">".static::dehtml($fn).'</a> '.static::x($lng['action_joinedbyrequest']);
 					break;
 				default:
