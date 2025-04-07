@@ -19,22 +19,20 @@ function exceptions_error_handler($severity, $message, $filename, $lineno) {
 set_error_handler('exceptions_error_handler');
 
 
-function json($json) {
+function json($json, $headers=true) {
 	if(defined("json")) return;
 	global $PARAMS;
-	// Add content-type if needed
-	if(isset($PARAMS['pretty']) || isset($PARAMS['json'])) {
-		header("Content-Type: application/json");
-	}
 	$c = JSON_UNESCAPED_SLASHES | (isset($_SERVER['HTTP_X_MPGRAM_UNICODE']) || isset($PARAMS['utf']) ? JSON_UNESCAPED_UNICODE : 0);
 	if(isset($PARAMS['pretty'])) {
 		$c |= JSON_PRETTY_PRINT;
 	}
-	$time = time();
-	$sv = api_version;
-	header("X-Server-Time: {$time}");
-	header("X-Server-Api-Version: {$sv}");
-	header("Content-Type: application/json");
+	if ($headers) {
+		$time = time();
+		$sv = api_version;
+		header("X-Server-Time: {$time}");
+		header("X-Server-Api-Version: {$sv}");
+		header("Content-Type: application/json");
+	}
 	echo json_encode($json, $c);
 	define("json", 1);
 }
@@ -1050,6 +1048,10 @@ try {
 		setupMadelineProto();
 		$p = array();
 		addParamToArray($p, 'peer');
+		
+		$peer = getParam('peer');
+		$thread = getParam('top_msg_id', null);
+		
 		if ($METHOD == 'getMessages') {
 			$p['id'] = explode(',', getParam('id'));
 			$rawData = $MP->messages->getMessages($p);
@@ -1067,7 +1069,19 @@ try {
 			}
 			$rawData = $METHOD == 'searchMessages' ? $MP->messages->search($p) : $MP->messages->getHistory($p);
 		}
-		//$autoread = !isParamEmpty('read'); // TODO
+		if (!isParamEmpty('read') && isset($rawData['messages'][0])) {
+			$maxid = $rawData['messages'][0]['id'];
+			if ($thread != null) {
+				$MP->messages->readDiscussion(['peer' => $peer, 'read_max_id' => $maxid, 'msg_id' => (int) $thread]);
+				$MP->messages->readMentions(['peer' => $peer, 'top_msg_id' => (int) $thread]);
+			} else if ((int) $peer < 0) {
+				$MP->channels->readHistory(['channel' => $peer, 'max_id' => $maxid]);
+				$MP->messages->readMentions(['peer' => $peer]);
+			} else {
+				$MP->messages->readHistory(['peer' => $peer, 'max_id' => $maxid]);
+				$MP->messages->readMentions(['peer' => $peer]);
+			}
+		}
 		$res = array();
 		if (isset($rawData['count'])) $res['count'] = $rawData['count'];
 		if (isset($rawData['offset_id_offset'])) $res['off'] = $rawData['offset_id_offset'];
@@ -1119,6 +1133,11 @@ try {
 		if (!$r) {
 			http_response_code(401);
 			error(['message' => 'Could not get user info']);
+		}
+		if (!isParamEmpty('status')) {
+			try {
+				$MP->account->updateStatus(['offline' => false]);
+			} catch (Exception) {}
 		}
 		json(parseUser($r));
 		break;
@@ -1176,23 +1195,24 @@ try {
 					if ($msg['id'] < $id) continue;
 					if ($msg['id'] == $id) {
 						$res = $update;
+						$res['exact'] = true;
 						break;
 					}
 					$res = $update;
 				}
 			}
-			//if ($res === null) $res = end($updates);
+			if ($res === null) $res = end($updates);
 		} else {
 			$res = $MP->getUpdates(['offset' => -1]);
 			$res = end($res);
 		}
-		
 		json(['res' => $res]);
 		break;
 	case 'updates':
 		checkAuth();
 		setupMadelineProto();
 		$timeout = (int) getParam('timeout', '10');
+		if ($timeout > 120) $timeout = 120;
 		$offset = (int) getParam('offset');
 		$peer = (int) getParam('peer', '0');
 		$message = (int) getParam('message', '0'); 
@@ -1209,66 +1229,79 @@ try {
 		$i = $message;
 		$maxmsg = 0;
 		$res = array();
-		while (true) {
-			flush();
-			if (connection_aborted() || microtime(true) - $time >= $timeout) break;
-			$updates = $MP->getUpdates(['offset' => $offset, 'limit' => $limit, 'timeout' => 1]);
-			foreach ($updates as $update) {
-				if ($update['update_id'] == $so) continue;
-				$type = $update['update']['_'];
-				$offset = $update['update_id'] + 1;
-				if ($types && !in_array($type, $types)) continue;
-				if ($exclude && in_array($type, $exclude)) continue;
-				if ($peer && ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage'
-				|| $type == 'updateEditMessage' || $type == 'updateEditChannelMessage')) {
-					$msg = $update['update']['message'];
-					if ($msg['peer_id'] != $peer) continue;
-					if ($msg['id'] < $i) continue;
-					if ($msg['id'] == $i) continue;
-					$maxmsg = $msg['id'];
-					$update['update']['message'] = parseMessage($update['update']['message'], $media);
-					array_push($res, $update);
-				}
-				if ($userPeer && ($type == 'updateUserStatus' || $type == 'updateUserTyping')) {
-					if ($update['update']['user_id'] != $peer) continue;
-					if (isset($update['update']['from_id'])) {
-						$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+		
+		http_response_code(200);
+		header("X-Accel-Buffering: no");
+		set_time_limit(0);
+		ob_implicit_flush(true);
+		echo '{';
+		
+		try {
+			while (true) {
+				flush();
+				if (connection_aborted() || microtime(true) - $time >= $timeout) break;
+				$updates = $MP->getUpdates(['offset' => $offset, 'limit' => $limit, 'timeout' => 1]);
+				foreach ($updates as $update) {
+					if ($update['update_id'] == $so) continue;
+					$type = $update['update']['_'];
+					$offset = $update['update_id'] + 1;
+					if ($types && !in_array($type, $types)) continue;
+					if ($exclude && in_array($type, $exclude)) continue;
+					if ($peer && ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage'
+					|| $type == 'updateEditMessage' || $type == 'updateEditChannelMessage')) {
+						$msg = $update['update']['message'];
+						if ($msg['peer_id'] != $peer) continue;
+						if ($msg['id'] < $i) continue;
+						if ($msg['id'] == $i) continue;
+						$maxmsg = $msg['id'];
+						$update['update']['message'] = parseMessage($msg, $media);
+						array_push($res, $update);
 					}
-					array_push($res, $update);
-				}
-				if ($chatPeer && ($type == 'updateDeleteChannelMessages' || $type == 'updateChannelUserTyping')) {
-					if ($update['update']['channel_id'] != $peer) continue;
-					if (isset($update['update']['from_id'])) {
-						$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+					if ($userPeer && ($type == 'updateUserStatus' || $type == 'updateUserTyping')) {
+						if ($update['update']['user_id'] != $peer) continue;
+						if (isset($update['update']['from_id'])) {
+							$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+						}
+						array_push($res, $update);
 					}
-					array_push($res, $update);
-				}
-				if ($chatPeer && $type == 'updateChatUserTyping') {
-					if ($update['update']['chat_id'] != $peer) continue;
-					if (isset($update['update']['from_id'])) {
-						$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+					if ($chatPeer && ($type == 'updateDeleteChannelMessages' || $type == 'updateChannelUserTyping')) {
+						if ($update['update']['channel_id'] != $peer) continue;
+						if (isset($update['update']['from_id'])) {
+							$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+						}
+						array_push($res, $update);
 					}
+					if ($chatPeer && $type == 'updateChatUserTyping') {
+						if ($update['update']['chat_id'] != $peer) continue;
+						if (isset($update['update']['from_id'])) {
+							$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+						}
+						array_push($res, $update);
+					}
+					
+					if ($peer) continue;
 					array_push($res, $update);
 				}
-				
-				if ($peer) continue;
-				array_push($res, $update);
+				if ($res) break;
 			}
-			if ($res) break;
-		}
-		if (!$res) {
-			json(['res' => []]);
-		} else {
-			if ($autoread && $maxmsg != 0) {
-				try {
-					if ($chatPeer) {
-						$MP->channels->readHistory(['channel' => $peer, 'max_id' => $maxmsg]);
-					} else {
-						$MP->messages->readHistory(['peer' => $peer, 'max_id' => $maxmsg]);
-					}
-				} catch (Exception) {}
+			if (!$res) {
+				echo '"res":[]}';
+			} else {
+				if ($autoread && $maxmsg != 0) {
+					try {
+						if ($chatPeer) {
+							$MP->channels->readHistory(['channel' => $peer, 'max_id' => $maxmsg]);
+						} else {
+							$MP->messages->readHistory(['peer' => $peer, 'max_id' => $maxmsg]);
+						}
+					} catch (Exception) {}
+				}
+				$c = JSON_UNESCAPED_SLASHES | (isset($_SERVER['HTTP_X_MPGRAM_UNICODE']) || isset($PARAMS['utf']) ? JSON_UNESCAPED_UNICODE : 0);
+				echo substr(json_encode(['res'=>$res], $c), 1);
 			}
-			json(['res' => $res]);
+		} catch (Exception $e) {
+			$c = JSON_UNESCAPED_SLASHES | (isset($_SERVER['HTTP_X_MPGRAM_UNICODE']) || isset($PARAMS['utf']) ? JSON_UNESCAPED_UNICODE : 0);
+			echo substr(json_encode(['error' => ['message' => 'Exception', 'stack_trace' =>mstrval($e)]], $c), 1);
 		}
 		break;
 	// v5
