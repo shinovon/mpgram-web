@@ -2,6 +2,7 @@
 ini_set('error_reporting', E_ERROR);
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
+ini_set('output_buffering', 0);
 
 require_once("api_values.php");
 require_once("config.php");
@@ -1475,7 +1476,86 @@ try {
 		$MP->account->updateStatus(['offline' => !isParamEmpty('off')]);
 		json(['res' => 1]);
 		break;
-	// TODO topics, getBotCallbackAnswer, sendVote
+	case 'sendMedia':
+		checkParamEmpty('peer');
+		checkAuth();
+		setupMadelineProto();
+		
+		$p = [];
+		addParamToArray($p, 'peer');
+		$p['message'] = getParam('text', '');
+		if (!isParamEmpty('reply')) {
+			$p['reply_to_msg_id'] = getParam('reply');
+		}
+		if (!isParamEmpty('html')) {
+			$p['parse_mode'] = 'HTML';
+		}
+		
+		if (!isset($_FILES['file'])) {
+			json(['error' => ['message' => 'No file: '.var_export($_FILES,true)]]);
+		}
+		if (($_FILES['file']['error'] ?? false) && $_FILES['file']['error'] != 4) {
+			json(['error' => ['message' => 'File error: '.$_FILES['file']['error']]]);
+		}
+		$file = $_FILES['file']['tmp_name'];
+		try {
+			if ($_FILES['file']['size'] == 0) {
+				json(['error' => ['message' => 'Size error']]);
+				break;
+			}
+			$max = 20 * 1024 * 1024;
+			if (defined('UPLOAD_SIZE_LIMIT')) $max = UPLOAD_SIZE_LIMIT;
+			if ($_FILES['file']['size'] > $max) {
+				json(['error' => ['message' => 'File is too large']]);
+				break;
+			}
+			
+			$filename = $_FILES['file']['name'];
+			$extidx = strrpos($filename, '.');
+			if ($extidx === false) {
+				json(['error' => ['message' => 'Invalid file extension']]);
+				break;
+			}
+			$ext = strtolower(substr($filename, $extidx+1));
+			$attr = false;
+			if (!isParamEmpty('uncompressed')) {
+				$type = 'inputMediaUploadedDocument';
+				$attr = true;
+			} else {
+				switch ($ext) {
+					case 'jpg':
+					case 'jpeg':
+					case 'png':
+						$newfile = $file.'.'.$ext;
+						if(!move_uploaded_file($file, $newfile)) {
+							json(['error' => ['message' => 'Failed to move file']]);
+							break;
+						}
+						$type = 'inputMediaUploadedPhoto';
+						$file = $newfile;
+						break;
+					default:
+						$type = 'inputMediaUploadedDocument';
+						$attr = true;
+						break;
+				}
+			}
+			$attributes = [];
+			if ($attr) {
+				array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
+			}
+			$p['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes, 'spoiler' => !isParamEmpty('spoiler')];
+			
+			$MP->messages->sendMedia($p);
+		} finally {
+			try {
+				unlink($file);
+			} catch (Exception) {}
+		}
+		
+		json(['res' => '1']);
+		break;
+	// TODO topics, getBotCallbackAnswer, sendVote,  getAllStickers, getStickerSet
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
 	}
