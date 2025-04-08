@@ -1283,6 +1283,7 @@ try {
 						}
 						array_push($res, $update);
 					}
+					// TODO updateDeleteMessages
 					
 					if ($peer) continue;
 					array_push($res, $update);
@@ -1558,6 +1559,23 @@ try {
 		}
 		
 		json(['res' => '1']);
+		break;
+	case 'searchChats':
+		checkAuth();
+		setupMadelineProto();
+		
+		$rawData = $MP->contacts->search(['q' => getParam('q')]);
+		$res = [];
+		$res['results'] = [];
+		foreach ($rawData['my_results'] as $c) {
+			$r = findPeer(getId($c), $rawData);
+			array_push($res['results'], $r['id'] < 0 ? parseChat($r) : parseUser($r));
+		}
+		foreach ($rawData['results'] as $c) {
+			$r = findPeer(getId($c), $rawData);
+			array_push($res['results'], $r['id'] < 0 ? parseChat($r) : parseUser($r));
+		}
+		json(['res' => $res]);
 		break;
 	// TODO topics, getBotCallbackAnswer, sendVote,  getAllStickers, getStickerSet
 	default:
