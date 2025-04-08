@@ -1192,7 +1192,9 @@ try {
 				$type = $update['update']['_'];
 				if ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage') {
 					$msg = $update['update']['message'];
-					if ($msg['peer_id'] != $peer) continue;
+					if ($msg['peer_id'] != $peer && ($msg['peer_id'] < 0 || $msg['from_id'] != $peer)) {
+						continue;
+					}
 					if ($msg['id'] < $id) continue;
 					if ($msg['id'] == $id) {
 						$res = $update;
@@ -1251,7 +1253,9 @@ try {
 					if ($peer && ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage'
 					|| $type == 'updateEditMessage' || $type == 'updateEditChannelMessage')) {
 						$msg = $update['update']['message'];
-						if ($msg['peer_id'] != $peer) continue;
+						if ($msg['peer_id'] != $peer && ($msg['peer_id'] < 0 || $msg['from_id'] != $peer)) {
+							continue;
+						}
 						if ($msg['id'] < $i) continue;
 						if ($msg['id'] == $i) continue;
 						$maxmsg = $msg['id'];
