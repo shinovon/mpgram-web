@@ -12,6 +12,9 @@ define("api_version", 6);
 define("api_version_min", 2);
 
 use danog\MadelineProto\Magic;
+use function Amp\async;
+use function Amp\Future\await;
+use danog\MadelineProto\Tools;
 
 // Setup error handler
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
@@ -462,7 +465,7 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 			foreach ($rows as $row) {
 				$markupRow = [];
 				foreach($row['buttons'] ?? [] as $button) {
-					$r = [];
+					$r = ['text' => $button['text'] ?? ''];
 					if (isset($button['data'])) {
 						$r['data'] = urlencode(base64_encode($button['data']));
 					} else if (isset($button['url'])) {
@@ -1600,6 +1603,9 @@ try {
 			'view_messages' => true,
 			'send_messages' => true
 			]]);
+			
+			
+		json(['res' => '1']);
 		break;
 	case 'getForumTopics':
 		checkAuth();
