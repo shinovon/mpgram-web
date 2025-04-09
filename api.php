@@ -8,7 +8,7 @@ require_once("api_values.php");
 require_once("config.php");
 
 define("def", 1);
-define("api_version", 5);
+define("api_version", 6);
 define("api_version_min", 2);
 
 use danog\MadelineProto\Magic;
@@ -1396,9 +1396,8 @@ try {
 		
 		$rawData = $MP->contacts->getContacts();
 		$res = [];
-		$res['users'] = [];
 		foreach ($rawData['contacts'] as $contact) {
-			array_push($res['users'], parseUser(findPeer(getId($contact), $rawData)));
+			array_push($res, parseUser(findPeer(getId($contact), $rawData)));
 		}
 		json(['res' => $res]);
 		break;
@@ -1581,14 +1580,13 @@ try {
 		
 		$rawData = $MP->contacts->search(['q' => getParam('q')]);
 		$res = [];
-		$res['results'] = [];
 		foreach ($rawData['my_results'] as $c) {
 			$r = findPeer(getId($c), $rawData);
-			array_push($res['results'], $r['id'] < 0 ? parseChat($r) : parseUser($r));
+			array_push($res, $r['id'] < 0 ? parseChat($r) : parseUser($r));
 		}
 		foreach ($rawData['results'] as $c) {
 			$r = findPeer(getId($c), $rawData);
-			array_push($res['results'], $r['id'] < 0 ? parseChat($r) : parseUser($r));
+			array_push($res, $r['id'] < 0 ? parseChat($r) : parseUser($r));
 		}
 		json(['res' => $res]);
 		break;
@@ -1609,7 +1607,6 @@ try {
 		
 		$rawData = $MP->channels->getForumTopics(['channel' => (int) getParam('peer'), 'limit' => (int) getParam('limit', 30)]);
 		$res = [];
-		$res['topics'] = [];
 		foreach ($rawData['topics'] as $t) {
 			$r = [
 			'closed' => $t['closed'] ?? false,
@@ -1621,9 +1618,9 @@ try {
 			'unread' => $t['unread_count'] ?? 0,
 			'read_max_id' => $t['read_inbox_max_id'] ?? 0
 			];
-			array_push($res['topics'], $r);
+			array_push($res, $r);
 		}
-		json($res);
+		json(['res' => $res]);
 		break;
 	case 'botCallback':
 		checkAuth();
