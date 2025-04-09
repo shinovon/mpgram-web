@@ -1638,7 +1638,54 @@ try {
 		
 		json($rawData);
 		break;
-	// TODO sendVote, getAllStickers, getStickerSet
+	case 'sendVote':
+		checkAuth();
+		setupMadelineProto();
+		
+		$votes = explode('vote=', $_SERVER['QUERY_STRING']);
+		$options = [];
+		foreach ($votes as $vote) {
+			if (strpos($vote, '=') !== false) continue;
+			$i = strpos($vote, '&');
+			if ($i !== false) $vote = substr($vote, 0, $i);
+			array_push($options, $vote);
+		}
+		$rawData = $MP->messages->sendVote(['peer' => getParam('peer'), 'msg_id' => getParam('id'), 'options' => $options]);
+		
+		json($rawData);
+		break;
+	case 'getStickerSets':
+		checkAuth();
+		setupMadelineProto();
+		
+		$rawData = $MP->messages->getAllStickers();
+		
+		$res = [];
+		foreach ($rawData['sets'] as $set) {
+			$r = ['id' => strval($set['id']), 'access_hash' => strval($set['access_hash']), 'title' => $set['title'] ?? ''];
+			if (isset($set['short_name'])) $r['short_name'] = $set['short_name'];
+			array_push($res, $r);
+		}
+		
+		json(['res' => $res]);
+		break;
+	case 'getStickerSet':
+		checkAuth();
+		setupMadelineProto();
+		
+		$rawData = $MP->messages->getStickerSet(['stickerset' =>
+		['_' => 'inputStickerSetID',
+		'id' => (int) getParam('id'),
+		'access_hash' => getParam('access_hash')]]);
+		
+		$res = [];
+		foreach ($rawData['documents'] as $doc) {
+			$r = ['id' => strval($doc['id']), 'access_hash' => strval($doc['access_hash']), 'mime' => $doc['mime_type']];
+			array_push($res, $r);
+		}
+		
+		json(['res' => $res]);
+		break;
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
 	}
