@@ -455,6 +455,26 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 	}
 	if ($v >= 5) {
 		if (isset($rawMessage['grouped_id'])) $message['group'] = $rawMessage['grouped_id'];
+		
+		if ($media && isset($rawMessage['reply_markup'])) {
+			$rows = $rawMessage['reply_markup']['rows'] ?? [];
+			$markup = [];
+			foreach ($rows as $row) {
+				$markupRow = [];
+				foreach($row['buttons'] ?? [] as $button) {
+					$r = [];
+					if (isset($button['data'])) {
+						$r['data'] = urlencode(base64_encode($button['data']));
+					} else if (isset($button['url'])) {
+						$r['url'] = $button['url'];
+					}
+					array_push($markupRow, $r);
+				}
+				array_push($markup, $markupRow);
+			}
+			
+			$message['markup'] = $markup;
+		}
 	}
 	//$message['raw'] = $rawMessage;
 	return $message;
@@ -1605,7 +1625,20 @@ try {
 		}
 		json($res);
 		break;
-	// TODO getBotCallbackAnswer, sendVote, getAllStickers, getStickerSet
+	case 'botCallback':
+		checkAuth();
+		setupMadelineProto();
+		
+		$timeout = (float) getParam('timeout', '0.5');
+		
+		$rawData = async(
+			$MP->messages->getBotCallbackAnswer(...),
+			['peer' => (int) getParam('peer'), 'msg_id' => (int) getParam('id'), 'data' => base64_decode(getParam('data'))]
+		)->await(Tools::getTimeoutCancellation($timeout));
+		
+		json($rawData);
+		break;
+	// TODO sendVote, getAllStickers, getStickerSet
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
 	}
