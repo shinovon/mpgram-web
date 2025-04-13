@@ -200,6 +200,10 @@ try {
 			imagedestroy($img);
 			die;
 		} else {
+			if (strpos($p, 'r') === 0) {
+				$p = substr($p, 1);
+				$img = imagerotate($img, 270, 0);
+			}
 			$ow = imagesx($img);
 			$oh = imagesy($img);
 			$w = $ow;
