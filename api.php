@@ -498,11 +498,11 @@ try {
 		if ($ipass != null) {
 			if ($ipass != INSTANCE_PASSWORD) {
 				http_response_code(403);
-				error(['message' => "Wrong password"]);
+				error(['message' => "Wrong instance password"]);
 			}
 		} else {
 			http_response_code(403);
-			error(['message' => "Password is required"]);
+			error(['message' => "Instance password is required"]);
 		}
 	}
 	$MP = null;
@@ -552,11 +552,11 @@ try {
 		imagepng($img);
 		imagedestroy($img);
 		break;
-	case 'phoneLogin':
+	case 'initLogin':
 		if ($PARAMS['user'] != null) {
 			error(['message' => 'Authorized']);
 		}
-	case 'initLogin':
+	case 'phoneLogin':
 		if ($v != api_version) {
 			http_response_code(403);
 			error(['message' => "Unsupported API version"]);
@@ -617,7 +617,7 @@ try {
 			if (strpos($e->getMessage(), 'PHONE_NUMBER_INVALID') !== false) {
 				json(['user' => $user, 'res' => 'phone_number_invalid']);
 			} else {
-				json(['user' => $user, 'result' => 'exception', 'message' => $e->getMessage()]);
+				json(['user' => $user, 'res' => 'exception', 'message' => $e->getMessage()]);
 			}
 		}
 		break;
@@ -1708,6 +1708,20 @@ try {
 		}
 		
 		json(['res' => $res]);
+		break;
+	// v6
+	case 'pinMessage':
+		checkAuth();
+		setupMadelineProto();
+		
+		$MP->messages->updatePinnedMessage([
+		'silent' => ((int) getParam('silent', '1')) == 1,
+		'unpin' => !isParamEmpty('unpin'),
+		'peer' => (int) getParam('peer'),
+		'id' => (int) getParam('id')
+		]);
+		
+		json(['res' => '1']);
 		break;
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
