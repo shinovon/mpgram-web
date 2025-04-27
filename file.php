@@ -264,6 +264,17 @@ try {
 					$w = 36;
 					$img = resize($img, $w, $h);
 				}
+			} elseif($p == 'sprevs') {
+				$q = 30;
+				if($w > $size) {
+					$h = ($h/$w)*$size;
+					$w = $size;
+					$img = resize($img, $w, $h);
+				} elseif($h > $size) {
+					$w = ($w/$h)*$size;
+					$h = $size;
+					$img = resize($img, $w, $h);
+				}
 			}
 		}
 		header('Content-Type: image/jpeg');

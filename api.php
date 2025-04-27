@@ -8,7 +8,7 @@ require_once("api_values.php");
 require_once("config.php");
 
 define("def", 1);
-define("api_version", 6);
+define("api_version", 7);
 define("api_version_min", 2);
 
 use danog\MadelineProto\Magic;
@@ -553,7 +553,7 @@ try {
 		imagedestroy($img);
 		break;
 	case 'initLogin':
-		if ($PARAMS['user'] != null) {
+		if (!isParamEmpty('user')) {
 			error(['message' => 'Authorized']);
 		}
 	case 'phoneLogin':
@@ -1262,6 +1262,7 @@ try {
 		
 		try {
 			while (true) {
+				echo ' ';
 				flush();
 				if (connection_aborted() || microtime(true) - $time >= $timeout) break;
 				$updates = $MP->getUpdates(['offset' => $offset, 'limit' => $limit, 'timeout' => 1]);
@@ -1355,17 +1356,17 @@ try {
 			'folder_id' => 1
 			])['dialogs']) > 0;
 		if (count($folders) == 0 && !$hasArchiveChats) {
-			json(['res' => 0]);
+			json(['res' => null]);
 			break;
 		}
 		$res = ['archive' => $hasArchiveChats];
 		if (count($folders) > 0) {
-			$res['folders'] = [];
+			$res['res'] = [];
 			foreach ($folders as $f) {
 				if (($f['_'] ?? '') == 'dialogFilterDefault' || !isset($f['id'])) {
-					array_push($res['folders'], ['id' => 0]);
+					array_push($res['res'], ['id' => 0]);
 				} else {
-					array_push($res['folders'], ['id' => $f['id'], 't' => $f['title']]);
+					array_push($res['res'], ['id' => $f['id'], 't' => $f['title']]);
 				}
 			}
 		}
@@ -1519,7 +1520,7 @@ try {
 		}
 		
 		if (!isset($_FILES['file'])) {
-			if ($METHOD == 'sendMedia') {
+			if ($METHOD == 'sendMedia' && (isParamEmpty('doc_id') || isParamEmpty('doc_access_hash'))) {
 				json(['error' => ['message' => 'No file: '.var_export($_FILES,true)]]);
 				break;
 			}
@@ -1578,6 +1579,8 @@ try {
 					array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
 				}
 				$p['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes, 'spoiler' => !isParamEmpty('spoiler')];
+			} else if (!isParamEmpty('doc_id')) {
+				$p['media'] = ['_' => 'document', 'id' => (int) getParam('doc_id'), 'access_hash' => getParam('doc_access_hash')];
 			}
 			
 			if ($METHOD == 'editMessage') {
@@ -1697,17 +1700,26 @@ try {
 		setupMadelineProto();
 		
 		$rawData = $MP->messages->getStickerSet(['stickerset' =>
-		['_' => 'inputStickerSetID',
-		'id' => (int) getParam('id'),
-		'access_hash' => getParam('access_hash')]]);
+		(isParamEmpty('slug') ? ['_' => 'inputStickerSetID',
+			'id' => (int) getParam('id'),
+			'access_hash' => getParam('access_hash')]
+		: ['_' => 'inputStickerSetShortName', 'short_name' => getParam('slug')]
+		)]);
 		
 		$res = [];
+		$res['res'] = [];
+		if (isset($rawData['set']['count'])) $res['count'] = $rawData['set']['count'];
+		if (isset($rawData['set']['title'])) $res['title'] = $rawData['set']['title'];
+		if (isset($rawData['set']['installed_date'])) $res['installed'] = $rawData['set']['installed_date'];
+		if (isset($rawData['set']['short_name'])) $res['short_name'] = $rawData['set']['short_name'];
+		$res['id'] = strval($rawData['set']['id']);
+		$res['access_hash'] = strval($rawData['set']['access_hash']);
 		foreach ($rawData['documents'] as $doc) {
 			$r = ['id' => strval($doc['id']), 'access_hash' => strval($doc['access_hash']), 'mime' => $doc['mime_type']];
-			array_push($res, $r);
+			array_push($res['res'], $r);
 		}
 		
-		json(['res' => $res]);
+		json($res);
 		break;
 	// v6
 	case 'pinMessage':
@@ -1723,6 +1735,19 @@ try {
 		
 		json(['res' => '1']);
 		break;
+	// v7
+	case 'installStickerSet':
+		checkAuth();
+		setupMadelineProto();
+		
+		$MP->messages->installStickerSet(['stickerset' =>
+		(isParamEmpty('slug') ? ['_' => 'inputStickerSetID',
+			'id' => (int) getParam('id'),
+			'access_hash' => getParam('access_hash')]
+		: ['_' => 'inputStickerSetShortName', 'short_name' => getParam('slug')]
+		)]);
+		
+		json(['res' => '1']);
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
 	}
