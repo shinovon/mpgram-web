@@ -35,6 +35,7 @@ function json($json, $headers=true) {
 		$sv = api_version;
 		header("X-Server-Time: {$time}");
 		header("X-Server-Api-Version: {$sv}");
+		if (defined('FILE_REWRITE') && FILE_REWRITE) header("X-file-rewrite-supported: 1");
 		header("Content-Type: application/json");
 	}
 	echo json_encode($json, $c);
@@ -1253,6 +1254,7 @@ try {
 		$i = $message;
 		$maxmsg = 0;
 		$res = array();
+		$selfid = strval($MP->getSelf()['id']);
 		
 		http_response_code(200);
 		header("X-Accel-Buffering: no");
@@ -1275,7 +1277,14 @@ try {
 					if ($peer && ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage'
 					|| $type == 'updateEditMessage' || $type == 'updateEditChannelMessage')) {
 						$msg = $update['update']['message'];
-						if ($msg['peer_id'] != $peer && ($msg['peer_id'] < 0 || $msg['from_id'] != $peer)) {
+						if ($userPeer) {
+							if (($peer == $selfid && $msg['from_id'] != $peer)
+								|| ($msg['peer_id'] != $peer &&
+									($msg['out'] || $msg['peer_id'] != $selfid || $msg['from_id'] != $peer))
+								|| ($type != 'updateNewMessage' && $type != 'updateEditMessage'))
+								continue;
+						} else if (($msg['peer_id'] != $peer)
+							|| ($type != 'updateNewChannelMessage' && $type != 'updateEditChannelMessage')) {
 							continue;
 						}
 						if ($msg['id'] < $i) continue;
