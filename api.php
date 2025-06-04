@@ -581,9 +581,6 @@ try {
 		session_start(['use_cookies' => '0']);
 		if (!isset($_SESSION['captcha_key']) || empty($_SESSION['captcha_key'])) {
 			unset($_SESSION['captcha_key']);
-			$id = md5(random_bytes(32));
-			session_id('API'.$id);
-			session_start(['use_cookies' => '0']);
 			$c = getCaptchaText(rand(6, 10));
 			$_SESSION['captcha_key'] = $c; 
 			json(['res' => 'captcha_expired', 'captcha_id' => $id]);
@@ -592,9 +589,6 @@ try {
 		}
 		if (strtolower($PARAMS['captcha_key']) != $_SESSION['captcha_key']) {
 			unset($_SESSION['captcha_key']);
-			$id = md5(random_bytes(32));
-			session_id('API'.$id);
-			session_start(['use_cookies' => '0']);
 			$c = getCaptchaText(rand(6, 10));
 			$_SESSION['captcha_key'] = $c; 
 			json(['res' => 'wrong_captcha', 'captcha_id' => $id]);
