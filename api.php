@@ -485,6 +485,10 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 			
 			$message['markup'] = $markup;
 		}
+		
+		if (isset($rawMessage['edit_date']) && !($rawMessage['edit_hide'] ?? false)) {
+			$message['edit'] = $rawMessage['edit_date'];
+		}
 	}
 	//$message['raw'] = $rawMessage;
 	return $message;
