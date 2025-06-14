@@ -8,7 +8,7 @@ require_once("api_values.php");
 require_once("config.php");
 
 define("def", 1);
-define("api_version", 7);
+define("api_version", 8);
 define("api_version_min", 2);
 
 use danog\MadelineProto\Magic;
@@ -268,6 +268,7 @@ function parsePeer($peer) {
 }
 
 function parseDialog($rawDialog) {
+	global $v;
 	$dialog = array();
 	$dialog['id'] = strval(getId($rawDialog['peer']));
 	if ($rawDialog['unread_count'] ?? 0 > 0) $dialog['unread'] = $rawDialog['unread_count'];
@@ -485,9 +486,13 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 			
 			$message['markup'] = $markup;
 		}
-		
-		if (isset($rawMessage['edit_date']) && !($rawMessage['edit_hide'] ?? false)) {
-			$message['edit'] = $rawMessage['edit_date'];
+	}
+	if ($v >= 7 && isset($rawMessage['edit_date']) && !($rawMessage['edit_hide'] ?? false)) {
+		$message['edit'] = $rawMessage['edit_date'];
+	}
+	if ($v >= 8) {
+		if ($rawMessage['silent'] ?? false) {
+			$message['silent'] = true;
 		}
 	}
 	//$message['raw'] = $rawMessage;
@@ -1258,7 +1263,6 @@ try {
 		header("X-Accel-Buffering: no");
 		set_time_limit(0);
 		ob_implicit_flush(true);
-		echo '{';
 		
 		try {
 			while (true) {
@@ -1272,45 +1276,49 @@ try {
 					$offset = $update['update_id'] + 1;
 					if ($types && !in_array($type, $types)) continue;
 					if ($exclude && in_array($type, $exclude)) continue;
-					if ($peer && ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage'
-					|| $type == 'updateEditMessage' || $type == 'updateEditChannelMessage')) {
+					if ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage'
+					|| $type == 'updateEditMessage' || $type == 'updateEditChannelMessage') {
 						$msg = $update['update']['message'];
-						if ($userPeer) {
-							if (($peer == $selfid && $msg['from_id'] != $peer)
-								|| ($msg['peer_id'] != $peer &&
-									($msg['out'] || $msg['peer_id'] != $selfid || $msg['from_id'] != $peer))
-								|| ($type != 'updateNewMessage' && $type != 'updateEditMessage'))
+						if ($peer) {
+							if ($userPeer) {
+								if (($peer == $selfid && $msg['from_id'] != $peer)
+									|| ($msg['peer_id'] != $peer &&
+										($msg['out'] || $msg['peer_id'] != $selfid || $msg['from_id'] != $peer))
+									|| ($type != 'updateNewMessage' && $type != 'updateEditMessage'))
+									continue;
+							} else if (($msg['peer_id'] != $peer)
+								|| ($type != 'updateNewChannelMessage' && $type != 'updateEditChannelMessage')) {
 								continue;
-						} else if (($msg['peer_id'] != $peer)
-							|| ($type != 'updateNewChannelMessage' && $type != 'updateEditChannelMessage')) {
-							continue;
+							}
+							if ($msg['id'] < $i) continue;
+							if ($msg['id'] == $i) continue;
+							$maxmsg = $msg['id'];
 						}
-						if ($msg['id'] < $i) continue;
-						if ($msg['id'] == $i) continue;
-						$maxmsg = $msg['id'];
 						$update['update']['message'] = parseMessage($msg, $media);
 						array_push($res, $update);
 					}
-					if ($userPeer && ($type == 'updateUserStatus' || $type == 'updateUserTyping')) {
+					if (($userPeer || $peer == 0) && ($type == 'updateUserStatus' || $type == 'updateUserTyping')) {
 						if ($update['update']['user_id'] != $peer) continue;
 						if (isset($update['update']['from_id'])) {
 							$update['update']['from_id'] = parsePeer($update['update']['from_id']);
 						}
 						array_push($res, $update);
 					}
-					if ($chatPeer && ($type == 'updateDeleteChannelMessages' || $type == 'updateChannelUserTyping')) {
-						if ($update['update']['channel_id'] != $peer) continue;
-						if (isset($update['update']['from_id'])) {
-							$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+					if ($chatPeer || $peer == 0) {
+						if ($type == 'updateDeleteChannelMessages' || $type == 'updateChannelUserTyping') {
+							if ($update['update']['channel_id'] != $peer) continue;
+							if (isset($update['update']['from_id'])) {
+								$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+							}
+							array_push($res, $update);
 						}
-						array_push($res, $update);
-					}
-					if ($chatPeer && $type == 'updateChatUserTyping') {
-						if ($update['update']['chat_id'] != $peer) continue;
-						if (isset($update['update']['from_id'])) {
-							$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+						if ($type == 'updateChatUserTyping') {
+							if ($update['update']['chat_id'] != $peer) continue;
+							if (isset($update['update']['from_id'])) {
+								$update['update']['from_id'] = parsePeer($update['update']['from_id']);
+							}
+							array_push($res, $update);
 						}
-						array_push($res, $update);
 					}
 					// TODO updateDeleteMessages
 					
@@ -1320,7 +1328,7 @@ try {
 				if ($res) break;
 			}
 			if (!$res) {
-				echo '"res":[]}';
+				echo '{"res":[]}';
 			} else {
 				if ($autoread && $maxmsg != 0) {
 					try {
@@ -1332,11 +1340,11 @@ try {
 					} catch (Exception) {}
 				}
 				$c = JSON_UNESCAPED_SLASHES | (isset($_SERVER['HTTP_X_MPGRAM_UNICODE']) || isset($PARAMS['utf']) ? JSON_UNESCAPED_UNICODE : 0);
-				echo substr(json_encode(['res'=>$res], $c), 1);
+				echo json_encode(['res'=>$res], $c);
 			}
 		} catch (Exception $e) {
 			$c = JSON_UNESCAPED_SLASHES | (isset($_SERVER['HTTP_X_MPGRAM_UNICODE']) || isset($PARAMS['utf']) ? JSON_UNESCAPED_UNICODE : 0);
-			echo substr(json_encode(['error' => ['message' => 'Exception', 'stack_trace' =>mstrval($e)]], $c), 1);
+			echo json_encode(['error' => ['message' => 'Exception', 'stack_trace' =>strval($e)]], $c);
 		}
 		break;
 	// v5
@@ -1755,6 +1763,60 @@ try {
 		)]);
 		
 		json(['res' => '1']);
+		break;
+	// v8
+	case 'getNotifySettings':
+		checkAuth();
+		setupMadelineProto();
+		
+		json([
+			'users' => $MP->account->getNotifySettings(peer: ['_' => 'inputNotifyUsers'])['mute_until'] ?? 0,
+			'chats' => $MP->account->getNotifySettings(peer: ['_' => 'inputNotifyChats'])['mute_until'] ?? 0,
+			'broadcasts' => $MP->account->getNotifySettings(peer: ['_' => 'inputNotifyBroadcasts'])['mute_until'] ?? 0
+		]);
+		break;
+	case 'notifications':
+		checkAuth();
+		setupMadelineProto();
+		
+		$offset = (int) getParam('offset');
+		$media = !isParamEmpty('media');
+		$peers = isParamEmpty('peers') ? false : explode(',', getParam('peers'));
+		$limit = (int) getParam('limit', '1000');
+		$includemuted = !isParamEmpty('include_muted');
+		$users = getParam('mute_users', '0');
+		$chats = getParam('mute_chats', '0');
+		$broadcasts = getParam('mute_broadcasts', '0');
+		
+		$so = $offset;
+		$res = [];
+		
+		$updates = $MP->getUpdates(['offset' => $offset, 'limit' => $limit, 'timeout' => 1]);
+		foreach ($updates as $update) {
+			if ($update['update_id'] == $so) continue;
+			$type = $update['update']['_'];
+			$offset = $update['update_id'] + 1;
+			if ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage') {
+				$msg = $update['update']['message'];
+				if ($peers && $type == 'updateNewChannelMessage') {
+					if (array_search(strval(getId($msg['peer_id'])), $peers) === false)
+						continue;
+				} else {
+					$info = $MP->getFullInfo($msg['peer_id']);
+					if ($info['Chat']['left'] ?? false)
+						continue;
+					$mute = $info['full']['notify_settings']['mute_until'] ??
+					(($info['Chat']['broadcast'] ?? false) ? $broadcasts : (isset($info['Chat']) ? $chats : $users));
+					if ($mute != 0 && !$includemuted)
+						continue;
+					if ($mute) $update['update']['mute'] = true;
+				}
+				$update['update']['message'] = parseMessage($msg, $media, true);
+				array_push($res, $update['update']);
+			}
+		}
+		json(['res' => $res, 'offset' => $offset]);
+		break;
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
 	}
