@@ -503,6 +503,9 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 			}
 			$message['comments'] = $comments;
 		}
+		if ($rawMessage['mentioned'] ?? false) {
+			$message['mention'] = true;
+		}
 	}
 	//$message['raw'] = $rawMessage;
 	return $message;
@@ -1814,8 +1817,8 @@ try {
 					$info = $MP->getFullInfo($msg['peer_id']);
 					if ($info['Chat']['left'] ?? false)
 						continue;
-					$mute = $info['full']['notify_settings']['mute_until'] ??
-					(($info['Chat']['broadcast'] ?? false) ? $broadcasts : (isset($info['Chat']) ? $chats : $users));
+					$mute = !($update['update']['message']['mentioned'] ?? false) && ($info['full']['notify_settings']['mute_until'] ??
+					(($info['Chat']['broadcast'] ?? false) ? $broadcasts : (isset($info['Chat']) ? $chats : $users)));
 					if ($mute != 0 && !$includemuted)
 						continue;
 					if ($mute) $update['update']['mute'] = true;
