@@ -494,6 +494,15 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 		if ($rawMessage['silent'] ?? false) {
 			$message['silent'] = true;
 		}
+		if ($rawMessage['replies']['comments'] ?? false) {
+			$comments = [];
+			$comments['count'] = $rawMessage['replies']['replies'] ?? 0;
+			$comments['peer'] = $rawMessage['replies']['channel_id'];
+			if (isset($rawMessage['replies']['read_max_id'])) {
+				$comments['read'] = $rawMessage['replies']['read_max_id'];
+			}
+			$message['comments'] = $comments;
+		}
 	}
 	//$message['raw'] = $rawMessage;
 	return $message;
@@ -1816,6 +1825,35 @@ try {
 			}
 		}
 		json(['res' => $res, 'offset' => $offset]);
+		break;
+	case 'getDiscussionMessage':
+		checkAuth();
+		setupMadelineProto();
+		
+		$r = $MP->messages->getDiscussionMessage([
+		'peer' => getParam('peer'),
+		'msg_id' => (int) getParam('id')
+		]);
+		$msg = $r['messages'][0];
+		
+		json([
+		'id' => $msg['id'],
+		'peer_id' => strval(getId($msg['peer_id'])),
+		'unread' => $r['unread_count'] ?? 0,
+		'read' => max($r['read_inbox_max_id'] ?? 0, $r['read_outbox_max_id'] ?? 0, $msg['id']),
+		'max_id' => $r['max_id']
+		]);
+		break;
+	case 'getInfo':
+		checkParamEmpty('id');
+		checkAuth();
+		setupMadelineProto();
+		$r = $MP->getInfo(getParam('id')) ?? null;
+		if ($r) {
+			json($r);
+		} else {
+			error(['message'=>'']);
+		}
 		break;
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
