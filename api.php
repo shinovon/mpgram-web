@@ -1393,7 +1393,7 @@ try {
 				if (($f['_'] ?? '') == 'dialogFilterDefault' || !isset($f['id'])) {
 					array_push($res['res'], ['id' => 0]);
 				} else {
-					array_push($res['res'], ['id' => $f['id'], 't' => $f['title']]);
+					array_push($res['res'], ['id' => $f['id'], 't' => $f['title']['text'] ?? $f['title']]);
 				}
 			}
 		}

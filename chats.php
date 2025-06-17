@@ -108,7 +108,7 @@ try {
 				echo '<a href="chats.php">'.MP::x($lng['all_chats']);
 			} else {
 				$sel = $fid == $f['id'];
-				echo '<a href="chats.php?f='.$f['id'].'"'.($sel?' class="fs"':'').'>'.MP::dehtml($f['title']);
+				echo '<a href="chats.php?f='.$f['id'].'"'.($sel?' class="fs"':'').'>'.MP::dehtml($f['title']['text'] ?? $f['title']);
 			}
 			echo '</a> ';
 		}
