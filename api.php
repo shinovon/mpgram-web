@@ -1263,6 +1263,7 @@ try {
 		$chatPeer = $peer < 0;
 		$media = !isParamEmpty('media');
 		$autoread = !isParamEmpty('read');
+		$thread = (int) getParam('top_msg', '0');
 		
 		$time = microtime(true);
 		$so = $offset;
@@ -1298,9 +1299,15 @@ try {
 										($msg['out'] || $msg['peer_id'] != $selfid || $msg['from_id'] != $peer))
 									|| ($type != 'updateNewMessage' && $type != 'updateEditMessage'))
 									continue;
-							} else if (($msg['peer_id'] != $peer)
-								|| ($type != 'updateNewChannelMessage' && $type != 'updateEditChannelMessage')) {
-								continue;
+							} else {
+								if (($msg['peer_id'] != $peer)
+									|| ($type != 'updateNewChannelMessage' && $type != 'updateEditChannelMessage')) {
+									continue;
+								}
+								if ($thread && (!isset($msg['reply_to'])
+									|| ($msg['reply_to']['reply_to_top_id'] ?? $msg['reply_to']['reply_to_msg_id'] ?? 0) != $thread)) {
+									continue;
+								}
 							}
 							if ($msg['id'] < $i) continue;
 							if ($msg['id'] == $i) continue;
@@ -1319,6 +1326,8 @@ try {
 					if ($chatPeer || $peer == 0) {
 						if ($type == 'updateDeleteChannelMessages' || $type == 'updateChannelUserTyping') {
 							if ($update['update']['channel_id'] != $peer) continue;
+							if ($thread && isset($update['update']['top_msg_id']) && $update['update']['top_msg_id'] != $thread)
+								continue;
 							if (isset($update['update']['from_id'])) {
 								$update['update']['from_id'] = parsePeer($update['update']['from_id']);
 							}
@@ -1345,18 +1354,21 @@ try {
 				if ($autoread && $maxmsg != 0) {
 					try {
 						if ($chatPeer && Magic::ZERO_CHANNEL_ID >= (int) $peer) {
-							$MP->channels->readHistory(['channel' => $peer, 'max_id' => $maxmsg]);
+							if ($thread) {
+								$MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxmsg, 'msg_id' => $thread]);
+								$MP->messages->readMentions(['peer' => $id, 'top_msg_id' => $thread]);
+							} else {
+								$MP->channels->readHistory(['channel' => $peer, 'max_id' => $maxmsg]);
+							}
 						} else {
 							$MP->messages->readHistory(['peer' => $peer, 'max_id' => $maxmsg]);
 						}
 					} catch (Exception) {}
 				}
-				$c = JSON_UNESCAPED_SLASHES | (isset($_SERVER['HTTP_X_MPGRAM_UNICODE']) || isset($PARAMS['utf']) ? JSON_UNESCAPED_UNICODE : 0);
-				echo json_encode(['res'=>$res], $c);
+				json(['res'=>$res], false);
 			}
 		} catch (Exception $e) {
-			$c = JSON_UNESCAPED_SLASHES | (isset($_SERVER['HTTP_X_MPGRAM_UNICODE']) || isset($PARAMS['utf']) ? JSON_UNESCAPED_UNICODE : 0);
-			echo json_encode(['error' => ['message' => 'Exception', 'stack_trace' =>strval($e)]], $c);
+			json(['error' => ['message' => 'Exception', 'stack_trace' =>strval($e)]], false);
 		}
 		break;
 	// v5
@@ -1490,7 +1502,7 @@ try {
 		addParamToArray($p, 'limit', 'int');
 		$rawData = $MP->channels->getParticipants($p);
 		$res = [];
-		$res['raw'] = $rawData;
+		//$res['raw'] = $rawData;
 		$res['users'] = [];
 		foreach ($rawData['participants'] as $p) {
 			$r = parseUser(findPeer(getId($p), $rawData));
@@ -1661,7 +1673,7 @@ try {
 		checkAuth();
 		setupMadelineProto();
 		
-		$rawData = $MP->channels->getForumTopics(['channel' => (int) getParam('peer'), 'limit' => (int) getParam('limit', 30)]);
+		$rawData = $MP->channels->getForumTopics(['channel' => getParam('peer'), 'limit' => (int) getParam('limit', 30)]);
 		$res = [];
 		foreach ($rawData['topics'] as $t) {
 			$r = [
