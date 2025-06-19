@@ -1503,14 +1503,14 @@ try {
 		$rawData = $MP->channels->getParticipants($p);
 		$res = [];
 		//$res['raw'] = $rawData;
-		$res['users'] = [];
+		$res['res'] = [];
 		foreach ($rawData['participants'] as $p) {
 			$r = parseUser(findPeer(getId($p), $rawData));
 			if (isset($p['admin_rights'])) $r['a'] = true;
-			array_push($res['users'], $r);
+			array_push($res['res'], $r);
 		}
 		if (isset($rawData['count'])) $res['count'] = $rawData['count'];
-		json(['res' => $res]);
+		json($res);
 		break;
 	case 'setTyping':
 		checkAuth();
