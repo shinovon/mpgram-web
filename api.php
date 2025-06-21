@@ -1685,7 +1685,7 @@ try {
 			'unread' => $t['unread_count'] ?? 0,
 			'read_max_id' => $t['read_inbox_max_id'] ?? 0
 			];
-			if (isset($t['title']) $r['title'] = $t['title'];
+			if (isset($t['title'])) $r['title'] = $t['title'];
 			array_push($res, $r);
 		}
 		json(['res' => $res]);
