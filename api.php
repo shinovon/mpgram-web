@@ -1680,12 +1680,12 @@ try {
 			'closed' => $t['closed'] ?? false,
 			'pinned' => $t['pinned'] ?? false,
 			'id' => $t['id'],
-			'title' => $t['title'] ?? null,
 			'date' => $t['date'] ?? 0,
 			'top' => $t['top_message'] ?? 0,
 			'unread' => $t['unread_count'] ?? 0,
 			'read_max_id' => $t['read_inbox_max_id'] ?? 0
 			];
+			if (isset($t['title']) $r['title'] = $t['title'];
 			array_push($res, $r);
 		}
 		json(['res' => $res]);
