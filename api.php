@@ -374,11 +374,12 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 		$message['fwd'] = $fwd;
 	}
 	if (isset($rawMessage['media'])) {
-		if (!$media) {
+		if (!$media && $v < 8) {
 			// media is disabled
 			$message['media'] = $v < 5 ? ['_' => 0] : null;
 		} else {
 			$rawMedia = $rawMessage['media'];
+			$typeonly = !$media;
 			$media = [];
 			if (isset($rawMedia['photo'])) {
 				$media['type'] = 'photo';
@@ -427,7 +428,11 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 				$media['type'] = 'undefined';
 				$media['_'] = $rawMedia['_'];
 			}
-			$message['media'] = $media;
+			if ($typeonly) {
+				$message['media'] = ['type' => $media['type'], 'hide' => 1];
+			} else {
+				$message['media'] = $media;
+			}
 		}
 	}
 	if (isset($rawMessage['action'])) {
@@ -1294,7 +1299,7 @@ try {
 						$msg = $update['update']['message'];
 						if ($peer) {
 							if ($userPeer) {
-								if (($peer == $selfid && $msg['from_id'] != $peer)
+								if (($peer == $selfid && ($msg['from_id'] ?? $peer) != $peer)
 									|| ($msg['peer_id'] != $peer &&
 										($msg['out'] || $msg['peer_id'] != $selfid || $msg['from_id'] != $peer))
 									|| ($type != 'updateNewMessage' && $type != 'updateEditMessage'))
