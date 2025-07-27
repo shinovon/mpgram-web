@@ -25,6 +25,7 @@ You can deploy your own instance quickly with Docker Compose - [see how](https:/
 ```
 patch -p0 < patches/InternalDoc.php.patch
 patch -p0 < patches/Files.php.patch
+patch -p0 < patches/UpdateHandler.php.patch
 ```
 - Make a background script that restarts php service at least every hour
 - Set `session.gc_maxlifetime = 8640000` in `php.ini`

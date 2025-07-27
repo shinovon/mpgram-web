@@ -42,9 +42,7 @@ if(MP::getUser()) {
  <a href="https://t.me/twsparkle">t.me</a>
 </p>
 <p>Donate:<br>
-<a href="https://ko-fi.com/shinovon">ko-fi.com/shinovon</a><br>
 <a href="https://boosty.to/nnproject/donate">boosty.to/nnproject/donate</a><br>
-4400430278594491 Kaspi (KZ)<br>
 </p>
 <?php
 require_once 'vendor/autoload.php';

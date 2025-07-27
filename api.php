@@ -8,7 +8,7 @@ require_once("api_values.php");
 require_once("config.php");
 
 define("def", 1);
-define("api_version", 8);
+define("api_version", 9);
 define("api_version_min", 2);
 
 use danog\MadelineProto\Magic;
@@ -305,7 +305,7 @@ function parseChat($rawChat) {
 	$chat['type'] = $rawChat['_'];
 	$chat['id'] = strval($rawChat['id']);
 	$chat[$v < 5 ? 'title' : 't'] = removeEmoji($rawChat['title'] ?? null);
-	if ((isset($rawUser['username']) && $rawUser['username'] !== null) || $v < 5) $chat[$v < 5 ? 'username' : 'name'] = $rawChat['username'] ?? null;
+	if ((isset($rawChat['username']) && $rawChat['username'] !== null) || $v < 5) $chat[$v < 5 ? 'username' : 'name'] = $rawChat['username'] ?? null;
 	if ($v >= 5) {
 		if (isset($rawChat['photo'])) $chat['p'] = true;
 		if ($rawChat['broadcast'] ?? false) $chat['c'] = true;
@@ -374,7 +374,7 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 		$message['fwd'] = $fwd;
 	}
 	if (isset($rawMessage['media'])) {
-		if (!$media && $v < 8) {
+		if (!$media && $v < 9) {
 			// media is disabled
 			$message['media'] = $v < 5 ? ['_' => 0] : null;
 		} else {
@@ -385,6 +385,12 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 				$media['type'] = 'photo';
 				$media['id'] = strval($rawMedia['photo']['id']);
 				$media['date'] = $rawMedia['photo']['date'] ?? null;
+				if ($v >= 9 && isset($rawMedia['photo']['sizes'])) {
+					foreach ($rawMedia['photo']['sizes'] as $size) {
+						$media['w'] = max($media['w'] ?? 0, $size['w'] ?? 0);
+						$media['h'] = max($media['h'] ?? 0, $size['h'] ?? 0);
+					}
+				}
 			} elseif (isset($rawMedia['document'])) {
 				$media['type'] = 'document';
 				$media['id'] = strval($rawMedia['document']['id']);
@@ -1314,9 +1320,11 @@ try {
 									continue;
 								}
 							}
-							if ($msg['id'] < $i) continue;
-							if ($msg['id'] == $i) continue;
-							$maxmsg = $msg['id'];
+							if ($type != 'updateEditMessage' && $type != 'updateEditChannelMessage') {
+								if ($msg['id'] < $i) continue;
+								if ($msg['id'] == $i) continue;
+								$maxmsg = $msg['id'];
+							}
 						}
 						$update['update']['message'] = parseMessage($msg, $media);
 						array_push($res, $update);
@@ -1373,7 +1381,11 @@ try {
 				json(['res'=>$res], false);
 			}
 		} catch (Exception $e) {
-			json(['error' => ['message' => 'Exception', 'stack_trace' =>strval($e)]], false);
+			if ($e->getMessage() == 'cancel') {
+				echo '{"cancel":1}';
+			} else {
+				json(['error' => ['message' => $e->getMessage(), 'stack_trace' =>strval($e)]], false);
+			}
 		}
 		break;
 	// v5
@@ -1557,7 +1569,7 @@ try {
 		$p['message'] = getParam('text', '');
 		if (!isParamEmpty('id')) addParamToArray($p, 'id');
 		if (!isParamEmpty('reply')) {
-			$p['reply_to_msg_id'] = getParam('reply');
+			$p['reply_to'] = ['_' => 'inputReplyToMessage', 'reply_to_msg_id' => getParam('reply')];
 		}
 		if (!isParamEmpty('html')) {
 			$p['parse_mode'] = 'HTML';
@@ -1875,11 +1887,17 @@ try {
 			error(['message'=>'']);
 		}
 		break;
+	// v9
+	case 'cancelUpdates':
+		checkAuth();
+		setupMadelineProto();
+		json(['res' => $MP->cancelGetUpdates()]);
+		break;
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
 	}
 } catch (Throwable $e) {
 	http_response_code(500);
-	error(['message' => "Unhandled exception", 'stack_trace' => strval($e)]);
+	error(['message' => "Unhandled exception: ".$e->getMessage(), 'stack_trace' => strval($e)]);
 }
 ?>

@@ -1,6 +1,6 @@
 --- vendor/danog/madelineproto/src/InternalDoc.php	2024-09-14 18:15:12.082109916 +0200
 +++ vendor/danog/madelineproto/src/InternalDoc.php	2024-09-14 18:17:57.592035611 +0200
-@@ -1055,7 +1055,7 @@
+@@ -1055,7 +1055,7 @@ abstract class InternalDoc
      /**
       * Gets info of the propic of a user.
       */
@@ -9,3 +9,14 @@
      {
          return $this->wrapper->getAPI()->getPropicInfo($data);
      }
+@@ -1177,6 +1177,10 @@ abstract class InternalDoc
+     ]): array
+     {
+         return $this->wrapper->getAPI()->getUpdates($params);
++    }
++	final public function cancelGetUpdates(): bool
++    {
++        return $this->wrapper->getAPI()->cancelGetUpdates();
+     }
+     /**
+      * Get a message to show to the user when starting the bot.

@@ -239,7 +239,7 @@ try {
 						$MP = MP::getMadelineAPI($user);
 						$params = ['peer' => $id, 'message' => $text];
 						if($msg) {
-							$params['reply_to_msg_id'] = $msg;
+							$params['reply_to'] = ['_' => 'inputReplyToMessage', 'reply_to_msg_id' => $msg];
 						}
 						if(isset($_GET["format"]) || isset($_POST["format"])) {
 							$params['parse_mode'] = 'HTML';
@@ -257,7 +257,7 @@ try {
 					$MP = MP::getMadelineAPI($user);
 					$params = ['peer' => $id, 'message' => $text];
 					if($msg) {
-						$params['reply_to_msg_id'] = $msg;
+						$params['reply_to'] = ['_' => 'inputReplyToMessage', 'reply_to_msg_id' => $msg];
 					}
 					$attributes = [];
 					if($voice) {

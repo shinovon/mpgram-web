@@ -275,6 +275,15 @@ try {
 					$h = $size;
 					$img = resize($img, $w, $h);
 				}
+			} elseif($p == 'view') {
+				$h = (int) $_GET['th'] ?? $size;
+				$w = ($ow / $oh) * $h;
+				$tw = (int) $_GET['tw'] ?? $size;
+				if($w > $tw) {
+					$w = $tw;
+					$h = ($oh / $ow) * $w;
+				}
+				$img = resize($img, $w, $h);
 			}
 		}
 		header('Content-Type: image/jpeg');
