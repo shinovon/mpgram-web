@@ -18,6 +18,7 @@ RUN apt-get update \
   # php8.4-json \ PHP8.3-JSON is not shipped as a separate component anymore
     php8.4-fileinfo \
     curl \
+	patch \
     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 COPY ./php.ini /etc/php/8.4/fpm/conf.d/90-php.ini

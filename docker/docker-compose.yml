@@ -1,4 +1,4 @@
-version: '2'
+version: '2.4'
 
 services:
     nginx:
@@ -42,7 +42,7 @@ services:
       volumes_from:
         - app
       working_dir: /var/www/mpgram
-      command: install
+      command: sh -c "composer install && patch -p0 < patches/InternalDoc.php.patch && patch -p0 < patches/Files.php.patch && patch -p0 < patches/UpdateHandler.php.patch"
 
 networks:
     mpgram:
