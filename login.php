@@ -373,7 +373,6 @@ if($phone !== null) {
 	//if($revoked) {
 	//	echo MP::x('<b>Ваша сессия истекла!</b><br>');
 	//}
-	//if(isset($_GET['asd']) || $ipass || true) {
 	echo MP::x($lng['phone_number']).':<br>';
 	echo '<form action="login.php"';
 	if($post) echo ' method="post"';
@@ -386,14 +385,19 @@ if($phone !== null) {
 	if($wrong) {
 		echo '<b>'.MP::x($lng['wrong_number_format']).'</b><br>';
 	} else {
-	//	echo '<a href="qrlogin.php">'.MP::x($lng['qr_login']).'</a> (experimental)';
+		echo '<b>';
+		// TODO: proper localization
+		if (($lng['lang'] ?? '') == 'ru') {
+			echo 'Не используйте аккаунты, которые были созданы менее полугода назад!';
+		} else {
+			echo 'Do not use new accounts that were created less than 6 months ago!';
+		}
+		echo '</b><br><br>';
+		echo '<a href="qrlogin.php">'.MP::x($lng['qr_login']).'</a>';
 	}
 	echo '<br><div>';
 	echo '<a href="about.php">'.MP::x($lng['about']).'</a> <a href="login.php?lang=en">English</a> <a href="login.php?lang=ru">'.MP::x('Русский').'</a>';
 	//echo ' <a href="sets.php">'.$lng['settings'].'</a>';
 	echo '</div>';
-	//} else {
-	//	echo "This instance is closed. Consider hosting your own: <br>https://github.com/shinovon/mpgram-web<br><p><small style=\"color: grey\"><small><small>or type login.php?asd in the url if only you understand the risks</small></small></small></p>";
-	//}
 	echo Themes::bodyEnd();
 }
