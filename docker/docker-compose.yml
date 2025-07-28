@@ -42,7 +42,7 @@ services:
       volumes_from:
         - app
       working_dir: /var/www/mpgram
-      command: sh -c "composer install && patch -p0 < patches/InternalDoc.php.patch && patch -p0 < patches/Files.php.patch && patch -p0 < patches/UpdateHandler.php.patch"
+      command: sh -c "composer install && patch -p0 -N < patches/InternalDoc.php.patch && patch -p0 -N < patches/Files.php.patch && patch -p0 -N < patches/UpdateHandler.php.patch"
 
 networks:
     mpgram:
