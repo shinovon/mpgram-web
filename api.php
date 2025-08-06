@@ -36,6 +36,7 @@ function json($json, $headers=true) {
 		header("X-Server-Time: {$time}");
 		header("X-Server-Api-Version: {$sv}");
 		if (defined('FILE_REWRITE') && FILE_REWRITE) header("X-file-rewrite-supported: 1");
+		if (defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES) header("X-voice-conversion-supported: 1");
 		header("Content-Type: application/json");
 	}
 	echo json_encode($json, $c);
@@ -1275,6 +1276,7 @@ try {
 		$media = !isParamEmpty('media');
 		$autoread = !isParamEmpty('read');
 		$thread = (int) getParam('top_msg', '0');
+		$longpoll = (int) getParam('longpoll', '1');
 		
 		$time = microtime(true);
 		$so = $offset;
@@ -1292,7 +1294,7 @@ try {
 			while (true) {
 				echo ' ';
 				flush();
-				if (connection_aborted() || microtime(true) - $time >= $timeout) break;
+				if (connection_aborted() || ($longpoll && microtime(true) - $time >= $timeout)) break;
 				$updates = $MP->getUpdates(['offset' => $offset, 'limit' => $limit, 'timeout' => 1]);
 				foreach ($updates as $update) {
 					if ($update['update_id'] == $so) continue;
@@ -1359,7 +1361,7 @@ try {
 					if ($peer) continue;
 					array_push($res, $update);
 				}
-				if ($res) break;
+				if ($res || !$longpoll) break;
 			}
 			if (!$res) {
 				echo '{"res":[]}';
@@ -1498,11 +1500,11 @@ try {
 		checkAuth();
 		setupMadelineProto();
 		$peer = getParam('peer');
-		$id = getParam('id');
+		$ids = explode(',', getParam('id'));
 		if (is_numeric($peer) && (int) $peer > 0) {
-			$MP->messages->deleteMessages(['id' => [(int) $id]]);
+			$MP->messages->deleteMessages(['id' => $ids]);
 		} else {
-			$MP->channels->deleteMessages(['channel' => $peer, 'id' => [(int) $id]]);
+			$MP->channels->deleteMessages(['channel' => $peer, 'id' => $ids]);
 		}
 		json(['res' => '1']);
 		break;

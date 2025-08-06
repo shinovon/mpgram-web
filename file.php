@@ -276,6 +276,7 @@ try {
 					$img = resize($img, $w, $h);
 				}
 			} elseif($p == 'view') {
+				$q = 70;
 				$h = (int) $_GET['th'] ?? $size;
 				$w = ($ow / $oh) * $h;
 				$tw = (int) $_GET['tw'] ?? $size;
