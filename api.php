@@ -1332,7 +1332,7 @@ try {
 						array_push($res, $update);
 					}
 					if (($userPeer || $peer == 0) && ($type == 'updateUserStatus' || $type == 'updateUserTyping')) {
-						if ($update['update']['user_id'] != $peer) continue;
+						if ($update['update']['user_id'] != $peer && $peer != 0) continue;
 						if (isset($update['update']['from_id'])) {
 							$update['update']['from_id'] = parsePeer($update['update']['from_id']);
 						}
@@ -1340,7 +1340,7 @@ try {
 					}
 					if ($chatPeer || $peer == 0) {
 						if ($type == 'updateDeleteChannelMessages' || $type == 'updateChannelUserTyping') {
-							if ($update['update']['channel_id'] != $peer) continue;
+							if ($update['update']['channel_id'] != $peer && $peer != 0) continue;
 							if ($thread && isset($update['update']['top_msg_id']) && $update['update']['top_msg_id'] != $thread)
 								continue;
 							if (isset($update['update']['from_id'])) {
@@ -1349,12 +1349,17 @@ try {
 							array_push($res, $update);
 						}
 						if ($type == 'updateChatUserTyping') {
-							if ($update['update']['chat_id'] != $peer) continue;
+							if ($update['update']['chat_id'] != $peer && $peer != 0) continue;
 							if (isset($update['update']['from_id'])) {
 								$update['update']['from_id'] = parsePeer($update['update']['from_id']);
 							}
 							array_push($res, $update);
 						}
+					}
+					if ($peer && ($type == 'updateReadHistoryOutbox' || $type == 'updateReadChannelOutbox')) {
+						if (isset($update['update']['peer']) && parsePeer($update['update']['peer']) != $peer) continue;
+						if (isset($update['update']['channel_id']) && $update['update']['channel_id'] != $peer) continue;
+						array_push($res, $update);
 					}
 					// TODO updateDeleteMessages
 					
@@ -1553,11 +1558,12 @@ try {
 		checkParamEmpty('peer');
 		checkAuth();
 		setupMadelineProto();
+		$peer = (int) getParam('peer');
 		
 		if (!isParamEmpty('fwd_from')) {
 			$MP->messages->forwardMessages([
 			'from_peer' => (int) getParam('fwd_from'),
-			'to_peer' => (int) getParam('peer'),
+			'to_peer' => $peer,
 			'id' => [(int) getParam('id')]
 			]);
 			if (!isset($_FILES['file']) && isParamEmpty('text')) {
@@ -1894,6 +1900,18 @@ try {
 		checkAuth();
 		setupMadelineProto();
 		json(['res' => $MP->cancelGetUpdates()]);
+		break;
+	case 'getDialog':
+		checkParamEmpty('id');
+		checkAuth();
+		setupMadelineProto();
+		$ids = explode(',', getParam('id'));
+		$r = $MP->messages->getPeerDialogs(peers: $ids)['dialogs'];
+		if (count($ids) == 1) {
+			json(['res' => $r[0]]);
+			break;
+		}
+		json(['res' => $r]);
 		break;
 	default:
 		error(['message' => "Method \"$METHOD\" is undefined"]);
