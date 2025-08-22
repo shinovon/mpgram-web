@@ -1564,7 +1564,7 @@ try {
 			$MP->messages->forwardMessages([
 			'from_peer' => (int) getParam('fwd_from'),
 			'to_peer' => $peer,
-			'id' => [(int) getParam('id')]
+			'id' => explode(',', getParam('id'))
 			]);
 			if (!isset($_FILES['file']) && isParamEmpty('text')) {
 				json(['res' => '1']);
@@ -1575,7 +1575,7 @@ try {
 		$p = [];
 		addParamToArray($p, 'peer');
 		$p['message'] = getParam('text', '');
-		if (!isParamEmpty('id')) addParamToArray($p, 'id');
+		if (!isParamEmpty('id') && isParamEmpty('fwd_from')) addParamToArray($p, 'id');
 		if (!isParamEmpty('reply')) {
 			$p['reply_to'] = ['_' => 'inputReplyToMessage', 'reply_to_msg_id' => getParam('reply')];
 		}
