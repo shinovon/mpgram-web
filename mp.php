@@ -201,7 +201,7 @@ class MP {
 					break;
 			}
 		} catch (Exception $e) {
-			echo $e;
+			echo static::dehtml($e);
 		}
 		return $txt;
 	}
@@ -300,7 +300,7 @@ class MP {
 				if(!isset($m['action'])) {
 					echo "<div class=\"m".($mentioned?' mpd':'')."\" id=\"msg_{$id}_{$m['id']}\">";
 					if(!$old) echo "<div class=\"mc".($out && !$search ?' my':($mentioned?' mpc':' mo'))."\">";
-					echo "<div class=\"mh\" onclick=\"location.href='{$href}';\">";
+					echo "<div class=\"mh\" onclick=\"location.href='".static::dehtml($href)."';\">";
 					if(!$pm && $uid != null && $l) {
 						echo "<b><a href=\"chat.php?c={$uid}\" class=\"mn\" {$color}>".static::dehtml($mname).'</a></b>';
 					} else {
@@ -312,9 +312,9 @@ class MP {
 						echo ' •';
 					}
 					if($search) { // replace "message options" link to "go to message" in history search
-						echo " <small><a href=\"{$href}\" class=\"u\">&gt;</a></small>";
+						echo " <small><a href=\"".static::dehtml($href)."\" class=\"u\">&gt;</a></small>";
 					} elseif($unswer) {
-						echo " <small><a href=\"{$href}\" class=\"u\">".static::x($lng['msg_options'])."</a></small>";
+						echo " <small><a href=\"".static::dehtml($href)."\" class=\"u\">".static::x($lng['msg_options'])."</a></small>";
 					}
 					echo '</div>';
 				} else {
@@ -405,7 +405,7 @@ class MP {
 							} elseif(isset($button['url'])) {
 								$s = 'href="'.static::wrapUrl($button['url']).'"';
 							}
-							echo '<td class="btd"><a class="btn" '.$s.'>'.$button['text'].'</a></td>';
+							echo '<td class="btd"><a class="btn" '.$s.'>'.static::dehtml($button['text']).'</a></td>';
 						}
 						echo '</tr></table></tr>';
 					}
@@ -417,7 +417,7 @@ class MP {
 				echo '</div>';
 				if(!$old) echo '</div>';
 			} catch (Exception $e) {
-				echo "<xmp>{$e->getMessage()}\n{$e->getTraceAsString()}</xmp>";
+				echo "<xmp>".static::dehtml($e->getMessage())."\n".static::dehtml($e->getTraceAsString())."</xmp>";
 			}
 		}
 	}
@@ -519,13 +519,13 @@ class MP {
 				} elseif($img && $imgs && !$mini) {
 					if($open) {
 						$filename = defined('FILE_REWRITE') && FILE_REWRITE ? "file/{$filename}" : "file.php";
-						echo "<div><a href=\"{$filename}?m={$m['id']}&c={$id}&p={$fq}\"><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}&s={$ps}\"></img></a></div>";
+						echo "<div><a href=\"".static::dehtml($filename)."?m={$m['id']}&c={$id}&p={$fq}\"><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}&s={$ps}\"></img></a></div>";
 					} else {
 						echo "<div><img src=\"file.php?m={$m['id']}&c={$id}&p={$q}&s={$ps}\"></img></div>";
 					}
 				} else {
 					$filename = defined('FILE_REWRITE') && FILE_REWRITE ? "file/{$filename}" : "file.php";
-					$url = "{$filename}?m={$m['id']}&c={$id}";
+					$url = static::dehtml($filename)."?m={$m['id']}&c={$id}";
 					$size = $d['size'];
 					if($size >= 1024 * 1024) {
 						$size = round($size/1024.0/1024.0, 2).' MB';

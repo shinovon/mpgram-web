@@ -158,13 +158,13 @@ if($phone !== null) {
 			if($post) echo ' method="post"';
 			echo '>';
 			if(isset($_GET['code']))
-				echo "<input type=\"hidden\" name=\"code\" value=\"{$_GET['code']}\">";
+				echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_GET['code'])."\">";
 			elseif(isset($_POST['code']))
-				echo "<input type=\"hidden\" name=\"code\" value=\"{$_POST['code']}\">";
+				echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_POS['code'])."\">";
 			if($phone !== null)
-				echo "<input type=\"hidden\" name=\"phone\" value=\"{$phone}\">";
+				echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
 			if($ipass !== null)
-				echo "<input type=\"hidden\" name=\"ipass\" value=\"{$ipass}\">";
+				echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
 			echo '<input type="text" name="c">';
 			echo '<input type="submit">';
 			echo '</form>';
@@ -188,13 +188,13 @@ if($phone !== null) {
 				if($post) echo ' method="post"';
 				echo '>';
 				if(isset($_GET['code']))
-					echo "<input type=\"hidden\" name=\"code\" value=\"{$_GET['code']}\">";
+					echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_GET['code'])."\">";
 				elseif(isset($_POST['code']))
-					echo "<input type=\"hidden\" name=\"code\" value=\"{$_POST['code']}\">";
+					echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_POST['code'])."\">";
 				if($phone !== null)
-					echo "<input type=\"hidden\" name=\"phone\" value=\"{$phone}\">";
+					echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
 				if($ipass !== null)
-					echo "<input type=\"hidden\" name=\"ipass\" value=\"{$ipass}\">";
+					echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
 				echo '<input type="text" name="c">';
 				echo '<input type="submit">';
 				echo '</form>';
@@ -231,9 +231,9 @@ if($phone !== null) {
 					echo '>';
 					echo '<input type="password" name="pass">';
 					if($phone !== null)
-						echo "<input type=\"hidden\" name=\"phone\" value=\"{$phone}\">";
+						echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
 					if($ipass !== null)
-						echo "<input type=\"hidden\" name=\"ipass\" value=\"{$ipass}\">";
+						echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
 					echo '<input type="submit">';
 					echo '</form>';
 					echo '<b>'.MP::x($lng['password_hash_invalid']).'</b><br>';
@@ -270,9 +270,9 @@ if($phone !== null) {
 						echo '>';
 						echo '<input type="password" name="pass">';
 						if($phone !== null)
-							echo "<input type=\"hidden\" name=\"phone\" value=\"{$phone}\">";
+							echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
 						if($ipass !== null)
-							echo "<input type=\"hidden\" name=\"ipass\" value=\"{$ipass}\">";
+							echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
 						echo '<input type="submit">';
 						echo '</form>';
 						echo Themes::bodyEnd();
@@ -316,9 +316,9 @@ if($phone !== null) {
 				echo '>';
 				echo '<input type="text" name="code">';
 				if($phone !== null)
-					echo "<input type=\"hidden\" name=\"phone\" value=\"{$phone}\">";
+					echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
 				if($ipass !== null)
-					echo "<input type=\"hidden\" name=\"ipass\" value=\"{$ipass}\">";
+					echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
 				echo '<input type="submit">';
 				echo '</form>';
 				echo Themes::bodyEnd();
@@ -361,9 +361,9 @@ if($phone !== null) {
 	echo '>';
 	echo '<input type="text" name="code">';
 	if($phone !== null)
-		echo "<input type=\"hidden\" name=\"phone\" value=\"{$phone}\">";
+		echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
 	if($ipass !== null)
-		echo "<input type=\"hidden\" name=\"ipass\" value=\"{$ipass}\">";
+		echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
 	echo '<input type="submit">';
 	echo '</form>';
 	echo Themes::bodyEnd();
@@ -380,7 +380,7 @@ if($phone !== null) {
 	echo '<input type="text" value="" name="phone">';
 	echo '<input type="submit">';
 	if($ipass !== null)
-		echo '<input type="hidden" name="ipass" value="'.$ipass.'">';
+		echo '<input type="hidden" name="ipass" value="'.MP::dehtml($ipass).'">';
 	echo '</form>';
 	if($wrong) {
 		echo '<b>'.MP::x($lng['wrong_number_format']).'</b><br>';
