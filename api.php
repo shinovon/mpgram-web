@@ -578,9 +578,9 @@ try {
 		$c = getCaptchaText(rand(6, 10));
 		$_SESSION['captcha_key'] = $c;
 		session_write_close();
-		$img = imagecreatetruecolor(150, 50);
+		$img = imagecreatetruecolor(120, 40);
 		imagefill($img, 0, 0, -1);
-		imagestring($img, rand(4, 10), rand(0, 50), rand(0, 25), $c, 0x000000);
+		imagestring($img, rand(4, 10), rand(0, 30), rand(0, 20), $c, 0x000000);
 		header("Cache-Control: no-store, no-cache, must-revalidate");
 		header('Content-type: image/png');
 		imagepng($img);
@@ -599,10 +599,10 @@ try {
 			http_response_code(403);
 			error(['message' => "Login API is disabled"]);
 		}
+		$id = $PARAMS['captcha_id'] ?? md5(random_bytes(32));
+		session_id('API'.$id);
+		session_start(['use_cookies' => '0']);
 		if (!isset($PARAMS['captcha_id']) || !isset($PARAMS['captcha_key'])) {
-			$id = md5(random_bytes(32));
-			session_id('API'.$id);
-			session_start(['use_cookies' => '0']);
 			$c = getCaptchaText(rand(6, 10));
 			$_SESSION['captcha_key'] = $c; 
 			json(['res' => 'need_captcha', 'captcha_id' => $id]);
@@ -610,8 +610,6 @@ try {
 			die();
 		}
 		checkParamEmpty('phone');
-		session_id('API'.$PARAMS['captcha_id']);
-		session_start(['use_cookies' => '0']);
 		if (!isset($_SESSION['captcha_key']) || empty($_SESSION['captcha_key'])) {
 			unset($_SESSION['captcha_key']);
 			$c = getCaptchaText(rand(6, 10));
