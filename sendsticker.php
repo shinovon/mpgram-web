@@ -31,7 +31,7 @@ try {
 		$MP = MP::getMadelineAPI($user);
 		$params = ['peer' => $id, 'message' => ''];
 		if($reply_to) {
-			$params['reply_to_msg_id'] = $reply_to;
+			$params['reply_to'] = ['_' => 'inputReplyToMessage', 'reply_to_msg_id' => $reply_to];
 		}
 		$params['media'] = ['_' => 'document', 'id' => (int) $_GET['id'], 'access_hash' => (int) $_GET['access_hash']];
 		$MP->messages->sendMedia($params);
