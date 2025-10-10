@@ -1831,9 +1831,14 @@ try {
 		$peers = isParamEmpty('peers') ? false : explode(',', getParam('peers'));
 		$limit = (int) getParam('limit', '1000');
 		$includemuted = !isParamEmpty('include_muted');
-		$users = getParam('mute_users', '0');
-		$chats = getParam('mute_chats', '0');
-		$broadcasts = getParam('mute_broadcasts', '0');
+		$old = !isParamEmpty('mute_users');
+		$users = getParam($old ? 'mute_users' : 'mu', '0');
+		$chats = getParam($old ? 'mute_chats' : 'mc', '0');
+		$broadcasts = getParam($old ? 'mute_broadcasts' : 'mb', '0');
+		
+		if (!isParamEmpty('online')) {
+			$MP->account->updateStatus(['offline' => false]);
+		}
 		
 		$so = $offset;
 		$res = [];
