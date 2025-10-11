@@ -930,10 +930,10 @@ class MP {
 		$db->setEnableMinDb(false);
 		$db->setEnableUsernameDb(true);
 		$db->setEnableFullPeerDb(false);
-		$db->setEnablePeerInfoDb(true);
-		$c = $sets->getConnection();
-		$c->setTimeout(10);
-		$c->setRetry(false);
+		$db->setEnablePeerInfoDb(false);
+		//$c = $sets->getConnection();
+		//$c->setTimeout(10);
+		//$c->setRetry(false);
 		return $sets;
 	}
 	
