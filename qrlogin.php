@@ -18,10 +18,6 @@ set_error_handler('exceptions_error_handler');
 
 include 'mp.php';
 MP::startSession();
-$logout = isset($_GET['logout']);
-if($logout) {
-	$_SESSION = [];
-}
 $user = MP::getUser();
 $nouser = $user == null || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
 
@@ -48,25 +44,21 @@ function htmlStart() {
 	echo Themes::bodyStart();
 }
 
+$ipass = $_GET['ipass'] ?? $_POST['ipass'] ?? null;
+
 $MP = null;
-if($logout && !$nouser) {
-	$nouser = true;
-	$logout = true;
-	MP::delcookie('user');
-	MP::delcookie('code');
-	try {
-		// Remove all session files
-		if(file_exists(sessionspath.$user.'.madeline')) {
-			try {
-				if(PHP_OS_FAMILY === "Linux") {
-					exec('kill -9 `ps -ef | grep -v grep | grep '.$user.'.madeline | awk \'{print $2}\'`');
-				}
-			} catch (Exception $e) {
-			}
-			MP::deleteSessionFile($user);
-		}
-	} catch (Exception $e) {
-		echo $e;
+if(defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
+	if($ipass === null || $ipass != INSTANCE_PASSWORD) {
+		htmlStart();
+		echo 'Instance password:<br>';
+		echo '<form action="qrlogin.php"';
+		if($post) echo ' method="post"';
+		echo '>';
+		echo '<input type="password" value="" name="ipass">';
+		echo '<input type="submit">';
+		echo '</form>';
+		if($ipass !== null) echo '<b>Wrong password</b>';
+		die;
 	}
 }
 if($user === null || $nouser) {
@@ -77,6 +69,8 @@ if($user === null || $nouser) {
 		echo '<p><img src="captcha.php?r='.time().'"></p>';
 		echo '<form action="qrlogin.php"'.($post?' method="post"':'').'>';
 		echo '<input type="text" value="" name="confirm">';
+		if ($ipass !== null)
+			echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
 		echo '<input type="submit">';
 		echo '</form>';
 		echo Themes::bodyEnd();
@@ -114,6 +108,8 @@ if(!$qr) {
 				echo '<input type="text" name="pass">';
 				//if($phone !== null)
 				//	echo '<input type="hidden" name="phone" value="'.$phone.'">';
+				if ($ipass !== null)
+					echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
 				echo '<input type="submit">';
 				echo '</form>';
 				echo '<b>'.MP::x($lng['password_hash_invalid']).'</b><br>';
@@ -136,6 +132,8 @@ if(!$qr) {
 		echo '<input type="text" name="pass">';
 		//if($phone !== null)
 		//	echo '<input type="hidden" name="phone" value="'.$phone.'">';
+		if ($ipass !== null)
+			echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
 		echo '<input type="submit">';
 		echo '</form>';
 		echo Themes::bodyEnd();
@@ -154,5 +152,5 @@ $_SESSION['qr_token'] = base64_encode($qrtext);
 htmlStart();
 echo $qrtext;
 echo '<br><img src="qrcode.php"><br>';
-echo '<a href="qrlogin.php?check">Check</a>';
+echo '<a href="qrlogin.php?check'.($ipass !== null ? '&ipass='.MP::dehtml($ipass) : '').'">Check</a>';
 echo Themes::bodyEnd();

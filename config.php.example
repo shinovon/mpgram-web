@@ -36,3 +36,9 @@ define('DOWNLOAD_SIZE_LIMIT', 1024 * 1024 * 1024);
 define('IMAGE_SIZE_LIMIT', 30 * 1024 * 1024);
 // msg.php file upload limit
 define('UPLOAD_SIZE_LIMIT', 20 * 1024 * 1024);
+
+// MadelineProto EnablePeerInfoDb setting, set false to reduce sessions size
+define('ENABLE_PEER_DB', true);
+
+// Override $_SERVER["SERVER_NAME"] for links
+//defined('SERVER_NAME', "example.com")

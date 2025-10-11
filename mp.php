@@ -802,7 +802,7 @@ class MP {
 		} else {
 			$sitepath .= "http";
 		}
-		$sitepath .= "://".$_SERVER["SERVER_NAME"];
+		$sitepath .= "://".(defined("SERVER_NAME") ? SERVER_NAME : $_SERVER["SERVER_NAME"]);
 		if(isset($_SERVER["PHP_SELF"])) {
 			$ss = $_SERVER["PHP_SELF"];
 			$ss = substr($ss, 0, strrpos($ss, "/")+1);
@@ -831,7 +831,10 @@ class MP {
 		|| strpos($user, '/') !== false
 		|| strpos($user, '.') !== false
 		|| strpos($user, ';') !== false
-		|| strpos($user, ':') !== false) {
+		|| strpos($user, ':') !== false
+		|| strpos($user, '?') !== false
+		|| strpos($user, '=') !== false
+		|| strpos($user, '&') !== false) {
 			return false;
 		}
 		if(!file_exists(sessionspath.$user.'.madeline')) {
@@ -930,7 +933,7 @@ class MP {
 		$db->setEnableMinDb(false);
 		$db->setEnableUsernameDb(true);
 		$db->setEnableFullPeerDb(false);
-		$db->setEnablePeerInfoDb(false);
+		$db->setEnablePeerInfoDb(defined('ENABLE_PEER_DB') && ENABLE_PEER_DB);
 		//$c = $sets->getConnection();
 		//$c->setTimeout(10);
 		//$c->setRetry(false);
