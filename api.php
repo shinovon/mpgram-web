@@ -8,7 +8,7 @@ require_once("api_values.php");
 require_once("config.php");
 
 define("def", 1);
-define("api_version", 9);
+define("api_version", 10);
 define("api_version_min", 2);
 
 use danog\MadelineProto\Magic;
