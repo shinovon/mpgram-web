@@ -481,6 +481,9 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 		
 		if ($media && isset($rawMessage['reply_markup'])) {
 			$rows = $rawMessage['reply_markup']['rows'] ?? [];
+			if ($rawMessage['reply_markup']['single_use'] ?? false) {
+				$message['once'] = true;
+			}
 			$markup = [];
 			foreach ($rows as $row) {
 				$markupRow = [];
@@ -518,6 +521,13 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 		if ($rawMessage['mentioned'] ?? false) {
 			$message['mention'] = true;
 		}
+	}
+	if ($v >= 10 && isset($rawMessage['reactions'])) {
+		$count = 0;
+		foreach (($rawMessage['reactions']['results'] ?? []) as $react) {
+			$count += $react['count'] ?? 0;
+		}
+		$message['reacts']['count'] = $count;
 	}
 	//$message['raw'] = $rawMessage;
 	return $message;
