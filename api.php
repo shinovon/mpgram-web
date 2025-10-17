@@ -457,6 +457,7 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 		$rawReply = $rawMessage['reply_to'];
 		$reply = [];
 		$reply[$v < 5 ? 'msg' : 'id'] = $rawReply['reply_to_msg_id'] ?? null;
+		if ($v >= 10 && isset($rawReply['reply_to_top_id'])) $reply['top'] = $rawReply['reply_to_msg_id'];
 		if (isset($rawReply['reply_to_peer_id'])) $reply['peer'] = $rawReply['reply_to_peer_id'];
 		if (isset($rawReply['quote_text'])) $reply['quote'] = $rawReply['quote_text'];
 		if ($v >= 5 && !$short && isset($reply['id'])) {
@@ -666,11 +667,12 @@ try {
 			http_response_code(403);
 			error(['message' => "Login API is disabled"]);
 		}
-		checkParamEmpty('code');
+		checkParamEmpty('phone');
+		checkParamEmpty('hash');
 		checkAuth();
 		setupMadelineProto();
 		
-		$MP->auth->resendCode(['phone' => $phone, 'phone_code_hash' => $hash]);
+		$MP->auth->resendCode(['phone' => $PARAMS['phone'], 'phone_code_hash' => $PARAMS['hash']]);
 		json(['res' => 1]);
 		break;
 	case 'completePhoneLogin':
@@ -1285,6 +1287,24 @@ try {
 		$autoread = !isParamEmpty('read');
 		$thread = (int) getParam('top_msg', '0');
 		$longpoll = (int) getParam('longpoll', '1');
+		$checkmuted = !isParamEmpty('m');
+		$delay = (int) getParam('delay', '0');
+		if (getParam('p', '0') == '1') {
+			$types = [
+			'updateUserStatus',
+			'updateUserTyping',
+			'updateChatUserTyping',
+			'updateChannelUserTyping',
+			'updateNewMessage',
+			'updateNewChannelMessage',
+			'updateDeleteChannelMessages',
+			'updateDeleteMessages',
+			'updateEditMessage',
+			'updateEditChannelMessage',
+			'updateReadHistoryOutbox',
+			'updateReadChannelOutbox'
+			];
+		}
 		
 		$time = microtime(true);
 		$so = $offset;
@@ -1302,7 +1322,10 @@ try {
 			while (true) {
 				echo ' ';
 				flush();
-				if (connection_aborted() || ($longpoll && microtime(true) - $time >= $timeout)) break;
+				if (connection_aborted()
+					|| ($longpoll && (microtime(true) - $time >= $timeout ||
+					($delay && $res && microtime(true) - $time >= $delay))))
+					break;
 				$updates = $MP->getUpdates(['offset' => $offset, 'limit' => $limit, 'timeout' => 1]);
 				foreach ($updates as $update) {
 					if ($update['update_id'] == $so) continue;
@@ -1335,6 +1358,16 @@ try {
 								if ($msg['id'] == $i) continue;
 								$maxmsg = $msg['id'];
 							}
+						} else if ($checkmuted && $type != 'updateEditMessage' && $type != 'updateEditChannelMessage') {
+							$info = $MP->getFullInfo($msg['peer_id']);
+							if ($info['Chat']['left'] ?? false) {
+								$update['update']['left'] = true;
+							} else {
+								$mute = $info['full']['notify_settings']['mute_until'] ?? null;
+								if ($mute) $update['update']['mute_until'] = $mute;
+								if ($info['Chat']['broadcast'] ?? false) $update['update']['broadcast'] = true;
+								else if (isset($info['Chat'])) $update['update']['chat'] = true;
+							}
 						}
 						$update['update']['message'] = parseMessage($msg, $media);
 						array_push($res, $update);
@@ -1364,17 +1397,22 @@ try {
 							array_push($res, $update);
 						}
 					}
-					if ($peer && ($type == 'updateReadHistoryOutbox' || $type == 'updateReadChannelOutbox')) {
-						if (isset($update['update']['peer']) && parsePeer($update['update']['peer']) != $peer) continue;
-						if (isset($update['update']['channel_id']) && $update['update']['channel_id'] != $peer) continue;
-						array_push($res, $update);
+					if ($type == 'updateReadHistoryOutbox' || $type == 'updateReadChannelOutbox') {
+						if (isset($update['update']['peer'])) {
+							$update['update']['peer'] = parsePeer($update['update']['peer']);
+						}
+						if ($peer) {
+							if (isset($update['update']['peer']) && $update['update']['peer'] != $peer) continue;
+							if (isset($update['update']['channel_id']) && $update['update']['channel_id'] != $peer) continue;
+							array_push($res, $update);
+						}
 					}
 					// TODO updateDeleteMessages
 					
 					if ($peer) continue;
 					array_push($res, $update);
 				}
-				if ($res || !$longpoll) break;
+				if (($res && !$delay) || !$longpoll) break;
 			}
 			if (!$res) {
 				echo '{"res":[]}';
