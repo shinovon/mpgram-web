@@ -1336,6 +1336,7 @@ try {
 					if ($type == 'updateNewMessage' || $type == 'updateNewChannelMessage'
 					|| $type == 'updateEditMessage' || $type == 'updateEditChannelMessage') {
 						$msg = $update['update']['message'];
+						$info = null;
 						if ($peer) {
 							if ($userPeer) {
 								if (($peer == $selfid && ($msg['from_id'] ?? $peer) != $peer)
@@ -1370,6 +1371,9 @@ try {
 							}
 						}
 						$update['update']['message'] = parseMessage($msg, $media);
+						if ($checkMuted && $type != 'updateEditMessage' && $type != 'updateEditChannelMessage') {
+							if ($info['Chat']['unread_count'] ?? false) $update['update']['message']['unread'] = $info['Chat']['unread_count'];
+						}
 						array_push($res, $update);
 					}
 					if (($userPeer || $peer == 0) && ($type == 'updateUserStatus' || $type == 'updateUserTyping')) {
