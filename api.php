@@ -416,6 +416,10 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 							}
 							$media['audio'] = $audio;
 						}
+						if ($v >= 10 && $attr['_'] == 'documentAttributeImageSize') {
+							$media['w'] = max($media['w'] ?? 0, $attr['w'] ?? 0);
+							$media['h'] = max($media['h'] ?? 0, $attr['h'] ?? 0);
+						}
 					}
 				}
 			} elseif (isset($rawMedia['webpage'])) {
@@ -1766,6 +1770,7 @@ try {
 		json(['res' => $res]);
 		break;
 	case 'botCallback':
+	case 'sendBotCallback': // v10
 		checkAuth();
 		setupMadelineProto();
 		
