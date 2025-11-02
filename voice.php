@@ -32,6 +32,14 @@ try {
 	$di = $MP->getDownloadInfo($msg['media']);
 	if(!file_exists(VOICE_TMP_DIR)) mkdir(VOICE_TMP_DIR);
 	
+	$max = 10 * 1024 * 1024; // 10 mb
+	if (defined('DOWNLOAD_SIZE_LIMIT')) $max = DOWNLOAD_SIZE_LIMIT;
+	if (($di['size'] ?? 0) > $max) {
+		http_response_code(400);
+		echo 'File is too large!';
+		die;
+	}
+	
 	// automatically delete converted voices
 	try {
 		$scan = scandir(VOICE_TMP_DIR);
