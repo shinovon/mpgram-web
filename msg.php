@@ -111,7 +111,7 @@ try {
 				$file = $_FILES['file']['tmp_name'];
 				$filename = $_FILES['file']['name'];
 				$extidx = strrpos($filename, '.');
-				if($extidx === false) {
+				if($extidx === false || !is_uploaded_file($file)) {
 					$reason = 'Invalid file';
 				} else {
 					$ext = strtolower(substr($filename, $extidx+1));
