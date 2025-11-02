@@ -51,7 +51,7 @@ try {
 	
 	$max = 1024 * 1024 * 1024; // 1 gb
 	if (defined('DOWNLOAD_SIZE_LIMIT')) $max = DOWNLOAD_SIZE_LIMIT;
-	if(($info['size'] ?? 0) > $max) {
+	if (($di['size'] ?? 0) > $max) {
 		http_response_code(400);
 		echo 'File is too large!';
 		die;
@@ -78,7 +78,7 @@ try {
 	if(strpos($p, 'r') === 0) {
 		$max = 30 * 1024 * 1024; // 30 mb
 		if (defined('IMAGE_SIZE_LIMIT')) $max = IMAGE_SIZE_LIMIT;
-		if(($info['size'] ?? 0) > $max) {
+		if (($di['size'] ?? 0) > $max) {
 			http_response_code(400);
 			echo 'File is too large!';
 			die;
