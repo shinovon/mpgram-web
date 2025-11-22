@@ -609,7 +609,7 @@ try {
 			error(['message' => 'Authorized']);
 		}
 	case 'phoneLogin':
-		if ($v != api_version) {
+		if ($v != api_version && $v != api_version - 1) {
 			http_response_code(403);
 			error(['message' => "Unsupported API version"]);
 		}
@@ -655,8 +655,13 @@ try {
 		}
 		setupMadelineProto($user);
 		try {
-			$a = $MP->phoneLogin($phone);
-			json(['user' => $user, 'res' => 'code_sent', 'phone_code_hash' => $a['phone_code_hash'] ?? null]);
+			if ($METHOD == 'initLogin' && !isParamEmpty('qr')) {
+				$a = $MP->qrLogin();
+				json(['user' => $user, 'res' => 'qr', 'text' => base64_encode($a->{'qrtext'})]);
+			} else {
+				$a = $MP->phoneLogin($phone);
+				json(['user' => $user, 'res' => 'code_sent', 'phone_code_hash' => $a['phone_code_hash'] ?? null]);
+			}
 		} catch (Exception $e) {
 			if (strpos($e->getMessage(), 'PHONE_NUMBER_INVALID') !== false) {
 				json(['user' => $user, 'res' => 'phone_number_invalid']);
@@ -666,7 +671,7 @@ try {
 		}
 		break;
 	case 'resendCode':
-		if ($v != api_version) {
+		if ($v != api_version && $v != api_version - 1) {
 			http_response_code(403);
 			error(['message' => "Unsupported API version"]);
 		}
@@ -683,7 +688,8 @@ try {
 		json(['res' => 1]);
 		break;
 	case 'completePhoneLogin':
-		if ($v != api_version) {
+	case 'qrLogin':
+		if ($v != api_version && $v != api_version - 1) {
 			http_response_code(403);
 			error(['message' => "Unsupported API version"]);
 		}
@@ -695,8 +701,20 @@ try {
 		checkAuth();
 		setupMadelineProto();
 		try {
-			$a = $MP->completePhoneLogin($PARAMS['code']);
-			$hash = $a['phone_code_hash'] ?? null;
+			$a = null;
+			$hash = null;
+			if ($METHOD == 'qrLogin') {
+				$a = $MP->qrLogin();
+				if ($a) {
+					json(['res' => 'qr', 'text' => base64_encode($a->{'qrtext'})]);
+				}
+				if ($MP->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
+					$a = ['_' => 'account.password'];
+				}
+			} else {
+				$a = $MP->completePhoneLogin($PARAMS['code']);
+				$hash = $a['phone_code_hash'] ?? null;
+			}
 			if (isset($a['_']) && $a['_'] === 'account.noPassword') {
 				json(['res' => 'no_password', 'phone_code_hash' => $hash]);
 			} elseif (isset($a['_']) && $a['_'] === 'account.password') {
@@ -720,7 +738,7 @@ try {
 		break;
 	case 'complete2faLogin':
 		// TODO password encryption
-		if ($v != api_version) {
+		if ($v != api_version && $v != api_version - 1) {
 			http_response_code(403);
 			error(['message' => "Unsupported API version"]);
 		}
