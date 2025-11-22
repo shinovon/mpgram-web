@@ -407,6 +407,9 @@ function parseMessage($rawMessage, $media=false, $short=false) {
 						if ($attr['_'] == 'documentAttributeAudio') {
 							$audio = [];
 							$audio['voice'] = $attr['voice'] ?? false;
+							if (isset($attr['waveform']) && $v >= 10) {
+								$audio['wave'] = $attr['waveform'];
+							}
 							$audio['time'] = $attr['duration'] ?? false;
 							if (isset($attr['title'])) {
 								$audio['title'] = $attr['title'];
