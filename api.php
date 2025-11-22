@@ -1378,7 +1378,7 @@ try {
 							}
 						}
 						$update['update']['message'] = parseMessage($msg, $media);
-						if ($checkMuted && $type != 'updateEditMessage' && $type != 'updateEditChannelMessage') {
+						if ($checkmuted && $type != 'updateEditMessage' && $type != 'updateEditChannelMessage') {
 							if ($info['Chat']['unread_count'] ?? false) $update['update']['message']['unread'] = $info['Chat']['unread_count'];
 						}
 						array_push($res, $update);
@@ -1944,7 +1944,7 @@ try {
 		'peer_id' => strval(getId($msg['peer_id'])),
 		'unread' => $r['unread_count'] ?? 0,
 		'read' => max($r['read_inbox_max_id'] ?? 0, $r['read_outbox_max_id'] ?? 0, $msg['id']),
-		'max_id' => $r['max_id']
+		'max_id' => $r['max_id'] ?? 0
 		]);
 		break;
 	case 'getInfo':
