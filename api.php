@@ -627,7 +627,7 @@ try {
 			session_write_close();
 			die();
 		}
-		checkParamEmpty('phone');
+		if (isParamEmpty('qr')) checkParamEmpty('phone');
 		if (!isset($_SESSION['captcha_key']) || empty($_SESSION['captcha_key'])) {
 			unset($_SESSION['captcha_key']);
 			$c = getCaptchaText(rand(6, 10));
@@ -647,7 +647,7 @@ try {
 		unset($_SESSION['captcha_key']);
 		session_write_close();
 		
-		$phone = getParam('phone');
+		$phone = getParam('phone', 'qr');
 		$user = $_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user'] ?? null;
 		// generate user id
 		if ($user === null) {
@@ -697,7 +697,6 @@ try {
 			http_response_code(403);
 			error(['message' => "Login API is disabled"]);
 		}
-		checkParamEmpty('code');
 		checkAuth();
 		setupMadelineProto();
 		try {
@@ -712,6 +711,7 @@ try {
 					$a = ['_' => 'account.password'];
 				}
 			} else {
+				checkParamEmpty('code');
 				$a = $MP->completePhoneLogin($PARAMS['code']);
 				$hash = $a['phone_code_hash'] ?? null;
 			}
