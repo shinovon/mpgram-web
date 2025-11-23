@@ -657,7 +657,7 @@ try {
 		try {
 			if ($METHOD == 'initLogin' && !isParamEmpty('qr')) {
 				$a = $MP->qrLogin();
-				json(['user' => $user, 'res' => 'qr', 'text' => base64_encode($a->{'qrtext'})]);
+				json(['user' => $user, 'res' => 'qr', 'text' => base64_encode($a->{'link'})]);
 			} else {
 				$a = $MP->phoneLogin($phone);
 				json(['user' => $user, 'res' => 'code_sent', 'phone_code_hash' => $a['phone_code_hash'] ?? null]);
@@ -705,7 +705,7 @@ try {
 			if ($METHOD == 'qrLogin') {
 				$a = $MP->qrLogin();
 				if ($a) {
-					json(['res' => 'qr', 'text' => base64_encode($a->{'qrtext'})]);
+					json(['res' => 'qr', 'text' => base64_encode($a->{'link'})]);
 				}
 				if ($MP->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
 					$a = ['_' => 'account.password'];
