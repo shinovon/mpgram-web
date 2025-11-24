@@ -113,7 +113,7 @@
 		[ "=", 1, "hace $ minuto", "hace $ minutos" ]
 	],
 	"install_stickerset": "Instalar paquete de stickers",
-	"set_chat_status": "Mostrar estado del chat",
+	"set_chat_status": "Mostrar estado de chat",
 	"chat_media": "Media",
 	"send_voice": "Enviar como mensaje de voz (audio)",
 	"send_spoiler": "Ocultar con spoiler",
