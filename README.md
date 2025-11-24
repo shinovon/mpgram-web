@@ -65,6 +65,7 @@ Partially supported (Auto update doesn't work and/or no auto scroll):
 - Opera Mini (All versions)
 - S40 5th Edition or older
 - Internet Explorer Mobile (?)
+- NetFront Browser 4.1 for Samsung
 
 Not supported
 - Internet Explorer 2 and older
