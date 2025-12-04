@@ -160,7 +160,7 @@ try {
                                             $sampleRate = max(1, (int) (count($frames) / 100));
                                             $s2 = 100 / count($frames);
                                             
-                                            foreach($frames as $frame) {
+                                            foreach ($frames as $frame) {
                                                 $sample = $frame->{'tags'}->{'lavfi.astats.Overall.Peak_level'};
                                                 $sample = $sample == '-inf' ? -100.0 : floatval($sample);
                                                 $sample = max(0, (int) (32768 * (10 ** ($sample / 20.0))));
@@ -171,7 +171,7 @@ try {
                                                     if ($index < 100) {
                                                         if ($sampleRate == 1) {
                                                             $i = 0;
-                                                            while($i++ < $s2) $waveform[$index++] = $peakSample;
+                                                            while ($i++ < $s2) $waveform[$index++] = $peakSample;
                                                         } else {
                                                             $waveform[$index++] = $peakSample;
                                                         }
@@ -186,14 +186,14 @@ try {
                                             }
                                             
                                             $sumSamples = 0;
-                                            foreach($waveform as $sample) {
+                                            foreach ($waveform as $sample) {
                                                 $sumSamples += $sample;
                                             }
                                             
                                             $peak = (int) ($sumSamples * 1.8 / 100);
                                             if ($peak < 2500) $peak = 2500;
                                             
-                                            for($i = 0; $i < 100; $i++) {
+                                            for ($i = 0; $i < 100; $i++) {
                                                 $sample = $waveform[$i];
                                                 if ($sample > $peak) $sample = $peak;
                                                 $waveform[$i] = max(0, min(31, (int) ($sample * 31 / $peak)));

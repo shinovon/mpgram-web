@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 0);
 include 'mp.php';
 MP::startSession();
 $user = MP::getUser();
-if(!$user) {
+if (!$user) {
     header('Location: login.php?logout=1');
     die;
 }
@@ -22,9 +22,9 @@ function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
 }
 set_error_handler('exceptions_error_handler');
-if($msg !== null) {
-    if(isset($random)) {
-        if(isset($_SESSION['random']) && $_SESSION['random'] == $random) {
+if ($msg !== null) {
+    if (isset($random)) {
+        if (isset($_SESSION['random']) && $_SESSION['random'] == $random) {
             header('Location: chat.php?c='.$id);
             die;
         }
@@ -32,7 +32,7 @@ if($msg !== null) {
     }
     try {
         $MP = MP::getMadelineAPI($user);
-        if(isset($_GET["format"]) || isset($_POST["format"])) {
+        if (isset($_GET["format"]) || isset($_POST["format"])) {
             $MP->messages->sendMessage(['peer' => $id, 'message' => $msg, 'parse_mode' => 'HTML']);
         } else {
             $MP->messages->sendMessage(['peer' => $id, 'message' => $msg]);

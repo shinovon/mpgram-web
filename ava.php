@@ -18,7 +18,7 @@ function resize($image, $w, $h) {
 try {
     include 'mp.php';
     $user = MP::getUser();
-    if(!$user) {
+    if (!$user) {
         http_response_code(401);
         die;
     }
@@ -31,13 +31,13 @@ try {
     try {
         $di = $MP->getPropicInfo($info);
     } catch (Exception) {}
-    if($di === null) {
+    if ($di === null) {
         if (isset($_GET['a'])) {
             http_response_code(404);
             die;
         }
         header('Content-Type: image/png');
-        if((int) $cid < 0) {
+        if ((int) $cid < 0) {
             echo file_get_contents('img/gr.png');
         } else {
             echo file_get_contents('img/us.png');
@@ -46,14 +46,14 @@ try {
         die;
     }
     $p = $_GET['p'] ?? '';
-    if(strpos($p, 'r') === 0) {
+    if (strpos($p, 'r') === 0) {
         header('Cache-Control: private, max-age=2592000');
         $p = substr($p, 1);
         $payload = new Amp\ByteStream\Payload($MP->downloadToReturnedStream($di));
         $img = imagecreatefromstring($payload->buffer());
         $payload->close();
         $png = false;
-        if(strpos($p, 'c') === 0) {
+        if (strpos($p, 'c') === 0) {
             $png = true;
             $p = substr($p, 1);
             $w = imagesx($img);
@@ -69,15 +69,15 @@ try {
             imagecolortransparent($img, $r);
             imagefill($img, 0, 0, $r);
         }
-        if(strpos($p, 'p') === 0) {
+        if (strpos($p, 'p') === 0) {
             $png = true;
             $p = substr($p, 1);
         }
-        if($p != 'orig') {
+        if ($p != 'orig') {
             $s = (int)$p;
             $img = resize($img, $s, $s);
         }
-        if($png) {
+        if ($png) {
             header('Content-Type: image/png');
             imagepng($img);
             imagedestroy($img);

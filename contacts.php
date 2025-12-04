@@ -13,13 +13,13 @@ $theme = MP::getSettingInt('theme');
 $lng = MP::initLocale();
 
 $user = MP::getUser();
-if(!$user) {
+if (!$user) {
     header('Location: login.php?logout=1');
     die;
 }
 
 $count = 300;
-if(isset($_GET['count'])) {
+if (isset($_GET['count'])) {
     $count = (int) $_GET['count'];
 }
 
@@ -49,19 +49,19 @@ try {
     try {
         $r = $MP->contacts->getContacts();
         $c = 0;
-        foreach($r['contacts'] as $contact){
+        foreach ($r['contacts'] as $contact){
             $id = $contact['user_id'];
             $name = null;
-            foreach($r['users'] as $user) {
-                if($user['id'] == $id) {
-                    if(isset($user['first_name'])) {
+            foreach ($r['users'] as $user) {
+                if ($user['id'] == $id) {
+                    if (isset($user['first_name'])) {
                         $name = trim($user['first_name']).(isset($user['last_name']) ? ' '.trim($user['last_name']) : '');
-                    } elseif(isset($user['last_name'])) {
+                    } elseif (isset($user['last_name'])) {
                         $name = trim($user['last_name']);
                     } else {
                         $name = 'Deleted Account';
                     }
-                    if(isset($user['username'])) {
+                    if (isset($user['username'])) {
                         $name .= ' ('.$user['username'].')';
                     }
                     break;

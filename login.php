@@ -10,12 +10,12 @@ include 'mp.php';
 
 MP::startSession();
 
-if(!defined('LOGIN_CAPTCHA')) define('LOGIN_CAPTCHA', true);
+if (!defined('LOGIN_CAPTCHA')) define('LOGIN_CAPTCHA', true);
 
 $theme = 0;
 $ua = '';
 $iev = MP::getIEVersion();
-if($iev > 0 && $iev < 4) $theme = 1;
+if ($iev > 0 && $iev < 4) $theme = 1;
 $theme = MP::getSettingInt('theme', $theme, true);
 $post = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false) && ($iev < 4 && $iev == 0);
 
@@ -54,8 +54,8 @@ function removeSession($logout=false) {
     MP::delcookie('PHPSESSID');
     try {
         // Remove all session files
-        if(file_exists(sessionspath.$user.'.madeline')) {
-            if($logout) {
+        if (file_exists(sessionspath.$user.'.madeline')) {
+            if ($logout) {
                 try {
                     $MP = MP::getMadelineAPI($user, true);
                     $MP->logout();
@@ -63,7 +63,7 @@ function removeSession($logout=false) {
                 } catch (Exception) {}
             }
             try {
-                if(PHP_OS_FAMILY === "Linux") {
+                if (PHP_OS_FAMILY === "Linux") {
                     exec('kill -9 `ps -ef | grep -v grep | grep '.$user.'.madeline | awk \'{print $2}\'`');
                 }
             } catch (Exception) {}
@@ -83,7 +83,7 @@ function htmlStart() {
     echo Themes::head();
     // определение часового пояса
     $iev = MP::getIEVersion();
-    if($iev == 0 || $iev > 4) {
+    if ($iev == 0 || $iev > 4) {
         $dtz = new DateTimeZone(date_default_timezone_get());
         $t = new DateTime('now', $dtz);
         $tof = $dtz->getOffset($t);
@@ -103,7 +103,7 @@ try {
     echo '<h1>MPGram Web</h1>';
 }
 
-if(isset($_GET['logout']) || $revoked || $wrong) {
+if (isset($_GET['logout']) || $revoked || $wrong) {
     $logout = true;
     $nouser = true;
     removeSession(($_GET['logout'] ?? '') == '2' && !$nouser);
@@ -111,59 +111,59 @@ if(isset($_GET['logout']) || $revoked || $wrong) {
 }
 
 $MP = null;
-if($user != null && !$logout && !$nouser) {
+if ($user != null && !$logout && !$nouser) {
     // Already logged in
-    if(isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {
+    if (isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {
         header('Location: chats.php');
         die;
     } else {
         $MP = MP::getMadelineAPI($user, true);
-        if($MP->getAuthorization() === 3) {
+        if ($MP->getAuthorization() === 3) {
             MP::cookie('code', '1', time() + (86400 * 365));
             header('Location: chats.php');
             die;
         }
-        if($phone === null) {
+        if ($phone === null) {
             unset($MP);
             removeSession();
         }
     }
 }
-if(defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
-    if($ipass === null || $ipass != INSTANCE_PASSWORD) {
+if (defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
+    if ($ipass === null || $ipass != INSTANCE_PASSWORD) {
         htmlStart();
         echo 'Instance password:<br>';
         echo '<form action="login.php"';
-        if($post) echo ' method="post"';
+        if ($post) echo ' method="post"';
         echo '>';
         echo '<input type="password" value="" name="ipass">';
         echo '<input type="submit">';
         echo '</form>';
-        if($ipass !== null) echo '<b>Wrong password</b>';
+        if ($ipass !== null) echo '<b>Wrong password</b>';
         die;
     }
 }
-if($phone !== null) {
+if ($phone !== null) {
     $p = $phone;
-    if(empty($p) || strlen($p) < 10 || !is_numeric(str_replace('-','',str_replace('+','', $p)))) {
+    if (empty($p) || strlen($p) < 10 || !is_numeric(str_replace('-','',str_replace('+','', $p)))) {
         header('Location: login.php?wrong=number');
         die;
     }
-    if(!isset($_SESSION['captcha_entered']) && LOGIN_CAPTCHA) {
-        if(!isset($_POST['c']) && !isset($_GET['c'])) {
+    if (!isset($_SESSION['captcha_entered']) && LOGIN_CAPTCHA) {
+        if (!isset($_POST['c']) && !isset($_GET['c'])) {
             htmlStart();
             echo 'CAPTCHA:<br>';
             echo '<p><img src="captcha.php?r='.time().'"></p>';
             echo '<form action="login.php"';
-            if($post) echo ' method="post"';
+            if ($post) echo ' method="post"';
             echo '>';
-            if(isset($_GET['code']))
+            if (isset($_GET['code']))
                 echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_GET['code'])."\">";
-            elseif(isset($_POST['code']))
+            elseif (isset($_POST['code']))
                 echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_POS['code'])."\">";
-            if($phone !== null)
+            if ($phone !== null)
                 echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
-            if($ipass !== null)
+            if ($ipass !== null)
                 echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
             echo '<input type="text" name="c">';
             echo '<input type="submit">';
@@ -173,48 +173,48 @@ if($phone !== null) {
             die;
         } else {
             $c = null;
-            if(isset($_POST['c'])) {
+            if (isset($_POST['c'])) {
                 $c = $_POST['c'];
-            } elseif(isset($_GET['c'])) {
+            } elseif (isset($_GET['c'])) {
                 $c = $_GET['c'];
             }
             $b = isset($_SESSION['captcha']);
-            if(!$b || strtolower($c) !== $_SESSION['captcha']) {
+            if (!$b || strtolower($c) !== $_SESSION['captcha']) {
                 htmlStart();
-                if($b) unset($_SESSION['captcha']);
+                if ($b) unset($_SESSION['captcha']);
                 echo 'CAPTCHA:<br>';
                 echo '<p><img src="captcha.php"></p>';
                 echo '<form action="login.php"';
-                if($post) echo ' method="post"';
+                if ($post) echo ' method="post"';
                 echo '>';
-                if(isset($_GET['code']))
+                if (isset($_GET['code']))
                     echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_GET['code'])."\">";
-                elseif(isset($_POST['code']))
+                elseif (isset($_POST['code']))
                     echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_POST['code'])."\">";
-                if($phone !== null)
+                if ($phone !== null)
                     echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
-                if($ipass !== null)
+                if ($ipass !== null)
                     echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
                 echo '<input type="text" name="c">';
                 echo '<input type="submit">';
                 echo '</form>';
-                if($b) echo '<b>'.MP::x($lng['wrong_captcha']).'</b>';
+                if ($b) echo '<b>'.MP::x($lng['wrong_captcha']).'</b>';
                 echo Themes::bodyEnd();
                 die;
             }
             $_SESSION['captcha_entered'] = 1;
         }
     }
-    if(!isset($user) || $nouser) {
+    if (!isset($user) || $nouser) {
         $SESSION['user'] = $user = rtrim(strtr(base64_encode(hash('sha384', sha1(md5($phone.rand(0,1000).random_bytes(6))).random_bytes(30), true)), '+/', '-_'), '=');
         MP::cookie('user', $user, time() + (86400 * 365));
         $MP = MP::getMadelineAPI($user, true);
     } else {
-        if(isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {
+        if (isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {
             unset($_SESSION['captcha_entered']);
             header('Location: chats.php');
             die;
-        } elseif(isset($_POST['pass']) || isset($_GET['pass'])) {
+        } elseif (isset($_POST['pass']) || isset($_GET['pass'])) {
             $MP = MP::getMadelineAPI($user, true);
             try {
                 $password = $_POST['pass'] ?? $_GET['pass'] ?? null;
@@ -223,23 +223,23 @@ if($phone !== null) {
                 header('Location: chats.php');
                 die;
             } catch (Exception $e) {
-                if(strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
+                if (strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
                     htmlStart();
                     echo MP::x($lng['pass_code']).':<br>';
                     echo '<form action="login.php"';
-                    if($post) echo ' method="post"';
+                    if ($post) echo ' method="post"';
                     echo '>';
                     echo '<input type="password" name="pass">';
-                    if($phone !== null)
+                    if ($phone !== null)
                         echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
-                    if($ipass !== null)
+                    if ($ipass !== null)
                         echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
                     echo '<input type="submit">';
                     echo '</form>';
                     echo '<b>'.MP::x($lng['password_hash_invalid']).'</b><br>';
                     echo Themes::bodyEnd();
                     die;
-                } elseif(strpos($e->getMessage(), 'AUTH_RESTART') !== false/* || strpos($e->getMessage(), 'I\'m not waiting') !== false*/) {
+                } elseif (strpos($e->getMessage(), 'AUTH_RESTART') !== false/* || strpos($e->getMessage(), 'I\'m not waiting') !== false*/) {
                 } else {
                     echo '<xmp>';
                     echo $e;
@@ -247,41 +247,41 @@ if($phone !== null) {
                     die;
                 }
             }
-        } elseif(isset($_POST['code']) || isset($_GET['code'])) {
+        } elseif (isset($_POST['code']) || isset($_GET['code'])) {
             $code = $_POST['code'] ?? $_GET['code'] ?? null;
-            if(!empty($code) && is_numeric($code)) {
+            if (!empty($code) && is_numeric($code)) {
                 try {
                     $MP = MP::getMadelineAPI($user, true);
                     $a = $MP->completePhoneLogin($code);
                     $hash = null;
-                    if(isset($a['phone_code_hash'])) {
+                    if (isset($a['phone_code_hash'])) {
                         $hash = $a['phone_code_hash'];
                     }
-                    if(isset($a['_']) && $a['_'] === 'account.noPassword') {
+                    if (isset($a['_']) && $a['_'] === 'account.noPassword') {
                         htmlStart();
                         echo '<b>'.MP::x($lng['no_pass_code']).'</b>';
                         echo Themes::bodyEnd();
                         die;
-                    } elseif(isset($a['_']) && $a['_'] === 'account.password') {
+                    } elseif (isset($a['_']) && $a['_'] === 'account.password') {
                         htmlStart();
                         echo MP::x($lng['pass_code']).':<br>';
                         echo '<form action="login.php"';
-                        if($post) echo ' method="post"';
+                        if ($post) echo ' method="post"';
                         echo '>';
                         echo '<input type="password" name="pass">';
-                        if($phone !== null)
+                        if ($phone !== null)
                             echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
-                        if($ipass !== null)
+                        if ($ipass !== null)
                             echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
                         echo '<input type="submit">';
                         echo '</form>';
                         echo Themes::bodyEnd();
                         die;
-                    } elseif(isset($a['_']) && $a['_'] === 'account.needSignup') {
+                    } elseif (isset($a['_']) && $a['_'] === 'account.needSignup') {
                         htmlStart();
                         echo MP::x($lng['need_signup']);
                         //echo '<form action="signin.php"';
-                        //if($post) echo ' method="post"';
+                        //if ($post) echo ' method="post"';
                         //echo '>';
                         //echo 'First name:<br><input type="text" name="first"><br>';
                         //echo 'Last name:<br><input type="text" name="last">';
@@ -296,11 +296,11 @@ if($phone !== null) {
                     }
                 } catch (Exception $e) {
                     htmlStart();
-                    if(strpos($e->getMessage(), 'PHONE_CODE_INVALID') !== false) {
+                    if (strpos($e->getMessage(), 'PHONE_CODE_INVALID') !== false) {
                         echo '<b>'.MP::x($lng['phone_code_invalid']).'</b><br>';
-                    } elseif(strpos($e->getMessage(), 'PHONE_CODE_EXPIRED') !== false) {
+                    } elseif (strpos($e->getMessage(), 'PHONE_CODE_EXPIRED') !== false) {
                         echo '<b>'.MP::x($lng['phone_code_expired']).'</b><br>';
-                    } elseif(strpos($e->getMessage(), 'AUTH_RESTART') !== false) {
+                    } elseif (strpos($e->getMessage(), 'AUTH_RESTART') !== false) {
                         unset($hash);
                     } else {
                         echo '<b>'.MP::x($lng['error']).'</b><br>';
@@ -312,12 +312,12 @@ if($phone !== null) {
             } else {
                 echo MP::x($lng['phone_code']).':<br>';
                 echo '<form action="login.php"';
-                if($post) echo ' method="post"';
+                if ($post) echo ' method="post"';
                 echo '>';
                 echo '<input type="text" name="code">';
-                if($phone !== null)
+                if ($phone !== null)
                     echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
-                if($ipass !== null)
+                if ($ipass !== null)
                     echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
                 echo '<input type="submit">';
                 echo '</form>';
@@ -330,7 +330,7 @@ if($phone !== null) {
         }
     }
     // ввод кода
-    if(isset($hash)) {
+    if (isset($hash)) {
         try {
             $MP->auth->resendCode(['phone' => $phone, 'phone_code_hash' => $hash]);
         } catch (Exception $e) {
@@ -343,7 +343,7 @@ if($phone !== null) {
         try {
             $MP->phoneLogin($phone);
         } catch (Exception $e) {
-            if(strpos($e->getMessage(), 'PHONE_NUMBER_INVALID') !== false) {
+            if (strpos($e->getMessage(), 'PHONE_NUMBER_INVALID') !== false) {
                 header('Location: login.php?wrong=number');
                 die;
             } else {
@@ -357,12 +357,12 @@ if($phone !== null) {
     htmlStart();
     echo MP::x($lng['phone_code']).':<br>';
     echo '<form action="login.php"';
-    if($post) echo ' method="post"';
+    if ($post) echo ' method="post"';
     echo '>';
     echo '<input type="text" name="code">';
-    if($phone !== null)
+    if ($phone !== null)
         echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
-    if($ipass !== null)
+    if ($ipass !== null)
         echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
     echo '<input type="submit">';
     echo '</form>';
@@ -370,19 +370,19 @@ if($phone !== null) {
 } else {
     // ввод телефона
     htmlStart();
-    //if($revoked) {
+    //if ($revoked) {
     //    echo MP::x('<b>Ваша сессия истекла!</b><br>');
     //}
     echo MP::x($lng['phone_number']).':<br>';
     echo '<form action="login.php"';
-    if($post) echo ' method="post"';
+    if ($post) echo ' method="post"';
     echo '>';
     echo '<input type="text" value="" name="phone">';
     echo '<input type="submit">';
-    if($ipass !== null)
+    if ($ipass !== null)
         echo '<input type="hidden" name="ipass" value="'.MP::dehtml($ipass).'">';
     echo '</form>';
-    if($wrong) {
+    if ($wrong) {
         echo '<b>'.MP::x($lng['wrong_number_format']).'</b><br>';
     } else {
         echo '<b>';

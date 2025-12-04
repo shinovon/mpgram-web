@@ -100,10 +100,10 @@ try {
                 try {
                     $scan = scandir(TGS_TMP_DIR);
                     $time = time();
-                    foreach($scan as $n) {
+                    foreach ($scan as $n) {
                         if (strpos($n, '.tgs') === false && strpos($n, '.gif') === false && strpos($n, '.png') === false)
                             continue;
-                        if (filectime(TGS_TMP_DIR.$n) + 30 * 60 > $time)
+                        if (filectime(TGS_TMP_DIR.$n) + 30 * 60 > $time || $n == '.' || $n == '..')
                             continue;
                         unlink(TGS_TMP_DIR.$n);
                     }
@@ -130,10 +130,10 @@ try {
                             rename($outpath.'/000.png', $outpath.'.png');
                         }
                         $scan = scandir($outpath.'/');
-                        foreach($scan as $n) {
+                        foreach ($scan as $n) {
                             if ($n == '.' || $n == '..') continue;
                             if (is_dir($outpath.'/'.$n)) {
-                                foreach(scandir($outpath.'/'.$n.'/') as $n2) {
+                                foreach (scandir($outpath.'/'.$n.'/') as $n2) {
                                     if ($n2 == '.' || $n2 == '..') continue;
                                     unlink($outpath.'/'.$n.'/'.$n2);
                                 }

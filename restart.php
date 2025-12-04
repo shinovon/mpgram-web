@@ -1,7 +1,7 @@
 <?php
 include 'mp.php';
 $user = MP::getUser();
-if(!$user) die;
+if (!$user) die;
 
 try {
 	$MP = MP::getMadelineAPI($user);

@@ -1,5 +1,5 @@
 <?php
-if(!defined('mp_loaded'))
+if (!defined('mp_loaded'))
 require_once 'mp.php';
 class Themes {
     static $theme = 0;
@@ -14,18 +14,18 @@ class Themes {
     
     static function loadColors($theme) {
         $file = './colors/colors_'.$theme.'.json';
-        if(!file_exists($file)) {
+        if (!file_exists($file)) {
             return false;
         }
         $file = file_get_contents($file);
-        if(!$file) {
+        if (!$file) {
             return false;
         }
         $json = json_decode($file, true);
-        if(!$json) {
+        if (!$json) {
             return false;
         }
-        foreach($json as $k => $v) {
+        foreach ($json as $k => $v) {
             static::$colors[$k] = $v;
         }
         static::$fillMsg = static::$fillMsg || ($json['fill_messages'] ?? 0);
@@ -98,7 +98,7 @@ class Themes {
     }
     
     static function bodyStart($a = null) {
-        if($a) {
+        if ($a) {
             return '<body '.$a.'>'.(static::$iev > 0 ? '<div class="bc">' : '');
         }
         return '<body>'.(static::$iev > 0 ? '<div class="bc">' : '');

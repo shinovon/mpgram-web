@@ -13,7 +13,7 @@ $theme = MP::getSettingInt('theme');
 $lng = MP::initLocale();
 
 $user = MP::getUser();
-if(!$user) {
+if (!$user) {
     header('Location: login.php?logout=1');
     die;
 }
@@ -35,7 +35,7 @@ echo '<div><a href="login.php">'.MP::x($lng['back']).'</a></div>';
 
 echo '<form action="chat'.($c ? '' : 'select').'.php">';
 echo '<p><input type="text" name="q" id="q"><br>';
-if($c) {
+if ($c) {
     echo '<input type="hidden" name="c" value="'.$c.'">';
 } else {
     echo '<input type="checkbox" name="g" id="g">';

@@ -1,7 +1,7 @@
 <?php
 include 'mp.php';
 $user = MP::getUser();
-if(!$user) {
+if (!$user) {
     header('Location: login.php?logout=1');
     die;
 }

@@ -8,7 +8,7 @@ require_once 'vendor/autoload.php';
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use chillerlan\QRCode\Output\QROutputInterface;
-if(!isset($_GET['t']) && !isset($_SESSION['qr_token'])) {
+if (!isset($_GET['t']) && !isset($_SESSION['qr_token'])) {
     http_response_code(400);
     die;
 }

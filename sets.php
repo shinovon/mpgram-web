@@ -24,49 +24,49 @@ include 'mp.php';
 
 MP::startSession();
 
-if($set) {
+if ($set) {
     $autoupd = isset($_GET['autoupd']) ? 1 : 0;
     $reverse = isset($_GET['reverse']) ? 1 : 0;
     $autoscroll = isset($_GET['autoscroll']) ? 1 : 0;
     $avas = isset($_GET['avas']) ? 1 : 0;
     $idf = $dynupd == 1 ? 10 : 25;
-    if(isset($_GET['lang'])) {
+    if (isset($_GET['lang'])) {
         $lang = $_GET['lang'];
     }
-    if(isset($_GET['updint'])) {
+    if (isset($_GET['updint'])) {
         $updint = $_GET['updint'];
-        if(!is_numeric($updint)) {
+        if (!is_numeric($updint)) {
             $updint = $idf;
         } else {
             $updint = (int) $updint;
         }
-        if($updint < 3 || $updint > 60) {
+        if ($updint < 3 || $updint > 60) {
             $updint = $idf;
         }
     }
-    if(isset($_GET['theme'])) {
+    if (isset($_GET['theme'])) {
         $theme = (int) $_GET['theme'];
     }
-    if(isset($_GET['chats'])) {
+    if (isset($_GET['chats'])) {
         $chats = (int) $_GET['chats'];
-        if($chats < 10) {
+        if ($chats < 10) {
             $chats = 10;
-        } elseif($chats > 100) {
+        } elseif ($chats > 100) {
             $chats = 100;
         }
     }
-    if(isset($_GET['limit'])) {
+    if (isset($_GET['limit'])) {
         $limit = (int) $_GET['limit'];
-        if($limit < 5) {
+        if ($limit < 5) {
             $limit = 5;
-        } elseif($chats > 50) {
+        } elseif ($chats > 50) {
             $limit = 50;
         }
     }
-    if(isset($_GET['photosize'])) {
+    if (isset($_GET['photosize'])) {
         $photosize = (int) $_GET['photosize'];
     }
-    if(isset($_GET['bgsize'])) {
+    if (isset($_GET['bgsize'])) {
         $bgsize = (int) $_GET['bgsize'];
     }
     $texttop = isset($_GET['texttop']) ? 1 : 0;
@@ -98,74 +98,74 @@ if($set) {
     $_SESSION['photosize'] = $photosize;
     $_SESSION['bgsize'] = $bgsize;
 } else {
-    if(isset($_COOKIE['lang']))
+    if (isset($_COOKIE['lang']))
         $lang = $_COOKIE['lang'];
-    if(isset($_COOKIE['autoupd']))
+    if (isset($_COOKIE['autoupd']))
         $autoupd = (int)$_COOKIE['autoupd'];
-    if(isset($_COOKIE['updint']))
+    if (isset($_COOKIE['updint']))
         $updint = (int)$_COOKIE['updint'];
-    if(isset($_COOKIE['theme']))
+    if (isset($_COOKIE['theme']))
         $theme = (int)$_COOKIE['theme'];
-    if(isset($_COOKIE['chats']))
+    if (isset($_COOKIE['chats']))
         $chats = (int)$_COOKIE['chats'];
-    if(isset($_COOKIE['reverse']))
+    if (isset($_COOKIE['reverse']))
         $reverse = (int)$_COOKIE['reverse'];
-    if(isset($_COOKIE['autoscroll']))
+    if (isset($_COOKIE['autoscroll']))
         $autoscroll = (int)$_COOKIE['autoscroll'];
-    if(isset($_COOKIE['limit']))
+    if (isset($_COOKIE['limit']))
         $limit = (int)$_COOKIE['limit'];
-    if(isset($_COOKIE['avas']))
+    if (isset($_COOKIE['avas']))
         $avas = (int)$_COOKIE['avas'];
-    if(isset($_COOKIE['texttop']))
+    if (isset($_COOKIE['texttop']))
         $texttop = (int)$_COOKIE['texttop'];
-    if(isset($_COOKIE['longpoll']))
+    if (isset($_COOKIE['longpoll']))
         $longpoll = (int)$_COOKIE['longpoll'];
-    if(isset($_COOKIE['status']))
+    if (isset($_COOKIE['status']))
         $status = (int)$_COOKIE['status'];
-    if(isset($_COOKIE['imgs']))
+    if (isset($_COOKIE['imgs']))
         $imgs = (int)$_COOKIE['imgs'];
-    if(isset($_COOKIE['pngava']))
+    if (isset($_COOKIE['pngava']))
         $pngava = (int)$_COOKIE['pngava'];
-    if(isset($_COOKIE['oldchat']))
+    if (isset($_COOKIE['oldchat']))
         $oldchat = (int)$_COOKIE['oldchat'];
-    if(isset($_COOKIE['photosize']))
+    if (isset($_COOKIE['photosize']))
         $photosize = (int)$_COOKIE['photosize'];
-    if(isset($_COOKIE['bgsize']))
+    if (isset($_COOKIE['bgsize']))
         $bgsize = (int)$_COOKIE['bgsize'];
     
-    if(isset($_SESSION['lang']))
+    if (isset($_SESSION['lang']))
         $lang = $_SESSION['lang'];
-    if(isset($_SESSION['autoupd']))
+    if (isset($_SESSION['autoupd']))
         $autoupd = (int)$_SESSION['autoupd'];
-    if(isset($_SESSION['updint']))
+    if (isset($_SESSION['updint']))
         $updint = (int)$_SESSION['updint'];
-    if(isset($_SESSION['theme']))
+    if (isset($_SESSION['theme']))
         $theme = (int)$_SESSION['theme'];
-    if(isset($_SESSION['chats']))
+    if (isset($_SESSION['chats']))
         $chats = (int)$_SESSION['chats'];
-    if(isset($_SESSION['reverse']))
+    if (isset($_SESSION['reverse']))
         $reverse = (int)$_SESSION['reverse'];
-    if(isset($_SESSION['autoscroll']))
+    if (isset($_SESSION['autoscroll']))
         $autoscroll = (int)$_SESSION['autoscroll'];
-    if(isset($_SESSION['limit']))
+    if (isset($_SESSION['limit']))
         $limit = (int)$_SESSION['limit'];
-    if(isset($_SESSION['avas']))
+    if (isset($_SESSION['avas']))
         $avas = (int)$_SESSION['avas'];
-    if(isset($_SESSION['texttop']))
+    if (isset($_SESSION['texttop']))
         $texttop = (int)$_SESSION['texttop'];
-    if(isset($_SESSION['longpoll']))
+    if (isset($_SESSION['longpoll']))
         $longpoll = (int)$_SESSION['longpoll'];
-    if(isset($_SESSION['status']))
+    if (isset($_SESSION['status']))
         $status = (int)$_SESSION['status'];
-    if(isset($_SESSION['imgs']))
+    if (isset($_SESSION['imgs']))
         $imgs = (int)$_SESSION['imgs'];
-    if(isset($_SESSION['pngava']))
+    if (isset($_SESSION['pngava']))
         $pngava = (int)$_SESSION['pngava'];
-    if(isset($_SESSION['oldchat']))
+    if (isset($_SESSION['oldchat']))
         $oldchat = (int)$_SESSION['oldchat'];
-    if(isset($_SESSION['photosize']))
+    if (isset($_SESSION['photosize']))
         $photosize = (int)$_SESSION['photosize'];
-    if(isset($_SESSION['bgsize']))
+    if (isset($_SESSION['bgsize']))
         $bgsize = (int)$_SESSION['bgsize'];
 }
 
@@ -185,7 +185,7 @@ echo '<form action="sets.php">';
 echo '<input type="hidden" name="set" value="1">';
 $langs = json_decode(file_get_contents('./locale/list.json'), true);
 echo '<p><b>'.MP::x($lng['set_language']).'</b></p>';
-foreach($langs as $k=>$v) {
+foreach ($langs as $k=>$v) {
     echo '<input type="radio" name="lang"'.($lang==$k ? ' checked' : '').' value="'.$k.'">'.MP::x($v).'<br>';
 }
 echo '<p><input type="submit"></p>';
@@ -219,7 +219,7 @@ echo '<label for="chats">'.MP::x($lng['set_chats_count']).'</label>:<br>';
 echo '<input type="text" size="3" id="chats" name="chats" value="'.$chats.'"></p>';
 echo '<p><b>'.MP::x($lng['set_chat_photos_size']).'</b></p>';
 $photosizes = [80, 120, 180, 240, 360];
-foreach($photosizes as $v) {
+foreach ($photosizes as $v) {
     echo '<input type="radio" name="photosize"'.($photosize==$v ? ' checked' : '').' value="'.$v.'">'.MP::x($v).'<br>';
 }
 echo '<p><b>'.MP::x($lng['set_theme']).'</b></p>';
@@ -231,17 +231,17 @@ $themes = array(
 7 => 'Dark variant',
 8 => 'Light variant'
 );
-foreach($themes as $k=>$v) {
+foreach ($themes as $k=>$v) {
     echo '<input type="radio" name="theme"'.($theme==$k ? ' checked' : '').' value="'.$k.'">'.MP::x($v).'<br>';
 }
 echo '<p><b>'.MP::x($lng['set_bg_size']).'</b></p>';
 $bgsizes = [240, 320, 640, 720, 1000];
-foreach($bgsizes as $v) {
+foreach ($bgsizes as $v) {
     echo '<input type="radio" name="bgsize"'.($bgsize==$v ? ' checked' : '').' value="'.$v.'">'.MP::x($v).'<br>';
 }
 echo '<p><input type="submit"></p>';
 echo '</form><br>';
-if(MP::getUser()) {
+if (MP::getUser()) {
     echo '<p><a class="bth ra" href="login.php?logout=2">'.MP::x($lng['logout']).'</a></p>';
 }
 echo Themes::bodyEnd();

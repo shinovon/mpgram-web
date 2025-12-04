@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 1);
 
 include 'mp.php';
 $user = MP::getUser();
-if(!$user) {
+if (!$user) {
     header('Location: login.php?logout=1');
     die;
 }
@@ -28,13 +28,13 @@ include 'themes.php';
 Themes::setTheme($theme);
 try {
     $MP = MP::getMadelineAPI($user);
-    if(isset($_GET['c'])) {
-        if(!$returnurl) $returnurl = '/chats.php';
+    if (isset($_GET['c'])) {
+        if (!$returnurl) $returnurl = '/chats.php';
         $MP->messages->installStickerSet(['stickerset' => $stickerset, 'archived' => false]);
         header("Location: $returnurl");
         die;
     }
-    if(!$returnurl) $returnurl = $_SERVER['HTTP_REFERER'] ?? '';
+    if (!$returnurl) $returnurl = $_SERVER['HTTP_REFERER'] ?? '';
     $r = $MP->messages->getStickerSet(['stickerset' => $stickerset]);
     echo '<html><head><title>'.MP::x($r['set']['title']).'</title>';
     echo Themes::head();
@@ -43,7 +43,7 @@ try {
     echo '<b>'.MP::x($r['set']['title']).'</b><br>';
     echo '<a href="addstickers.php?n='.$name.'&u='.urlencode($returnurl).'&c">'.MP::x($lng['install_stickerset']).'</a>';
     echo '<p>';
-    foreach($r['documents'] as $v) {
+    foreach ($r['documents'] as $v) {
         echo '<img src="file.php?sticker='.$v['id'].'&access_hash='.$v['access_hash'].'&p=r'.(($v['mime_type'] ?? '') == 'application/x-tgsticker' ? 'tgss&s=100' : 'sprev').'">';
     }
     echo '</p>';

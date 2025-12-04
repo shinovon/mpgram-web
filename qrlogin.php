@@ -24,7 +24,7 @@ $nouser = $user == null || empty($user) || strlen($user) < 32 || strlen($user) >
 $theme = 0;
 $ua = '';
 $iev = MP::getIEVersion();
-if($iev > 0 && $iev < 4) $theme = 1;
+if ($iev > 0 && $iev < 4) $theme = 1;
 $theme = MP::getSettingInt('theme', $theme);
 $lng = MP::initLocale();
 MP::cookie('theme', $theme, time() + (86400 * 365));
@@ -47,22 +47,22 @@ function htmlStart() {
 $ipass = $_GET['ipass'] ?? $_POST['ipass'] ?? null;
 
 $MP = null;
-if(defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
-    if($ipass === null || $ipass != INSTANCE_PASSWORD) {
+if (defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
+    if ($ipass === null || $ipass != INSTANCE_PASSWORD) {
         htmlStart();
         echo 'Instance password:<br>';
         echo '<form action="qrlogin.php"';
-        if($post) echo ' method="post"';
+        if ($post) echo ' method="post"';
         echo '>';
         echo '<input type="password" value="" name="ipass">';
         echo '<input type="submit">';
         echo '</form>';
-        if($ipass !== null) echo '<b>Wrong password</b>';
+        if ($ipass !== null) echo '<b>Wrong password</b>';
         die;
     }
 }
-if($user === null || $nouser) {
-    if($confirm === null || empty($confirm) || !isset($_SESSION['captcha']) || strtolower($confirm) !== $_SESSION['captcha']) {
+if ($user === null || $nouser) {
+    if ($confirm === null || empty($confirm) || !isset($_SESSION['captcha']) || strtolower($confirm) !== $_SESSION['captcha']) {
         unset($_SESSION['captcha']);
         htmlStart();
         echo 'CAPTCHA:<br>';
@@ -85,14 +85,14 @@ if($user === null || $nouser) {
     $MP = MP::getMadelineAPI($user, true);
 }
 $qr = $MP->qrLogin();
-if(!$qr) {
-    if(isset($_POST['pass']) || isset($_GET['pass'])) {
+if (!$qr) {
+    if (isset($_POST['pass']) || isset($_GET['pass'])) {
         // 2fa check
         try {
             $password = null;
-            if(isset($_POST['pass'])) {
+            if (isset($_POST['pass'])) {
                 $password = $_POST['pass'];
-            } elseif(isset($_GET['pass'])) {
+            } elseif (isset($_GET['pass'])) {
                 $password = $_GET['pass'];
             }
             $MP->complete2faLogin($password);
@@ -101,12 +101,12 @@ if(!$qr) {
             header('Location: chats.php');
             die;
         } catch (Exception $e) {
-            if(strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
+            if (strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
                 htmlStart();
                 echo MP::x($lng['pass_code']).':<br>';
                 echo '<form action="qrlogin.php"'.($post?' method="post"':'').'>';
                 echo '<input type="text" name="pass">';
-                //if($phone !== null)
+                //if ($phone !== null)
                 //    echo '<input type="hidden" name="phone" value="'.$phone.'">';
                 if ($ipass !== null)
                     echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
@@ -130,7 +130,7 @@ if(!$qr) {
         echo MP::x($lng['pass_code']).':<br>';
         echo '<form action="qrlogin.php"'.($post?' method="post"':'').'>';
         echo '<input type="text" name="pass">';
-        //if($phone !== null)
+        //if ($phone !== null)
         //    echo '<input type="hidden" name="phone" value="'.$phone.'">';
         if ($ipass !== null)
             echo "<input type=\"hidden\" name=\"ipass\" value=\"".MP::dehtml($ipass)."\">";
@@ -139,7 +139,7 @@ if(!$qr) {
         echo Themes::bodyEnd();
         die;
     }
-    if(isset($_SESSION['qr_token'])) {
+    if (isset($_SESSION['qr_token'])) {
         unset($_SESSION['qr_token']);
         MP::cookie('user', $user, time() + (86400 * 365));
         MP::cookie('code', '1', time() + (86400 * 365));

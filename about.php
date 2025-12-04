@@ -21,7 +21,7 @@ echo MP::x('<div><a href="login.php">'.$lng['back'].'</a></div>');
 <p>Links:<br>
 <a href="https://github.com/shinovon/mpgram-web">GitHub</a><br>
 <?php
-if(MP::getUser()) {
+if (MP::getUser()) {
     echo '<a href="chat.php?c=nnmidletschat">Discussion chat</a>';
 } else {
     echo '<a href="https://t.me/nnmidletschat">Discussion chat</a>';

@@ -495,7 +495,7 @@ function parseMessage($rawMessage, $media=false, $short=false) {
             $markup = [];
             foreach ($rows as $row) {
                 $markupRow = [];
-                foreach($row['buttons'] ?? [] as $button) {
+                foreach ($row['buttons'] ?? [] as $button) {
                     $r = ['text' => $button['text'] ?? ''];
                     if (isset($button['data'])) {
                         $r['data'] = urlencode(base64_encode($button['data']));

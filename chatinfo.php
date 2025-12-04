@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 1);
 
 include 'mp.php';
 $user = MP::getUser();
-if(!$user) {
+if (!$user) {
     header('Location: login.php?logout=1');
     die;
 }
@@ -41,17 +41,17 @@ try {
     $fullinfo = $MP->getFullInfo($id)['full'] ?? null;
     $pin = $fullinfo['pinned_msg_id'] ?? false;
 
-    if($type != 'user') {
+    if ($type != 'user') {
         $desc = $fullinfo['about'] ?? null;
         $members = $chat['participants'] ?? null;
         $memberscount = $chat['participants_count'] ?? false;
         $onlines = 0;
 
-        if($members) {
-            foreach($members as $i => $m) {
-                if(isset($m['kicked_by'])) {
+        if ($members) {
+            foreach ($members as $i => $m) {
+                if (isset($m['kicked_by'])) {
                     unset($members[$i]);
-                } elseif(isset($m['user']) && isset($m['user']['status']) && $m['user']['status']['_'] == 'userStatusOnline') {
+                } elseif (isset($m['user']) && isset($m['user']['status']) && $m['user']['status']['_'] == 'userStatusOnline') {
                     $onlines ++;
                 }
             }
@@ -68,31 +68,31 @@ try {
     echo '<div class="cin">';
     echo MP::dehtml($name);
     echo '</div><div>';
-    if($type != 'user' && !empty($members)) {
+    if ($type != 'user' && !empty($members)) {
         echo MP::x(MPLocale::number($type == 'chat' || $type == 'supergroup' ? 'members' : 'subscribers', $memberscount !== false ? $memberscount : count($members)));
-        if($onlines > 0) {
+        if ($onlines > 0) {
             echo ', ' . strval($onlines) . ' ' . MP::x($lng['online']);
         }
     }
     echo '</div></div><br>';
-    if($desc) {
+    if ($desc) {
         echo '<p>'.MP::x($lng['chat_about']).':<br>'.MP::dehtml($desc).'</p>';
     }
-    if($type == 'user') {
+    if ($type == 'user') {
         $desc = $fullinfo['about'] ?? null;
-        if(isset($chat['phone'])) {
+        if (isset($chat['phone'])) {
             echo '<p>'.MP::x($lng['chat_phone']).':<br>+'.MP::dehtml($chat['phone']).'</p>';
         }
-        if($desc) {
+        if ($desc) {
             echo '<p>'.MP::x($lng['chat_bio']).':<br>'.MP::dehtml($desc).'</p>';
         }
-        if(isset($chat['username'])) {
+        if (isset($chat['username'])) {
             echo '<p>'.MP::x($lng['chat_username']).':<br>'.MP::dehtml($chat['username']).'</p>';
         }
-    } elseif(isset($chat['username'])) {
+    } elseif (isset($chat['username'])) {
         echo '<p>'.MP::x($lng['chat_link']).':<br>t.me/'.MP::dehtml($chat['username']).'</p>';
     }
-    if($pin) {
+    if ($pin) {
         try {
             $msg = $MP->messages->getHistory([
                 'peer' => $id,
@@ -109,15 +109,15 @@ try {
         }
     }
     echo '<p><a class="bth" href="chatsearch.php?c='.$id.'">'.MP::x($lng['search_messages']).'</a> <a class="bth" href="chatmedia.php?c='.$id.'">'.MP::x($lng['chat_media']).'</a>';
-    if($type != 'user') echo ' <a class="bth ra" href="chat.php?c='.$id.'&leave">'.MP::x($lng['leave_chat']).'</a></p>';
-    if($type != 'user' && $members) {
+    if ($type != 'user') echo ' <a class="bth ra" href="chat.php?c='.$id.'&leave">'.MP::x($lng['leave_chat']).'</a></p>';
+    if ($type != 'user' && $members) {
         $avas = MP::getSettingInt('avas', 0);
         echo MP::x($lng['chat_members']).':';
         echo '<table class="cl">';
         $i = 0;
-        foreach($members as $m) {
+        foreach ($members as $m) {
             $i ++;
-            if($i > 100) {
+            if ($i > 100) {
                 echo '<tr>...</tr>';
                 break;
             }
@@ -127,26 +127,26 @@ try {
 
             $un = $u['title'] ?? (isset($u['first_name']) ? $u['first_name'] . (isset($u['last_name']) ? ' '.$u['last_name'] : '') : null) ?? 'Deleted Account';
             $status = null;
-            if(isset($u['status'])) {
+            if (isset($u['status'])) {
                 $status = $u['status']['_'] == 'userStatusOnline';
                 $last = $u['status']['was_online'] ?? 0;
             }
             $rank = null;
-            if(isset($m['rank'])) {
+            if (isset($m['rank'])) {
                 $rank = $m['rank'];
-            } elseif(isset($m['role'])) {
+            } elseif (isset($m['role'])) {
                 $role = $m['role'];
-                if($role == 'creator') {
+                if ($role == 'creator') {
                     $rank = MP::x($lng['owner']);
-                } elseif($role == 'admin') {
+                } elseif ($role == 'admin') {
                     $rank = MP::x($lng['admin']);
                 }
             }
-            if($avas) {
+            if ($avas) {
                 echo '<td class="cava cbd"><img class="ri" src="ava.php?c='.$u['id'].'&p='.($pngava?'rc':'r').'36"></td>';
             }
             echo '<td class="ctext cbd">';
-            if($rank) {
+            if ($rank) {
                 echo '<div class="chr ml">'.MP::dehtml($rank).'</div>';
             }
             echo '<a href="chat.php?c='.$id.'">'.MP::dehtml($un).'</a>';

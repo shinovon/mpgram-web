@@ -13,7 +13,7 @@ $msglimit = MP::getSettingInt('limit', 20);
 $theme = MP::getSettingInt('theme');
 
 $user = MP::getUser();
-if(!$user) {
+if (!$user) {
     header('Location: login.php?logout=1');
     die;
 }
@@ -29,16 +29,16 @@ $query = $_GET['q'] ?? null;
 $msgoffset = 0;
 $msgoffsetid = 0;
 $msgmaxid = 0;
-if(isset($_GET['offset'])) {
+if (isset($_GET['offset'])) {
     $msgoffset = (int) $_GET['offset'];
 }
-if(isset($_GET['offset_from'])) {
+if (isset($_GET['offset_from'])) {
     $msgoffsetid = (int) $_GET['offset_from'];
-} elseif(isset($_GET['m'])) {
+} elseif (isset($_GET['m'])) {
     $msgoffsetid = (int) $_GET['m'];
     $msgoffset = -1;
 }
-if(isset($_GET['max_id'])) {
+if (isset($_GET['max_id'])) {
     $msgmaxid = (int) $_GET['max_id'];
 }
 
@@ -53,7 +53,7 @@ try {
     $MP = MP::getMadelineAPI($user);
     $info = $MP->getInfo($id);
     $name = null;
-    if(!is_numeric($id)) {
+    if (!is_numeric($id)) {
         $id = MP::getId($info);
     }
     $name = $info['Chat']['title'] ?? $info['User']['first_name'] ?? $info['User']['last_name'] ?? null;
@@ -70,9 +70,9 @@ try {
     'hash' => 0
     ]);
     $id_offset = null;
-    if(isset($r['offset_id_offset'])) {
+    if (isset($r['offset_id_offset'])) {
         $id_offset = $r['offset_id_offset'];
-        if($msgoffset < 0) {
+        if ($msgoffset < 0) {
             $id_offset = $id_offset+$msgoffset;
         }
     }
@@ -85,16 +85,16 @@ try {
     echo Themes::bodyStart();
     echo '<div><a href="chat.php?c='.$id.'">'.MP::x($lng['back']).'</a></div>';
     echo '<p><a href="chatmedia.php?c='.$id.'&f=Photos">Photos</a> <a href="chatmedia.php?c='.$id.'&f=Document">Documents</a> <a href="chatmedia.php?c='.$id.'&f=Music">Audio</a> <a href="chatmedia.php?c='.$id.'&f=Voice">Voice</a></p>';
-    if($hasOffset && !$endReached) {
-        if(($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
+    if ($hasOffset && !$endReached) {
+        if (($id_offset !== null && $id_offset <= $msglimit) || $msgoffset == $msglimit) {
             echo '<p><a href="'.$file.'?c='.$id.'&f='.$filter.'">'.MP::x($lng['history_up']).'</a></p>';
         } else {
             echo '<p><a href="'.$file.'?c='.$id.'&f='.$filter.'&offset_from='.$rm[0]['id'].'&offset='.(-$msglimit-1).'">'.MP::x($lng['history_up']).'</a></p>';
         }
     }
-    foreach($rm as $m) {
+    foreach ($rm as $m) {
         try {
-            if(!isset($m['media'])) continue;
+            if (!isset($m['media'])) continue;
             echo '<div class="mm" id="msg_'.$id.'_'.$m['id'].'">';
             MP::printMessageMedia($MP, $m, $id, true, $lng, true);
             echo '</div>';
@@ -102,7 +102,7 @@ try {
             echo '<xmp>'.$e->getMessage()."\n".$e->getTraceAsString().'</xmp>';
         }
     }
-    if(count($rm) >= $msglimit) {
+    if (count($rm) >= $msglimit) {
         echo '<p><a href="'.$file.'?c='.$id.'&f='.$filter.'&offset_from='.$rm[count($rm)-1]['id'].'">'.MP::x($lng['history_down']).'</a></p>';
     }
     echo Themes::bodyEnd();
