@@ -1,5 +1,7 @@
 <?php
-
+/*
+Copyright (c) 2022-2025 Arman Jussupgaliyev
+*/
 include 'mp.php';
 
 if (!isset($_GET['t'])) MP::startSession();

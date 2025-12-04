@@ -1,5 +1,7 @@
 <?php
-
+/*
+Copyright (c) 2022-2025 Arman Jussupgaliyev
+*/
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
 }

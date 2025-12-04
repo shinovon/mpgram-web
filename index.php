@@ -1,4 +1,7 @@
 <?php
+/*
+Copyright (c) 2022-2025 Arman Jussupgaliyev
+*/
 include 'config.php';
 // HTTPS redirecting
 if (FORCE_HTTPS || (CHROME_HTTPS && isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false)) {

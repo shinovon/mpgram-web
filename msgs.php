@@ -1,4 +1,7 @@
 <?php
+/*
+Copyright (c) 2022-2025 Arman Jussupgaliyev
+*/
 if (!isset($_GET['id'])) die;
 $i = intval($_GET['m'] ?? 0);
 $limit = $_GET['l'] ?? 0;

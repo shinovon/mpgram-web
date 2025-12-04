@@ -1,4 +1,7 @@
 <?php
+/*
+Copyright (c) 2022-2025 Arman Jussupgaliyev
+*/
 if (defined('mp_loaded')) return;
 define('mp_loaded', true);
 

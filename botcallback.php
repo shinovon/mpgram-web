@@ -1,4 +1,7 @@
 <?php
+/*
+Copyright (c) 2022-2025 Arman Jussupgaliyev
+*/
 include 'mp.php';
 $user = MP::getUser();
 if (!$user) {

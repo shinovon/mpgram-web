@@ -1,5 +1,7 @@
 <?php
-
+/*
+Copyright (c) 2022-2025 Arman Jussupgaliyev
+*/
 include 'redirect.php';
 
 ini_set('error_reporting', E_ALL);

@@ -1,4 +1,7 @@
 <?php
+/*
+Copyright (c) 2022-2025 Arman Jussupgaliyev
+*/
 $user = $_GET['user'] ?? die;
 function cookie($n, $v, $e=null) {
     if ($e === null) $e = time() + (86400 * 365);

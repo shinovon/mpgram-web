@@ -1,4 +1,7 @@
 <?php
+/*
+Copyright (c) 2022-2025 Arman Jussupgaliyev
+*/
 $lang = 'ru';
 $autoupd = 1;
 $dynupd = 1;

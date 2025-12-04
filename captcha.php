@@ -1,4 +1,7 @@
 <?php
+/*
+Copyright (c) 2022-2025 Arman Jussupgaliyev
+*/
 session_start();
 function getCaptchaText($length) {
     $c = '0123456789';//abcdefghjkmnopqrstuvwxyz';
