@@ -14,8 +14,8 @@ $lng = MP::initLocale();
 
 $user = MP::getUser();
 if(!$user) {
-	header('Location: login.php?logout=1');
-	die;
+    header('Location: login.php?logout=1');
+    die;
 }
 
 $c = $_GET['c'] ?? null;
@@ -36,10 +36,10 @@ echo '<div><a href="login.php">'.MP::x($lng['back']).'</a></div>';
 echo '<form action="chat'.($c ? '' : 'select').'.php">';
 echo '<p><input type="text" name="q" id="q"><br>';
 if($c) {
-	echo '<input type="hidden" name="c" value="'.$c.'">';
+    echo '<input type="hidden" name="c" value="'.$c.'">';
 } else {
-	echo '<input type="checkbox" name="g" id="g">';
-	echo '<label for="g">'.MP::x(MP::x($lng['global_search'])).'</label>';
+    echo '<input type="checkbox" name="g" id="g">';
+    echo '<label for="g">'.MP::x(MP::x($lng['global_search'])).'</label>';
 }
 echo '</p><input type="submit">';
 echo '</form>';
