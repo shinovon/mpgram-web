@@ -1776,7 +1776,7 @@ try {
         checkAuth();
         setupMadelineProto();
         
-        $rawData = $MP->channels->getForumTopics(['channel' => getParam('peer'), 'limit' => (int) getParam('limit', 30)]);
+        $rawData = $MP->messages->getForumTopics(['peer' => getParam('peer'), 'limit' => (int) getParam('limit', 30)]);
         $res = [];
         foreach ($rawData['topics'] as $t) {
             $r = [

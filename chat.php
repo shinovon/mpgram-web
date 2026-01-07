@@ -264,7 +264,7 @@ try {
     $top = 0;
     if ($forum && $thread != null) {
         try {
-            $topic = $MP->channels->getForumTopics(['channel' => $id, 'limit' => 20])['topics'][0];
+            $topic = $MP->messages->getForumTopics(['peer' => $id, 'limit' => 20])['topics'][0];
             $top = $topic['top_message'];
         } catch (Exception $e) {}
     }
@@ -441,7 +441,7 @@ alert("'.str_replace('"', '\"', $alert).'");
     if ($forum) {
         echo '<div>';
         try {
-            $topics = $MP->channels->getForumTopics(['channel' => $id, 'limit' => 20])['topics'];
+            $topics = $MP->messages->getForumTopics(['peer' => $id, 'limit' => 20])['topics'];
             foreach ($topics as $topic) {
                 echo "<a href=\"{$file}?c={$id}&t={$topic['id']}"
                 .($topic['read_inbox_max_id'] != $topic['top_message']?'&m='.$topic['read_inbox_max_id']:'')
