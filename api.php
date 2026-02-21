@@ -1584,7 +1584,7 @@ try {
         setupMadelineProto();
         $peer = getParam('peer');
         $ids = explode(',', getParam('id'));
-        if (is_numeric($peer) && (int) $peer > 0) {
+        if (is_numeric($peer) && ((int) $peer > 0 || (int) $peer > Magic::ZERO_CHANNEL_ID)) {
             $MP->messages->deleteMessages(['id' => $ids]);
         } else {
             $MP->channels->deleteMessages(['channel' => $peer, 'id' => $ids]);
@@ -2004,4 +2004,3 @@ try {
     http_response_code(500);
     error(['message' => "Unhandled exception: ".$e->getMessage(), 'stack_trace' => strval($e)]);
 }
-?>
