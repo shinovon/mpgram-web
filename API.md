@@ -423,10 +423,23 @@ Returns information about of logged user.
 
 
 ### `getPeer`
-TODO
+
+#### Parameters
+`id`: [Peer ID](#Peer-ID)
+
+#### Response
+[User](#User) or [Chat](#Chat) object
 
 ### `getPeers`
-TODO
+
+#### Parameters
+`id`: Comma-separated [Peer IDs](#Peer-ID)
+
+#### Response
+Object
+
+- `users`: Array of [User](#User) objects
+- `chats`: Array of [Chat](#Chat) objects
 
 ### `getFullInfo`
 TODO
