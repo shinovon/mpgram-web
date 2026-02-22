@@ -35,7 +35,7 @@ if (MP::getUser()) {
 <b>Shinovon</b> <a href="https://github.com/shinovon">github</a>
  <a href="https://t.me/shinovon">t.me</a>
 <br>
-<b>MuseCat77</b></i>
+<b>MuseCat77</b>
  <a href="https://github.com/musecat77">github</a>
  <a href="https://t.me/musecat77">t.me</a>
 </p>

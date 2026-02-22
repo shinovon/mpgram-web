@@ -9,3 +9,5 @@ composer.lock
 lastclean
 api_values.php
 config.php
+*.iml
+/.idea/

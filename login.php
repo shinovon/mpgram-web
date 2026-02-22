@@ -162,7 +162,7 @@ if ($phone !== null) {
             if (isset($_GET['code']))
                 echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_GET['code'])."\">";
             elseif (isset($_POST['code']))
-                echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_POS['code'])."\">";
+                echo "<input type=\"hidden\" name=\"code\" value=\"".MP::dehtml($_POST['code'])."\">";
             if ($phone !== null)
                 echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
             if ($ipass !== null)

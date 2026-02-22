@@ -3,7 +3,8 @@
     "type": "project",
     "require": {
         "danog/madelineproto": "^8",
-        "chillerlan/php-qrcode": "^5.0@beta"
+        "chillerlan/php-qrcode": "^5.0@beta",
+        "ext-gd": "*"
     },
     "minimum-stability": "beta"
 }
