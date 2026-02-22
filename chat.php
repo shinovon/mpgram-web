@@ -11,7 +11,6 @@ ini_set('display_startup_errors', 1);
 include 'mp.php';
 
 use function Amp\async;
-use function Amp\Future\await;
 use danog\MadelineProto\Tools;
 
 $iev = MP::getIEVersion();
@@ -168,7 +167,8 @@ try {
             }
         } catch (Exception) {}
     }
-    function printInputField() {
+    function printInputField(): void
+    {
         global $full;
         global $left;
         global $ch;
@@ -398,6 +398,7 @@ alert("'.str_replace('"', '\"', $alert).'");
                     break;
                 case 'userStatusLastMonth':
                     $status_str = MP::x($lng['last_seen'].' '.$lng['last_month']);
+                    break;
                 default:
                 case 'userStatusEmpty':
                     $status_str = '';

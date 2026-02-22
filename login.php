@@ -300,11 +300,11 @@ if ($phone !== null) {
                     }
                 } catch (Exception $e) {
                     htmlStart();
-                    if (strpos($e->getMessage(), 'PHONE_CODE_INVALID') !== false) {
+                    if (str_contains($e->getMessage(), 'PHONE_CODE_INVALID')) {
                         echo '<b>'.MP::x($lng['phone_code_invalid']).'</b><br>';
-                    } elseif (strpos($e->getMessage(), 'PHONE_CODE_EXPIRED') !== false) {
+                    } elseif (str_contains($e->getMessage(), 'PHONE_CODE_EXPIRED')) {
                         echo '<b>'.MP::x($lng['phone_code_expired']).'</b><br>';
-                    } elseif (strpos($e->getMessage(), 'AUTH_RESTART') !== false) {
+                    } elseif (str_contains($e->getMessage(), 'AUTH_RESTART')) {
                         unset($hash);
                     } else {
                         echo '<b>'.MP::x($lng['error']).'</b><br>';
@@ -347,7 +347,7 @@ if ($phone !== null) {
         try {
             $MP->phoneLogin($phone);
         } catch (Exception $e) {
-            if (strpos($e->getMessage(), 'PHONE_NUMBER_INVALID') !== false) {
+            if (str_contains($e->getMessage(), 'PHONE_NUMBER_INVALID')) {
                 header('Location: login.php?wrong=number');
                 die;
             } else {

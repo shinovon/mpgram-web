@@ -1,13 +1,12 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 ini_set('error_reporting', E_ERROR);
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 
 set_time_limit(300);
-use Amp\Success;
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
 }
@@ -31,6 +30,8 @@ try {
         die;
     }
     $MP = MP::getMadelineAPI($user);
+    $cid = null;
+    $mid = null;
     $msg = null;
     $di = null;
     if (isset($_GET['sticker'])) {
@@ -65,11 +66,11 @@ try {
     if ($size <= 0) $size = 180;
     
     $p = $_GET['p'] ?? '';
-    if (strpos($p, 'thumb') === 0) {
+    if (str_starts_with($p, 'thumb')) {
         $p = substr($p, 5);
         $t = str_replace('messagemedia', '', strtolower($msg['media']['_']));
         $m = $msg['media'][$t];
-        $d = array();
+        $d = [];
         $d['InputFileLocation']['_'] = 'inputDocumentFileLocation';
         $d['InputFileLocation']['id'] = $m['id'];
         $d['InputFileLocation']['access_hash'] = $m['access_hash'];
@@ -78,7 +79,7 @@ try {
         $d['InputFileLocation']['dc_id'] = $m['dc_id'];
         $di = $d;
     }
-    if (strpos($p, 'r') === 0) {
+    if (str_starts_with($p, 'r')) {
         $max = 30 * 1024 * 1024; // 30 mb
         if (defined('IMAGE_SIZE_LIMIT')) $max = IMAGE_SIZE_LIMIT;
         if (($di['size'] ?? 0) > $max) {
@@ -88,7 +89,7 @@ try {
         }
         header('Cache-Control: private, max-age=2592000');
         $p = substr($p, 1);
-        if (strpos($p, 'tgs') === 0) {
+        if (str_starts_with($p, 'tgs')) {
             if (!defined('CONVERT_TGS_STICKERS') || !CONVERT_TGS_STICKERS) {
                 http_response_code(403);
                 die;
@@ -104,7 +105,7 @@ try {
                     $scan = scandir(TGS_TMP_DIR);
                     $time = time();
                     foreach ($scan as $n) {
-                        if (strpos($n, '.tgs') === false && strpos($n, '.gif') === false && strpos($n, '.png') === false)
+                        if (!str_contains($n, '.tgs') && !str_contains($n, '.gif') && !str_contains($n, '.png'))
                             continue;
                         if (filectime(TGS_TMP_DIR.$n) + 30 * 60 > $time || $n == '.' || $n == '..')
                             continue;
@@ -113,8 +114,8 @@ try {
                 } catch (Exception) {}
             }
             $p = substr($p, 3);
-            $png = strpos($p, 'p') === 0;
-            $gif = LOTTIE_TO_GIF && strpos($p, 's') === false;
+            $png = str_starts_with($p, 'p');
+            $gif = LOTTIE_TO_GIF && !str_contains($p, 's');
             $prefix = TGS_TMP_DIR.\hash('crc32',$user).(isset($_GET['sticker']) ? (int)$_GET['sticker'] : ($cid.'_'.$mid));
             $outpath = $prefix.($gif?'.gif':'.png');
             $inpath = $prefix.'.tgs';
@@ -203,7 +204,7 @@ try {
             imagedestroy($img);
             die;
         } else {
-            if (strpos($p, 'r') === 0) {
+            if (str_starts_with($p, 'r')) {
                 $p = substr($p, 1);
                 $img = imagerotate($img, 270, 0);
             }

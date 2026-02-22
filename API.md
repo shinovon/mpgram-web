@@ -159,6 +159,7 @@ Object
   - `msg` (int or null): **replaced by `id`**
 
 
+
 ## Dialog
 
 Object

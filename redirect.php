@@ -1,9 +1,9 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 include 'config.php';
-if (!isset($_SERVER['HTTPS']) && (FORCE_HTTPS || (CHROME_HTTPS && isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false))) {
+if (!isset($_SERVER['HTTPS']) && (FORCE_HTTPS || (CHROME_HTTPS && isset($_SERVER['HTTP_USER_AGENT']) && str_contains($_SERVER['HTTP_USER_AGENT'], 'Chrome')))) {
     $s = 'https://' . $_SERVER['SERVER_NAME'];
     if (isset($_SERVER['REQUEST_URI'])) {
         $s .= $_SERVER['REQUEST_URI'];

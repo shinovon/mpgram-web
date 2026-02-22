@@ -242,7 +242,7 @@ try {
                 }
                 usort($dialogs, 'cmp');
                 if (count($folder['pinned_peers']) > 0) {
-                    $pinned = array();
+                    $pinned = [];
                     foreach ($folder['pinned_peers'] as $p) {
                         $p = MP::getId($p);
                         foreach ($all as $d) {

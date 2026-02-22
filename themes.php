@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 if (!defined('mp_loaded'))
 require_once 'mp.php';
@@ -15,7 +15,8 @@ class Themes {
     static $fillChats = 0;
     static $chat;
     
-    static function loadColors($theme) {
+    static function loadColors($theme): bool
+    {
         $file = './colors/colors_'.$theme.'.json';
         if (!file_exists($file)) {
             return false;
@@ -37,19 +38,21 @@ class Themes {
         return true;
     }
     
-    static function color($d) {
+    static function color($d)
+    {
         if (static::$theme == 4) {
             $a = dechex(rand(0,0xfff));
             while (strlen($a) < 3) $a = '0'.$a;
             return "#{$a}";
         }
-        if (strpos($d, '!') === 0) {
+        if (str_starts_with($d, '!')) {
             return static::$colors[substr($d, 1)];
         }
         return $d;
     }
     
-    static function setTheme($theme, $chat=false) {
+    static function setTheme($theme, $chat=false): void
+    {
         switch ($theme) {
         case 2:
             $theme = 1;
@@ -96,22 +99,26 @@ class Themes {
         static::loadColors($theme);
     }
     
-    static function setChatTheme($theme) {
+    static function setChatTheme($theme): void
+    {
         static::setTheme($theme, true);
     }
     
-    static function bodyStart($a = null) {
+    static function bodyStart($a = null): string
+    {
         if ($a) {
             return '<body '.$a.'>'.(static::$iev > 0 ? '<div class="bc">' : '');
         }
         return '<body>'.(static::$iev > 0 ? '<div class="bc">' : '');
     }
     
-    static function bodyEnd() {
+    static function bodyEnd(): string
+    {
         return (static::$iev > 0 ? '</div>' : '').'</body></html>';
     }
     
-    static function head() {
+    static function head(): string
+    {
         $nocss = MP::getSettingInt('nocss', 0, true) == 1;
         if ($nocss) {
             return (MP::$enc == null ? '<meta charset="UTF-8">' : '').

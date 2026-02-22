@@ -17,7 +17,6 @@ const MIN_API_VERSION = 2;
 
 use danog\MadelineProto\Magic;
 use function Amp\async;
-use function Amp\Future\await;
 use danog\MadelineProto\Tools;
 
 // Setup error handler
@@ -295,7 +294,7 @@ function parsePeer($peer): string
 function parseDialog($rawDialog): array
 {
     global $v;
-    $dialog = array();
+    $dialog = [];
     $dialog['id'] = parsePeer($rawDialog['peer']);
     if (($rawDialog['unread_count'] ?? 0) > 0) {
         $dialog[$v >= 5 ? 'unread' : 'unread_count'] = $rawDialog['unread_count'];
@@ -315,7 +314,7 @@ function parseUser($rawUser)
     if (!$rawUser) {
         return false;
     }
-    $user = array();
+    $user = [];
     $user['id'] = strval($rawUser['id']);
     $user[$v < 5 ? 'first_name' : 'fn'] = removeEmoji($rawUser['first_name'] ?? null);
     $user[$v < 5 ? 'last_name' : 'ln'] = removeEmoji($rawUser['last_name'] ?? null);
@@ -337,7 +336,7 @@ function parseUser($rawUser)
 function parseChat($rawChat): array
 {
     global $v;
-    $chat = array();
+    $chat = [];
     if ($v < 11) $chat['type'] = $rawChat['_'];
     $chat['id'] = strval($rawChat['id']);
     $chat[$v < 5 ? 'title' : 't'] = removeEmoji($rawChat['title'] ?? null);
@@ -367,7 +366,7 @@ function getCaptchaText($length): string
 function parseMessage($rawMessage, $media=false, $short=false): array
 {
     global $v;
-    $message = array();
+    $message = [];
     //$message['raw'] = $rawMessage;
     $message['id'] = $rawMessage['id'] ?? null;
     $message['date'] = $rawMessage['date'] ?? null;
@@ -392,7 +391,7 @@ function parseMessage($rawMessage, $media=false, $short=false): array
     }
     if (isset($rawMessage['fwd_from'])) {
         $rawFwd = $rawMessage['fwd_from'];
-        $fwd = array();
+        $fwd = [];
         if (isset($rawFwd['from_id'])) {
             $fwd['from_id'] = parsePeer($rawFwd['from_id']);
         }
@@ -598,7 +597,7 @@ try {
     }
     global $MP;
     // Parameters
-    $PARAMS = array();
+    $PARAMS = [];
     if (count($_GET) > 0) {
         $PARAMS = array_merge($PARAMS, $_GET);
     }
@@ -981,7 +980,7 @@ try {
                 }
                 usort($dialogs, 'cmp');
                 if (count($folder['pinned_peers']) > 0) {
-                    $pinned = array();
+                    $pinned = [];
                     foreach ($folder['pinned_peers'] as $p) {
                         $p = getId($p);
                         foreach ($all as $d) {
@@ -1005,20 +1004,20 @@ try {
         } else {
             $rawData = $MP->messages->getDialogs($p);
         }
-        $res = array();
+        $res = [];
         if (checkField('raw') === true) {
             $res['raw'] = $rawData;
         }
         if (isset($rawData['count'])) $res['count'] = $rawData['count'];
-        $dialogPeers = array();
-        $senderPeers = array();
-        $messages = array();
+        $dialogPeers = [];
+        $senderPeers = [];
+        $messages = [];
         if (checkField('dialogs', true)) {
             foreach ($rawData['messages'] as $rawMessage) {
                 $message = parseMessage($rawMessage, $PARAMS['media'] ?? false, $v < 5 ? false : ($PARAMS['text'] ?? true));
                 $messages[strval($message['peer_id'])] = $message;
             }
-            $res['dialogs'] = array();
+            $res['dialogs'] = [];
             foreach ($rawData['dialogs'] as $rawDialog) {
                 $dialog = parseDialog($rawDialog);
                 $res['dialogs'][] = $dialog;
@@ -1042,7 +1041,7 @@ try {
             }
         }
         if (checkField('users', true)) {
-            $res['users'] = array();
+            $res['users'] = [];
             $res['users']['0'] = 0;
             foreach ($rawData['users'] as $rawUser) {
                 $id = strval($rawUser['id']);
@@ -1053,7 +1052,7 @@ try {
             }
         }
         if (checkField('chats', true)) {
-            $res['chats'] = array();
+            $res['chats'] = [];
             $res['chats']['0'] = 0;
             foreach ($rawData['chats'] as $rawChat) {
                 $id = strval($rawChat['id']);
@@ -1065,7 +1064,7 @@ try {
         }
         if (checkField('messages', true)) {
             if ($v < 5) {
-                $res['messages'] = array();
+                $res['messages'] = [];
                 $res['messages']['0'] = 0;
                 foreach ($messages as $message) {
                     $id = $message['peer_id'];
@@ -1095,19 +1094,19 @@ try {
         checkAuth();
         setupMadelineProto();
         $rawData = getAllDialogs();
-        $res = array();
+        $res = [];
         if (checkField('raw') === true) {
             $res['raw'] = $rawData;
         }
-        $dialogPeers = array();
-        $senderPeers = array();
-        $messages = array();
+        $dialogPeers = [];
+        $senderPeers = [];
+        $messages = [];
         if (checkField('dialogs')) {
             foreach ($rawData['messages'] as $rawMessage) {
                 $message = parseMessage($rawMessage);
                 $messages[strval($message['peer_id'])] = $message;
             }
-            $res['dialogs'] = array();
+            $res['dialogs'] = [];
             foreach ($rawData['dialogs'] as $rawDialog) {
                 $dialog = parseDialog($rawDialog);
                 $res['dialogs'][] = $dialog;
@@ -1153,7 +1152,7 @@ try {
             }
         }
         if (checkField('users')) {
-            $res['users'] = array();
+            $res['users'] = [];
             $res['users']['0'] = 0;
             foreach ($rawData['users'] as $rawUser) {
                 $id = strval($rawUser['id']);
@@ -1164,7 +1163,7 @@ try {
             }
         }
         if (checkField('chats')) {
-            $res['chats'] = array();
+            $res['chats'] = [];
             $res['chats']['0'] = 0;
             foreach ($rawData['chats'] as $rawChat) {
                 $id = strval($rawChat['id']);
@@ -1175,7 +1174,7 @@ try {
             }
         }
         if (checkField('messages', false) && $v < 5) {
-            $res['messages'] = array();
+            $res['messages'] = [];
             $res['messages']['0'] = 0;
             foreach ($messages as $message) {
                 $id = $message['peer_id'];
@@ -1191,7 +1190,7 @@ try {
         checkParamEmpty('peer');
         checkAuth();
         setupMadelineProto();
-        $p = array();
+        $p = [];
         addParamToArray($p, 'peer');
         
         $peer = getParam('peer');
@@ -1229,17 +1228,17 @@ try {
                 }
             }
         } catch (Exception) {}
-        $res = array();
+        $res = [];
         if (isset($rawData['count'])) $res['count'] = $rawData['count'];
         if (isset($rawData['offset_id_offset'])) $res['off'] = $rawData['offset_id_offset'];
         if (checkField('messages')) {
-            $res['messages'] = array();
+            $res['messages'] = [];
             foreach ($rawData['messages'] as $rawMessage) {
                 $res['messages'][] = parseMessage($rawMessage, $PARAMS['media'] ?? false);
             }
         }
         if (checkField('users')) {
-            $res['users'] = array();
+            $res['users'] = [];
             $res['users']['0'] = 0;
             foreach ($rawData['users'] as $rawUser) {
                 $id = strval($rawUser['id']);
@@ -1248,7 +1247,7 @@ try {
             }
         }
         if (checkField('chats')) {
-            $res['chats'] = array();
+            $res['chats'] = [];
             $res['chats']['0'] = 0;
             foreach ($rawData['chats'] as $rawChat) {
                 $id = strval($rawChat['id']);
@@ -1378,7 +1377,7 @@ try {
         $so = $offset;
         $i = $message;
         $maxmsg = 0;
-        $res = array();
+        $res = [];
         $selfid = strval($MP->getSelf()['id']);
         
         http_response_code(200);
