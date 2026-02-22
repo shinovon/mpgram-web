@@ -286,7 +286,7 @@ function findPeer($id, $r)
 
 function parsePeer($peer): string
 {
-    return strval(getId($peer) ?? error('Peer with null id detected'));
+    return strval(getId($peer) ?? error(['message' => 'Peer with null id detected']));
 }
 
 function parseDialog($rawDialog): array
@@ -625,7 +625,7 @@ try {
         session_id('API'.$PARAMS['captcha_id']);
         session_start(['use_cookies' => '0']);
         if (empty($_SESSION['captcha_key'])) {
-            error('Captcha id expired');
+            error(['message' => 'Captcha id expired']);
         }
         $c = getCaptchaText(rand(6, 10));
         $_SESSION['captcha_key'] = $c;

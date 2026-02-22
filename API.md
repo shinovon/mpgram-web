@@ -12,6 +12,7 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
 - All methods requre authorization, unless stated otherwise.
 - All methods return JSON objects, unless stated otherwise.
 - All methods accept parameters with GET query, POST multipart or POST URL-encoded form.
+- All methods may return [Error object](#Error) in case of failure.
 - For authorization, set `X-mpgram-user` request header or `user` parameter via GET or POST.
 
 ## Client request headers
@@ -124,6 +125,8 @@ Object
 
 ### Dialog
 
+Object
+
 - `id` (string): [Peer ID](#Peer-ID)
 - `pin` (boolean, optional): true if dialog is pinned
 - `unread` (int, optional): Count of unread messages, present if more than 0
@@ -193,21 +196,39 @@ Object
 
 Object
 
-- `res` (string or int, optional)
-  - 1: authorization completed, client should call `me`.
-  - `code_sent`: authorization code is send, client must call `completePhoneLogin`.
+- `res` (string or int)
+  - 1: Authorization completed, client should call `me`.
+  - `code_sent`: Authorization code is send, client must call `completePhoneLogin`.
   - `qr`: QR code is generated, `text` contains authorization link, client must call `qrLogin` after QR code is scanned.
-  - `phone_code_invalid`: authorization code is invalid, code will be resent, client must call `completePhoneLogin` again with correct code.
-  - `phone_code_expired`: authorization code is expired, code will be resent, client must call `completePhoneLogin` again with correct code.
-  - `need_captcha`: captcha required, client must call `getCaptchaImg` with provided `captcha_id`, then client must call method again with `captcha_id` and `captcha_key`.
-  - `password`: cloud password requested, must call `complete2faLogin`.
-  - `auth_restart`: authorization failed, client must call `phoneLogin` again.
-  - `phone_number_invalid`: phone number is invalid, cannot proceed.
-  - `no_password`: cloud password is enabled but not set, cannot proceed.
-  - `need_signup`: phone number is unregistered, cannot proceed.
-  - `exception`: server side error occurred.
+  - `phone_code_invalid`: Authorization code is invalid, code will be resent, client must call `completePhoneLogin` again with correct code.
+  - `phone_code_expired`: Authorization code is expired, code will be resent, client must call `completePhoneLogin` again with correct code.
+  - `need_captcha`: Captcha required, client must call `getCaptchaImg` with provided `captcha_id`, then client must call method again with `captcha_id` and `captcha_key`.
+  - `password`: Cloud password requested, must call `complete2faLogin`.
+  - `auth_restart`: Authorization failed, client must call `phoneLogin` again.
+  - `phone_number_invalid`: Pphone number is invalid, cannot proceed.
+  - `no_password`: Cloud password is enabled but not set, cannot proceed.
+  - `need_signup`: Phone number is unregistered, cannot proceed.
+  - `exception`: Server side error occurred.
 - `user` (string, optional): User code, client must save it if present.
 - `message` (string, optional): Error message
+
+
+
+### Error
+
+Object
+
+- `error` (object)
+  - `message` (string): Error message
+  - `stack_trace` (string, optional): Exception stack trace
+
+Most common error messages:
+- `API is disabled`: Server does not support API requests
+- `Instance password is required`: Server requires password
+- `Unsupported API version`: Client API version is outdated
+- `Login API is disabled`: Server does not accept authorization through API
+- `Invalid authorization`: Requested method requires valid authorization
+- `Could not get user info`, `Failed to load session`: Authorization session expired
 
 
 ## Authorization methods
