@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 ini_set('error_reporting', E_ERROR);
 ini_set('display_errors', 0);
@@ -59,7 +59,7 @@ function error($error): void
 {
     $obj['error'] = $error;
     json($obj);
-    die();
+    die;
 }
 
 function checkField($field, $def = def)
@@ -149,12 +149,12 @@ function checkAuth(): void
     
     if ($user == null || empty($user)
         || strlen($user) < 32 || strlen($user) > 200
-        || strpos($user, '\\') !== false
-        || strpos($user, '/') !== false
-        || strpos($user, '.') !== false
-        || strpos($user, ';') !== false
-        || strpos($user, ':') !== false
-        || strpos($user, ' ') !== false
+        || str_contains($user, '\\')
+        || str_contains($user, '/')
+        || str_contains($user, '.')
+        || str_contains($user, ';')
+        || str_contains($user, ':')
+        || str_contains($user, ' ')
         || !file_exists(sessionspath.$user.'.madeline')) {
         http_response_code(401);
         error(['message'=>'Invalid authorization']);
@@ -289,7 +289,7 @@ function parsePeer($peer)
     return getId($peer);
 }
 
-function parseDialog($rawDialog)
+function parseDialog($rawDialog): array
 {
     global $v;
     $dialog = array();
@@ -583,7 +583,7 @@ try {
             error(['message' => "Instance password is required"]);
         }
     }
-    $MP = null;
+    global $MP;
     // Parameters
     $PARAMS = array();
     if (count($_GET) > 0) {
@@ -652,7 +652,7 @@ try {
             $_SESSION['captcha_key'] = $c; 
             json(['res' => 'need_captcha', 'captcha_id' => $id]);
             session_write_close();
-            die();
+            die;
         }
         if (isParamEmpty('qr')) checkParamEmpty('phone');
         if (!isset($_SESSION['captcha_key']) || empty($_SESSION['captcha_key'])) {
@@ -661,7 +661,7 @@ try {
             $_SESSION['captcha_key'] = $c; 
             json(['res' => 'captcha_expired', 'captcha_id' => $id]);
             session_write_close();
-            die();
+            die;
         }
         if (strtolower($PARAMS['captcha_key']) != $_SESSION['captcha_key']) {
             unset($_SESSION['captcha_key']);
@@ -669,7 +669,7 @@ try {
             $_SESSION['captcha_key'] = $c; 
             json(['res' => 'wrong_captcha', 'captcha_id' => $id]);
             session_write_close();
-            die();
+            die;
         }
         unset($_SESSION['captcha_key']);
         session_write_close();
@@ -690,7 +690,7 @@ try {
                 json(['user' => $user, 'res' => 'code_sent', 'phone_code_hash' => $a['phone_code_hash'] ?? null]);
             }
         } catch (Exception $e) {
-            if (strpos($e->getMessage(), 'PHONE_NUMBER_INVALID') !== false) {
+            if (str_contains($e->getMessage(), 'PHONE_NUMBER_INVALID')) {
                 json(['user' => $user, 'res' => 'phone_number_invalid']);
             } else {
                 json(['user' => $user, 'res' => 'exception', 'message' => $e->getMessage()]);
@@ -752,11 +752,11 @@ try {
                 json(['res' => 1, 'phone_code_hash' => $hash]);
             }
         } catch (Exception $e) {
-            if (strpos($e->getMessage(), 'PHONE_CODE_INVALID') !== false) {
+            if (str_contains($e->getMessage(), 'PHONE_CODE_INVALID')) {
                 json(['res' => 'phone_code_invalid']);
-            } elseif (strpos($e->getMessage(), 'PHONE_CODE_EXPIRED') !== false) {
+            } elseif (str_contains($e->getMessage(), 'PHONE_CODE_EXPIRED')) {
                 json(['res' => 'phone_code_expired']);
-            } elseif (strpos($e->getMessage(), 'AUTH_RESTART') !== false) {
+            } elseif (str_contains($e->getMessage(), 'AUTH_RESTART')) {
                 json(['res' => 'auth_restart']);
             } else {
                 error(['message' => $e->getMessage()]);
@@ -780,7 +780,7 @@ try {
             $MP->complete2faLogin($PARAMS['password']);
             json(['res' => 1]);
         } catch(Exception $e) {
-            if (strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
+            if (str_contains($e->getMessage(), 'PASSWORD_HASH_INVALID')) {
                 json(['res' => 'password_hash_invalid']);
             } else {
                 error(['message' => $e->getMessage()]);
@@ -816,7 +816,8 @@ try {
         checkAuth();
         setupMadelineProto();
         
-        function cmp($a, $b) {
+        function cmp($a, $b): int
+        {
             global $rawData;
             $ma = $a['message'] ?? null;
             $mb = $b['message'] ?? null;
@@ -856,6 +857,7 @@ try {
             } else if ((int) $f > 1) {
                 $sort = false;
                 $fid = (int) $f;
+                unset($f);
                 $folders = $MP->messages->getDialogFilters();
                 if (($folders['_'] ?? '') == 'messages.dialogFilters')
                     $folders = $folders['filters'];
@@ -879,7 +881,7 @@ try {
                         break;
                     }
                 }
-                if ($f['contacts'] || $f['non_contacts']) {
+                if ($folder['contacts'] || $folder['non_contacts']) {
                     $contacts = $MP->contacts->getContacts()['contacts'];
                     foreach ($all as $d) {
                         if ($d['peer'] < 0) continue;
@@ -887,15 +889,15 @@ try {
                         foreach ($contacts as $c) {
                             if ($d['peer'] != getId($c)) continue;
                             $found = true;
-                            if ($f['contacts']) array_push($dialogs, $d);
+                            if ($folder['contacts']) array_push($dialogs, $d);
                             break;
                         }
-                        if ($found || $f['non_contacts']) continue;
+                        if ($found || $folder['non_contacts']) continue;
                         if (!in_array($d, $dialogs)) array_push($dialogs, $d);
                     }
                     unset($contacts);
                 }
-                if ($f['groups']) {
+                if ($folder['groups']) {
                     foreach ($all as $d) {
                         $peer = $d['peer'];
                         if ($peer > 0) continue;
@@ -907,7 +909,7 @@ try {
                         }
                     }
                 }
-                if ($f['broadcasts']) {
+                if ($folder['broadcasts']) {
                     foreach ($all as $d) {
                         $peer = $d['peer'];
                         if ($peer > 0) continue;
@@ -919,7 +921,7 @@ try {
                         }
                     }
                 }
-                if ($f['bots']) {
+                if ($folder['bots']) {
                     foreach ($all as $d) {
                         $peer = $d['peer'];
                         if ($peer < 0) continue;
@@ -932,8 +934,8 @@ try {
                         continue;
                     }
                 }
-                if (count($f['exclude_peers']) > 0) {
-                    foreach ($f['exclude_peers'] as $p) {
+                if (count($folder['exclude_peers']) > 0) {
+                    foreach ($folder['exclude_peers'] as $p) {
                         $p = getId($p);
                         foreach ($dialogs as $idx => $d) {
                             if ($d['peer'] != $p) continue;
@@ -942,20 +944,20 @@ try {
                         }
                     }
                 }
-                if ($f['exclude_archived']) {
+                if ($folder['exclude_archived']) {
                     foreach ($dialogs as $idx => $d) {
                         if (!isset($d['folder_id']) || $d['folder_id'] != 1) continue;
                         unset($dialogs[$idx]);
                     }
                 }
-                if ($f['exclude_read']) {
+                if ($folder['exclude_read']) {
                     foreach ($dialogs as $idx => $d) {
                         if (!isset($d['unread_count']) || $d['unread_count'] > 0) continue;
                         unset($dialogs[$idx]);
                     }
                 }
-                if (count($f['include_peers']) > 0) {
-                    foreach ($f['include_peers'] as $p) {
+                if (count($folder['include_peers']) > 0) {
+                    foreach ($folder['include_peers'] as $p) {
                         $p = getId($p);
                         foreach ($all as $d) {
                             if ($d['peer'] != $p) continue;
@@ -965,9 +967,9 @@ try {
                     }
                 }
                 usort($dialogs, 'cmp');
-                if (count($f['pinned_peers']) > 0) {
+                if (count($folder['pinned_peers']) > 0) {
                     $pinned = array();
-                    foreach ($f['pinned_peers'] as $p) {
+                    foreach ($folder['pinned_peers'] as $p) {
                         $p = getId($p);
                         foreach ($all as $d) {
                             if ($d['peer'] != $p) continue;
@@ -1086,7 +1088,7 @@ try {
         }
         $dialogPeers = array();
         $senderPeers = array();
-        $mesages = array();
+        $messages = array();
         if (checkField('dialogs')) {
             foreach ($rawData['messages'] as $rawMessage) {
                 $message = parseMessage($rawMessage);
@@ -1718,6 +1720,7 @@ try {
                 }
                 $ext = strtolower(substr($filename, $extidx+1));
                 $attr = false;
+                $type = null;
                 if (!isParamEmpty('uncompressed')) {
                     $type = 'inputMediaUploadedDocument';
                     $attr = true;
@@ -1838,7 +1841,7 @@ try {
         $votes = explode('vote=', $_SERVER['QUERY_STRING']);
         $options = [];
         foreach ($votes as $vote) {
-            if (strpos($vote, '=') !== false) continue;
+            if (str_contains($vote, '=')) continue;
             $i = strpos($vote, '&');
             if ($i !== false) $vote = substr($vote, 0, $i);
             array_push($options, $vote);

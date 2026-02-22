@@ -21,7 +21,7 @@ $autoupd = MP::getSettingInt('autoupd', ($iev == 0 || $iev > 4) ? 1 : 0);
 $updint = MP::getSettingInt('updint', 10);
 $dynupd = MP::getSettingInt('dynupd', 1);
 $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-$sym3 = strpos($ua, 'Symbian/3') !== false ? 1 : 0;
+$sym3 = str_contains($ua, 'Symbian/3') ? 1 : 0;
 $reverse = MP::getSettingInt('reverse', $sym3, true) == 1;
 $autoscroll = MP::getSettingInt('autoscroll', 1) == 1;
 $full = MP::getSettingInt('full', 0) == 1;
@@ -84,7 +84,7 @@ Themes::setChatTheme($theme);
 
 try {
     $MP = MP::getMadelineAPI($user);
-    if (strpos($id, '+') === 0) {
+    if (str_starts_with($id, '+')) {
         $id = substr($id, 1);
         $invite = $MP->messages->checkChatInvite(hash: $id);
         if (isset($_GET['join'])) {
@@ -144,7 +144,7 @@ try {
             $votes = explode('vote=', $_SERVER['QUERY_STRING']);
             $options = [];
             foreach ($votes as $vote) {
-                if (strpos($vote, '=') !== false) continue;
+                if (str_contains($vote, '=')) continue;
                 $i = strpos($vote, '&');
                 if ($i !== false) $vote = substr($vote, 0, $i);
                 array_push($options, $vote);
@@ -189,9 +189,9 @@ try {
             echo '<input type="submit" value="'.MP::x($lng['join']).'">';
             echo '</form>';
         } elseif (!$ch || $canpost) {
-            $post = strpos($ua, 'Series60/3') === false && strpos($ua, 'EPOC') === false;
-            $opera = strpos($ua, 'Opera') !== false || ($iev != 0 && $iev <= 7);
-            $watchos = strpos($ua, 'Watch OS') !== false;
+            $post = !str_contains($ua, 'Series60/3') && !str_contains($ua, 'EPOC');
+            $opera = str_contains($ua, 'Opera') || ($iev != 0 && $iev <= 7);
+            $watchos = str_contains($ua, 'Watch OS');
             echo '<form action="write.php"'.($post ? ' method="post"' : '').' class="in">';
             echo '<input type="hidden" name="c" value="'.$id.'">';
             echo '<input type="hidden" name="r" value="'. \base64_encode(random_bytes(16)).'">';
@@ -332,7 +332,7 @@ alert("'.str_replace('"', '\"', $alert).'");
             echo Themes::bodyStart();
     $useragent = $_SERVER['HTTP_USER_AGENT'] ?? '';
     $avas = strpos($useragent, 'AppleWebKit') || strpos($useragent, 'Chrome') || strpos($useragent, 'Symbian/3') || strpos($useragent, 'SymbOS') || strpos($useragent, 'Android') || strpos($useragent, 'Linux') ? 1 : 0;
-    $avas = MP::getSettingInt('avas', $avas) && strpos($useragent, 'SymbianOS/9') === false;
+    $avas = MP::getSettingInt('avas', $avas) && !str_contains($useragent, 'SymbianOS/9');
     $statussett = MP::getSettingInt('status', 0);
     if ($iev != 0 && $iev <= 7) {
         echo '<header>';

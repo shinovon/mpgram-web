@@ -44,11 +44,13 @@ try {
     $fullinfo = $MP->getFullInfo($id)['full'] ?? null;
     $pin = $fullinfo['pinned_msg_id'] ?? false;
 
+    $members = null;
+    $onlines = 0;
+    $memberscount = false;
     if ($type != 'user') {
         $desc = $fullinfo['about'] ?? null;
         $members = $chat['participants'] ?? null;
         $memberscount = $chat['participants_count'] ?? false;
-        $onlines = 0;
 
         if ($members) {
             foreach ($members as $i => $m) {

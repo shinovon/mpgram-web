@@ -19,7 +19,7 @@ $ua = '';
 $iev = MP::getIEVersion();
 if ($iev > 0 && $iev < 4) $theme = 1;
 $theme = MP::getSettingInt('theme', $theme, true);
-$post = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Series60/3') === false) && ($iev < 4 && $iev == 0);
+$post = (isset($_SERVER['HTTP_USER_AGENT']) && !str_contains($_SERVER['HTTP_USER_AGENT'], 'Series60/3')) && ($iev < 4 && $iev == 0);
 
 $lng = MP::initLocale();
 //MP::cookie('theme', $theme, time() + (86400 * 365));
@@ -48,7 +48,8 @@ $ipass = $_GET['ipass'] ?? $_POST['ipass'] ?? null;
 
 // Check session existance
 $nouser = $user == null || $user === false || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
-function removeSession($logout=false) {
+function removeSession($logout=false): void
+{
     global $user;
     $_SESSION = [];
     MP::delcookie('user');
@@ -76,7 +77,8 @@ function removeSession($logout=false) {
     }
 }
 
-function htmlStart() {
+function htmlStart(): void
+{
     if (defined('HTML_STARTED')) return;
     define('HTML_STARTED', 1);
     global $lng;
@@ -155,7 +157,7 @@ if ($phone !== null) {
         if (!isset($_POST['c']) && !isset($_GET['c'])) {
             htmlStart();
             echo 'CAPTCHA:<br>';
-            echo '<p><img src="captcha.php?r='.time().'"></p>';
+            echo '<p><img src="captcha.php?r='.time().'"/></p>';
             echo '<form action="login.php"';
             if ($post) echo ' method="post"';
             echo '>';
@@ -225,7 +227,7 @@ if ($phone !== null) {
                 header('Location: chats.php');
                 die;
             } catch (Exception $e) {
-                if (strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
+                if (str_contains($e->getMessage(), 'PASSWORD_HASH_INVALID')) {
                     htmlStart();
                     echo MP::x($lng['pass_code']).':<br>';
                     echo '<form action="login.php"';
@@ -241,7 +243,7 @@ if ($phone !== null) {
                     echo '<b>'.MP::x($lng['password_hash_invalid']).'</b><br>';
                     echo Themes::bodyEnd();
                     die;
-                } elseif (strpos($e->getMessage(), 'AUTH_RESTART') !== false/* || strpos($e->getMessage(), 'I\'m not waiting') !== false*/) {
+                } elseif (str_contains($e->getMessage(), 'AUTH_RESTART')/* || strpos($e->getMessage(), 'I\'m not waiting') !== false*/) {
                 } else {
                     echo '<xmp>';
                     echo $e;

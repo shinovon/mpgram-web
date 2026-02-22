@@ -49,14 +49,14 @@ try {
         die;
     }
     $p = $_GET['p'] ?? '';
-    if (strpos($p, 'r') === 0) {
+    if (str_starts_with($p, 'r')) {
         header('Cache-Control: private, max-age=2592000');
         $p = substr($p, 1);
         $payload = new Amp\ByteStream\Payload($MP->downloadToReturnedStream($di));
         $img = imagecreatefromstring($payload->buffer());
         $payload->close();
         $png = false;
-        if (strpos($p, 'c') === 0) {
+        if (str_starts_with($p, 'c')) {
             $png = true;
             $p = substr($p, 1);
             $w = imagesx($img);
@@ -72,7 +72,7 @@ try {
             imagecolortransparent($img, $r);
             imagefill($img, 0, 0, $r);
         }
-        if (strpos($p, 'p') === 0) {
+        if (str_starts_with($p, 'p')) {
             $png = true;
             $p = substr($p, 1);
         }

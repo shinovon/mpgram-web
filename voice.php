@@ -46,7 +46,7 @@ try {
     try {
         $scan = scandir(VOICE_TMP_DIR);
         foreach ($scan as $n) {
-            if (strpos($n, '.mp3') === false || $n == '.' || $n == '..') continue;
+            if (!str_contains($n, '.mp3') || $n == '.' || $n == '..') continue;
             if (date('d.m.y', filemtime(VOICE_TMP_DIR.$n)) == date('d.m.y', time())) {
                 continue;
             }
@@ -60,7 +60,7 @@ try {
         $MP->downloadToFile($di, $inpath);
         $res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$inpath.'" -b:a 64k -ac 1 -y -acodec mp3 "'.$outpath.'"'.(WINDOWS?'':' 2>&1')) ?? '';
         unlink($inpath);
-        if (strpos($res, 'failed') !== false) {
+        if (str_contains($res, 'failed')) {
             echo 'Conversion failed';
             die;
         }

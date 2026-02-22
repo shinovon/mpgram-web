@@ -3,7 +3,8 @@
 Copyright (c) 2022-2025 Arman Jussupgaliyev
 */
 session_start();
-function getCaptchaText($length) {
+function getCaptchaText($length): string
+{
     $c = '0123456789';//abcdefghjkmnopqrstuvwxyz';
     $l = strlen($c);
     $s = '';

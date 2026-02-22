@@ -134,7 +134,7 @@ try {
                 $dialogs = [];
                 $all = $r['dialogs'];
                 unset($r['dialogs']);
-                if ($f['contacts'] || $f['non_contacts']) {
+                if ($folder['contacts'] || $folder['non_contacts']) {
                     $contacts = $MP->contacts->getContacts()['contacts'];
                     foreach ($all as $d) {
                         if ($d['peer'] < 0) continue;
@@ -142,15 +142,15 @@ try {
                         foreach ($contacts as $c) {
                             if ($d['peer'] != MP::getId($c)) continue;
                             $found = true;
-                            if ($f['contacts']) array_push($dialogs, $d);
+                            if ($folder['contacts']) array_push($dialogs, $d);
                             break;
                         }
-                        if ($found || $f['non_contacts']) continue;
+                        if ($found || $folder['non_contacts']) continue;
                         if (!in_array($d, $dialogs)) array_push($dialogs, $d);
                     }
                     unset($contacts);
                 }
-                if ($f['groups']) {
+                if ($folder['groups']) {
                     foreach ($all as $d) {
                         $peer = $d['peer'];
                         if ($peer > 0) continue;
@@ -162,7 +162,7 @@ try {
                         }
                     }
                 }
-                if ($f['broadcasts']) {
+                if ($folder['broadcasts']) {
                     foreach ($all as $d) {
                         $peer = $d['peer'];
                         if ($peer > 0) continue;
@@ -174,7 +174,7 @@ try {
                         }
                     }
                 }
-                if ($f['bots']) {
+                if ($folder['bots']) {
                     foreach ($all as $d) {
                         $peer = $d['peer'];
                         if ($peer < 0) continue;
@@ -187,8 +187,8 @@ try {
                         continue;
                     }
                 }
-                if (count($f['exclude_peers']) > 0) {
-                    foreach ($f['exclude_peers'] as $p) {
+                if (count($folder['exclude_peers']) > 0) {
+                    foreach ($folder['exclude_peers'] as $p) {
                         $p = MP::getId($p);
                         foreach ($dialogs as $idx => $d) {
                             if ($d['peer'] != $p) continue;
@@ -197,20 +197,20 @@ try {
                         }
                     }
                 }
-                if ($f['exclude_archived']) {
+                if ($folder['exclude_archived']) {
                     foreach ($dialogs as $idx => $d) {
                         if (!isset($d['folder_id']) || $d['folder_id'] != 1) continue;
                         unset($dialogs[$idx]);
                     }
                 }
-                if ($f['exclude_read']) {
+                if ($folder['exclude_read']) {
                     foreach ($dialogs as $idx => $d) {
                         if (!isset($d['unread_count']) || $d['unread_count'] > 0) continue;
                         unset($dialogs[$idx]);
                     }
                 }
-                if (count($f['include_peers']) > 0) {
-                    foreach ($f['include_peers'] as $p) {
+                if (count($folder['include_peers']) > 0) {
+                    foreach ($folder['include_peers'] as $p) {
                         $p = MP::getId($p);
                         foreach ($all as $d) {
                             if ($d['peer'] != $p) continue;
@@ -241,9 +241,9 @@ try {
                     return ($ma['date'] > $mb['date']) ? -1 : 1;
                 }
                 usort($dialogs, 'cmp');
-                if (count($f['pinned_peers']) > 0) {
+                if (count($folder['pinned_peers']) > 0) {
                     $pinned = array();
-                    foreach ($f['pinned_peers'] as $p) {
+                    foreach ($folder['pinned_peers'] as $p) {
                         $p = MP::getId($p);
                         foreach ($all as $d) {
                             if ($d['peer'] == $p) {
@@ -256,12 +256,11 @@ try {
                     $dialogs = array_merge($pinned, $dialogs);
                 }
                 unset($all);
-                unset($r['messages']);
             } else {
                 $r = MP::getAllDialogs($MP, 0, 0);
                 $dialogs = $r['dialogs'];
-                unset($r['messages']);
             }
+            unset($r['messages']);
         }
         $c = 0;
         foreach ($dialogs as $d){

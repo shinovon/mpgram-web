@@ -131,7 +131,7 @@ try {
                                 $newfile = $file.'.ogg';
                                 $res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$file.'" -ac 1 -y -map 0:a -map_metadata -1 "'.$newfile.'"'.(WINDOWS?'':' 2>&1')) ?? '';
                                 unlink($file);
-                                if (strpos($res, 'failed') !== false) {
+                                if (str_contains($res, 'failed')) {
                                     $result = 'Conversion failed';
                                     break;
                                 }
@@ -382,9 +382,4 @@ if (!$ch) {
         echo '</form>';
     }
 }
-try {
-    if ($MP) {
-        $MP->close();
-    }
-} catch (Exception) {}
 echo Themes::bodyEnd();

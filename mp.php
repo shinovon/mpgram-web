@@ -142,8 +142,8 @@ class MP {
         }
         if (($iev != 0 && $iev < 5)
             || ($opera != 0 && $opera <= 5)
-            || strpos(static::$useragent, 'EPOC') !== false
-            || strpos(static::$useragent, 'Profile/MIDP-1.0') !== false) {
+            || str_contains(static::$useragent, 'EPOC')
+            || str_contains(static::$useragent, 'Profile/MIDP-1.0')) {
             return static::getSetting('lang') == 'ru' ? 'windows-1251' : 'windows-1252';
         }
         return 'utf-8';
@@ -222,7 +222,7 @@ class MP {
         return $txt;
     }
     
-    static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false, $old=false, $photosize=0, $showdate=true, $mentions=null, $thread=null)
+    static function printMessages($MP, $rm, $id, $pm, $ch, $lng, $imgs, $name=null, $timeoff=0, $chid=false, $unswer=false, $ar=null, $search=false, $old=false, $photosize=0, $showdate=true, $mentions=null, $thread=null): void
     {
         $lastdate = date('d.m.y', time()-$timeoff);
         $selfid = static::getSelfId($MP);
@@ -439,7 +439,7 @@ class MP {
         }
     }
     
-    static function printMessageMedia($MP, $m, $id, $imgs, $lng, $mini=false, $ps=0, $out=false, $old=false)
+    static function printMessageMedia($MP, $m, $id, $imgs, $lng, $mini=false, $ps=0, $out=false, $old=false): void
     {
         if ($ps <= 0) $ps = 180;
         $media = $m['media'];
@@ -501,7 +501,7 @@ class MP {
                 && ($opera == 0 || $opera > 5);
                 switch(strtolower(substr($fext, 1))) {
                     case 'webp':
-                        if (strpos($d['name'], 'sticker_') === 0) {
+                        if (str_starts_with($d['name'], 'sticker_')) {
                             $open = false;
                             $img = true;
                             $q = 'rsticker'.($png?'p':'');
@@ -660,7 +660,7 @@ class MP {
         }
     }
     
-    static function durationstr($time)
+    static function durationstr($time): string
     {
         $sec = $time % 60;
         if ($sec < 10) $sec = "0{$sec}";
@@ -702,7 +702,7 @@ class MP {
         return static::dehtml($text);
     }
     
-    static function wrapRichText($text, $entities)
+    static function wrapRichText($text, $entities): string
     {
         $len = count($entities);
         $lastOffset = 0;
@@ -781,7 +781,7 @@ class MP {
     
     static function wrapUrl($url, $unsafe=false)
     {
-        if (strpos($url, 'http') !== 0) {
+        if (!str_starts_with($url, 'http')) {
             $url = 'http://'.$url;
         }
         if (!$unsafe) {
@@ -799,12 +799,12 @@ class MP {
                     if (count($path) == 2 && strlen($path[1] > 0)) {
                         $url = static::getURL().'chat.php?c='.urlencode($path[0]).'&m='.$path[1];
                     } elseif (count($path) == 1) {
-                        if (strpos($path[0], 'iv?') !== 0) {
+                        if (!str_starts_with($path[0], 'iv?')) {
                             $s = $path[0];
-                            if (strpos($s, '?start=') !== false) {
+                            if (str_contains($s, '?start=')) {
                                 $s = str_replace('?start=', "&start=", $s);
                                 $s .= '&r='.rand(0, 100000);
-                            } elseif (strpos($s, '?') !== false) {
+                            } elseif (str_contains($s, '?')) {
                                 $i = strpos($s, '?');
                                 $s = substr($s, 0, $i).'&'.substr($s, $i+1);
                                 $s .= '&r='.rand(0, 100000);
@@ -819,10 +819,10 @@ class MP {
         return $url;
     }
 
-    static function getURL()
+    static function getURL(): string
     {
         $sitepath = "";
-        if (($_SERVER["HTTPS"] ?? "") === "on" || ($_SERVER["HTTP_X_FORWARDED_PROTO"] ?? "") == "https" || strpos($_SERVER["HTTP_CF_VISITOR"] ?? "", "https") !== false) {
+        if (($_SERVER["HTTPS"] ?? "") === "on" || ($_SERVER["HTTP_X_FORWARDED_PROTO"] ?? "") == "https" || str_contains($_SERVER["HTTP_CF_VISITOR"] ?? "", "https")) {
             $sitepath .= "https";
         } else {
             $sitepath .= "http";
@@ -843,7 +843,7 @@ class MP {
             $user = $_GET['user'];
         } elseif (isset($_COOKIE['user'])) {
             $user = $_COOKIE['user'];
-            if (strpos($user, ', ') !== false) {
+            if (str_contains($user, ', ')) {
                 $user = substr($user, 0, strpos($user, ', '));
             }
         } elseif (isset($_SESSION) && isset($_SESSION['user'])) {
@@ -853,14 +853,14 @@ class MP {
         } 
         if ($user == null || empty($user)
         || strlen($user) < 32 || strlen($user) > 200
-        || strpos($user, '\\') !== false
-        || strpos($user, '/') !== false
-        || strpos($user, '.') !== false
-        || strpos($user, ';') !== false
-        || strpos($user, ':') !== false
-        || strpos($user, '?') !== false
-        || strpos($user, '=') !== false
-        || strpos($user, '&') !== false) {
+        || str_contains($user, '\\')
+        || str_contains($user, '/')
+        || str_contains($user, '.')
+        || str_contains($user, ';')
+        || str_contains($user, ':')
+        || str_contains($user, '?')
+        || str_contains($user, '=')
+        || str_contains($user, '&')) {
             return false;
         }
         if (!file_exists(sessionspath.$user.'.madeline')) {
@@ -869,7 +869,7 @@ class MP {
         return $user;
     }
     
-    static function getMadelineSettings()
+    static function getMadelineSettings(): \danog\MadelineProto\Settings
     {
         $sets = new \danog\MadelineProto\Settings;
         $app = new \danog\MadelineProto\Settings\AppInfo;
@@ -884,7 +884,7 @@ class MP {
                     $info = $br = $b['parent'];
                     if (isset($b['device_name'])) {
                         $d = $b['device_name'];
-                        if ($d !== 'unknown' && strpos($b['device_name'], 'general') !== 0) {
+                        if ($d !== 'unknown' && !str_starts_with($b['device_name'], 'general')) {
                             if (isset($b['device_brand_name']) && $b['device_brand_name'] !== 'unknown') {
                                 $dbn = $b['device_brand_name'];
                                 if (!stripos($dbn, 'desktop')) {
@@ -895,15 +895,15 @@ class MP {
                         }
                     }
                     $pl = null;
-                    if (strpos($ua, 'Opera Mini') !== false) {
-                        if (strpos($ua, 'J2ME/MIDP') !== false) {
+                    if (str_contains($ua, 'Opera Mini')) {
+                        if (str_contains($ua, 'J2ME/MIDP')) {
                             $pl = 'J2ME';
-                        } elseif (strpos($ua, 'BlackBerry') !== false) {
+                        } elseif (str_contains($ua, 'BlackBerry')) {
                             $pl = 'BlackBerry OS';
-                        } elseif (strpos($ua, 'Android') !== false) {
+                        } elseif (str_contains($ua, 'Android')) {
                             $pl = 'Android';
                         }
-                    } elseif (strpos($ua, 'Series60/') !== false) {
+                    } elseif (str_contains($ua, 'Series60/')) {
                         $s60 = substr($ua, strpos($ua, 'Series60/')+9, 3);
                         switch($s60) {
                         case '3.0':
@@ -931,7 +931,7 @@ class MP {
                             $pl = 'Symbian Belle FP2';
                             break;
                         default:
-                            if (strpos($ua, 'Symbian/3') !== false) {
+                            if (str_contains($ua, 'Symbian/3')) {
                                 $pl = 'Symbian^3';
                             } else {
                                 $pl = 'Symbian OS';
@@ -967,7 +967,7 @@ class MP {
         return $sets;
     }
     
-    static function getMadelineAPI($user, $settings = false)
+    static function getMadelineAPI($user, $settings = false): \danog\MadelineProto\API
     {
         require_once 'vendor/autoload.php';
         if ($settings) {
@@ -989,7 +989,7 @@ class MP {
             $x = $_SESSION[$name];
         } elseif (isset($_COOKIE[$name])) {
             $x = $_COOKIE[$name];
-            if (strpos($x, ', ') !== false) {
+            if (str_contains($x, ', ')) {
                 $x = substr($x, 0, strpos($x, ', '));
             }
         }
@@ -1010,7 +1010,7 @@ class MP {
             $x = (int) $_SESSION[$name];
         } elseif (isset($_COOKIE[$name])) {
             $x = $_COOKIE[$name];
-            if (strpos($x, ', ') !== false) {
+            if (str_contains($x, ', ')) {
                 $x = substr($x, 0, strpos($x, ', '));
             }
             $x = (int)$x;
@@ -1022,7 +1022,7 @@ class MP {
         return $x;
     }
     
-    static function startSession()
+    static function startSession(): void
     {
         if (defined('session_started')) return;
         ini_set('session.cookie_lifetime', 365 * 60 * 60 * 24);
@@ -1038,7 +1038,7 @@ class MP {
         try {
             $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
             static::$useragent = $ua;
-            if (strpos($ua, 'MSIE ') !== false) {
+            if (str_contains($ua, 'MSIE ')) {
                 $i = strpos($ua, 'MSIE ')+5;
                 static::$iev = (int)substr($ua, $i, $i+1);
             }
@@ -1046,24 +1046,24 @@ class MP {
         return static::$iev;
     }
 
-    static function getOperaVersion()
+    static function getOperaVersion(): int
     {
         try {
             $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
             static::$useragent = $ua;
-            if (strpos($ua, 'Opera/v') !== false) {
+            if (str_contains($ua, 'Opera/v')) {
                 $i = strpos($ua, 'Opera/v')+7;
                 return (int)substr($ua, $i, $i+1);
             }
-            if (strpos($ua, 'Opera/') !== false) {
+            if (str_contains($ua, 'Opera/')) {
                 $i = strpos($ua, 'Opera/')+6;
                 return (int)substr($ua, $i, $i+1);
             }
-            if (strpos($ua, 'Opera v') !== false) {
+            if (str_contains($ua, 'Opera v')) {
                 $i = strpos($ua, 'Opera v')+7;
                 return (int)substr($ua, $i, $i+1);
             }
-            if (strpos($ua, 'Opera ') !== false) {
+            if (str_contains($ua, 'Opera ')) {
                 $i = strpos($ua, 'Opera ')+6;
                 return (int)substr($ua, $i, $i+1);
             }
@@ -1071,19 +1071,19 @@ class MP {
         return 0;
     }
 
-    static function cookie($n, $v, $e = null)
+    static function cookie($n, $v, $e = null): void
     {
         if ($e === null) $e = time() + (86400 * 365);
         $e = date('D, d M Y H:i:s \G\M\T', $e);
         header("Set-Cookie: {$n}={$v}; expires={$e}; path=/", false);
     }
 
-    static function delCookie($n)
+    static function delCookie($n): void
     {
         static::cookie($n, '', time() - 86400);
     }
     
-    static function deleteSessionFile($user)
+    static function deleteSessionFile($user): void
     {
         $session = sessionspath.$user.'.madeline';
         if (is_dir($session)) {
@@ -1120,10 +1120,10 @@ class MP {
         }
     }
     
-    public static function initLocale()
+    public static function initLocale(): array
     {
         $xlang = $lang = static::getSetting('lang', null, true);
-        $lang ??= isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && strpos(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') !== false ? 'ru' : 'en';
+        $lang ??= isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && str_contains(strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']), 'ru') ? 'ru' : 'en';
         include 'locale.php';
         MPLocale::init();
         if (!MPLocale::load($lang)) {
@@ -1135,12 +1135,12 @@ class MP {
         return MPLocale::$lng;
     }
 
-    public static function init()
+    public static function init(): void
     {
         static::$enc = static::getEncoding();
     }
     
-    public static function addUsers($users, $chats)
+    public static function addUsers($users, $chats): void
     {
         foreach ($users as $user) {
             static::$users[$user['id']] = $user;
@@ -1150,13 +1150,13 @@ class MP {
         }
     }
     
-    public static function gc()
+    public static function gc(): void
     {
         static::$users = [];
         static::$chats = [];
     }
     
-    public static function getAllDialogs($MP, $limit = 0, $folder_id = -1)
+    public static function getAllDialogs($MP, $limit = 0, $folder_id = -1): array
     {
         $p = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];
         if ($folder_id != -1) {
@@ -1210,7 +1210,7 @@ class MP {
         return $r;
     }
 
-    static function getPeerColors($MP)
+    static function getPeerColors($MP): void
     {
         if (isset(static::$colors)) return;
         $peercolors = $MP->help->getPeerColors();

@@ -34,11 +34,8 @@ MP::cookie('theme', $theme, time() + (86400 * 365));
 include 'themes.php';
 Themes::setTheme($theme);
 
-function base64_encode_url($string) {
-    return str_replace(['+','/','='], ['-','_',''], base64_encode($string));
-}
-
-function htmlStart() {
+function htmlStart(): void
+{
     global $lng;
     header("Content-Type: text/html; charset=utf-8");
     echo '<html><head><title>'.MP::x($lng['login']).'</title>';
@@ -104,7 +101,7 @@ if (!$qr) {
             header('Location: chats.php');
             die;
         } catch (Exception $e) {
-            if (strpos($e->getMessage(), 'PASSWORD_HASH_INVALID') !== false) {
+            if (str_contains($e->getMessage(), 'PASSWORD_HASH_INVALID')) {
                 htmlStart();
                 echo MP::x($lng['pass_code']).':<br>';
                 echo '<form action="qrlogin.php"'.($post?' method="post"':'').'>';

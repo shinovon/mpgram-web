@@ -8,7 +8,7 @@ $dynupd = 1;
 $updint = 10;
 $theme = 0;
 $chats = 15;
-$sym3 = strpos($_SERVER['HTTP_USER_AGENT'] ?? '', 'Symbian/3') !== false;
+$sym3 = str_contains($_SERVER['HTTP_USER_AGENT'] ?? '', 'Symbian/3');
 $reverse = $sym3 ? 1 : 0;
 $autoscroll = 1;
 $limit = 20;
