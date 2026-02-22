@@ -147,7 +147,7 @@ String
 - Positive integer: User
 - 0 to -1000000000000 exclusive: Chat
 - -1000000000000 to -2000000000000 exclusive: Channel
-- from -2000000000000 to -Infinity exclusive: Secret chat
+- from -2000000000000 to -Infinity exclusive: Secret chat **(Unsupported!)**
 
 
 

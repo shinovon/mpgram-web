@@ -1007,7 +1007,7 @@ try {
         if (isset($rawData['count'])) $res['count'] = $rawData['count'];
         $dialogPeers = array();
         $senderPeers = array();
-        $mesages = array();
+        $messages = array();
         if (checkField('dialogs', true)) {
             foreach ($rawData['messages'] as $rawMessage) {
                 $message = parseMessage($rawMessage, $PARAMS['media'] ?? false, $v < 5 ? false : ($PARAMS['text'] ?? true));
