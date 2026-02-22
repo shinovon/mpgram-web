@@ -36,6 +36,8 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
 
 ## Authorization flow example
 
+### Phone number
+
 1. Request: `method=phoneLogin&phone=+123`
 <br>Response: `{"res":"need_captcha","captcha_id":"zxc"}`
 
@@ -48,6 +50,21 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
 4. Request: `method=completePhoneLogin&code=12345`
 <br>Header: `X-mpgram-user: asdfgh`
 <br>Response: `{"res":1}`
+
+### QR code
+
+1. Request: `method=initLogin&qr=1`
+   <br>Response: `{"res":"need_captcha","captcha_id":"zxc"}`
+
+2. Request: `method=getCaptchaImg&captcha_id=zxc`
+   <br>Response: JPEG Image
+
+3. Request: `method=initLogin&qr=1&captcha_id=zxc&captcha_key=54321`
+   <br>Response: `{"res":"qr","user":"asdfgh","text":"tg://something"}`
+
+4. Request: `method=qrLogin`
+   <br>Header: `X-mpgram-user: asdfgh`
+   <br>Response: `{"res":1}`
 
 ## Models
 
