@@ -5,7 +5,7 @@
 >
 > **MPGram API must not be used for bots, its only purpose is to make custom clients for legacy devices.**
 >
-> **Instance owners are advised to block any suspicious-looking User-Agents or IP addresses from data-centers**
+> **Instance owners are advised to block any suspicious-looking User-Agents or IP addresses from data-centers.**
 
 Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets`
 
@@ -60,7 +60,7 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
    <br>Response: JPEG Image
 
 3. Request: `method=initLogin&qr=1&captcha_id=zxc&captcha_key=54321`
-   <br>Response: `{"res":"qr","user":"asdfgh","text":"tg://something"}`
+   <br>Response: `{"res":"qr","user":"asdfgh","text":"dGc6Ly9zb21ldGhpbmc="}`
 
 4. Request: `method=qrLogin`
    <br>Header: `X-mpgram-user: asdfgh`
@@ -235,7 +235,7 @@ Object
 - `res` (string or int)
   - 1: Authorization completed, client should call `me`.
   - `code_sent`: Authorization code is sent, client must call `completePhoneLogin`.
-  - `qr`: QR code is generated, `text` contains authorization link, client must call `qrLogin` after QR code is scanned.
+  - `qr`: QR code is generated, `text` contains Base64-encoded authorization link, client must call `qrLogin` after QR code is scanned.
   - `phone_code_invalid`: Authorization code is invalid, code will be resent, client must call `completePhoneLogin` again with correct code.
   - `phone_code_expired`: Authorization code is expired, code will be resent, client must call `completePhoneLogin` again with correct code.
   - `need_captcha`: Captcha required, client must call `getCaptchaImg` with provided `captcha_id`, then client must call method again with `captcha_id` and `captcha_key`.
