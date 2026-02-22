@@ -47,7 +47,7 @@ try {
     if (isset($_GET['act'])) {
         $act = $_GET['act'];
         $MP = MP::getMadelineAPI($user);
-        switch($act) {
+        switch ($act) {
         case 'delete':
             if (is_numeric($id) && (int)$id > 0) {
                 $MP->messages->deleteMessages(['id' => [(int)$msg]]);
@@ -122,7 +122,7 @@ try {
                         $type = 'inputMediaUploadedDocument';
                         $attr = true;
                     } elseif ($voice) {
-                        switch($ext) {
+                        switch ($ext) {
                             case 'amr':
                             case 'mp3':
                             case 'aac':
@@ -214,7 +214,7 @@ try {
                                 break;
                         }
                     } else {
-                        switch($ext) {
+                        switch ($ext) {
                             case 'jpg':
                             case 'jpeg':
                             case 'png':
@@ -268,9 +268,9 @@ try {
                         if ($waveform !== false) {
                             $att['waveform'] = $waveform;
                         }
-                        array_push($attributes, $att);
+                        $attributes[] = $att;
                     } elseif ($attr) {
-                        array_push($attributes, ['_' => 'documentAttributeFilename', 'file_name' => $filename]);
+                        $attributes[] = ['_' => 'documentAttributeFilename', 'file_name' => $filename];
                     }
                     $params['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes, 'spoiler' => $spoiler];
                     if (isset($_GET["format"]) || isset($_POST["format"])) {

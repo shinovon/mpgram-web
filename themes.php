@@ -50,7 +50,7 @@ class Themes {
     }
     
     static function setTheme($theme, $chat=false) {
-        switch($theme) {
+        switch ($theme) {
         case 2:
             $theme = 1;
             static::$bg = $chat;
@@ -78,7 +78,7 @@ class Themes {
             break;
         }
         $bgsize = MP::getSettingInt('bgsize', 0);
-        switch($bgsize) {
+        switch ($bgsize) {
         case 240:
         case 320:
         case 640:

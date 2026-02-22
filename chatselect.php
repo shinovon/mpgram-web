@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 include 'redirect.php';
 
@@ -142,11 +142,11 @@ try {
                         foreach ($contacts as $c) {
                             if ($d['peer'] != MP::getId($c)) continue;
                             $found = true;
-                            if ($folder['contacts']) array_push($dialogs, $d);
+                            if ($folder['contacts']) $dialogs[] = $d;
                             break;
                         }
                         if ($found || $folder['non_contacts']) continue;
-                        if (!in_array($d, $dialogs)) array_push($dialogs, $d);
+                        if (!in_array($d, $dialogs)) $dialogs[] = $d;
                     }
                     unset($contacts);
                 }
@@ -157,7 +157,7 @@ try {
                         foreach ($r['chats'] as $c) {
                             if ($c['id'] != $peer) continue;
                             if (!($c['broadcast'] ?? false) && !in_array($d, $dialogs))
-                                array_push($dialogs, $d);
+                                $dialogs[] = $d;
                             break;
                         }
                     }
@@ -169,7 +169,7 @@ try {
                         foreach ($r['chats'] as $c) {
                             if ($c['id'] != $peer) continue;
                             if (($c['broadcast'] ?? false) && !in_array($d, $dialogs))
-                                array_push($dialogs, $d);
+                                $dialogs[] = $d;
                             break;
                         }
                     }
@@ -181,7 +181,7 @@ try {
                         foreach ($r['users'] as $u) {
                             if ($u['id'] != $peer) continue;
                             if (($u['bot'] ?? false) && !in_array($d, $dialogs))
-                                array_push($dialogs, $d);
+                                $dialogs[] = $d;
                             break;
                         }
                         continue;
@@ -214,7 +214,7 @@ try {
                         $p = MP::getId($p);
                         foreach ($all as $d) {
                             if ($d['peer'] != $p) continue;
-                            if (!in_array($d, $dialogs)) array_push($dialogs, $d);
+                            if (!in_array($d, $dialogs)) $dialogs[] = $d;
                             break;
                         }
                     }
@@ -248,7 +248,7 @@ try {
                         foreach ($all as $d) {
                             if ($d['peer'] == $p) {
                                 if (in_array($d, $dialogs)) unset($dialogs[array_search($d, $dialogs)]);
-                                array_push($pinned, $d);
+                                $pinned[] = $d;
                                 break;
                             }
                         }

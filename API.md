@@ -5,7 +5,7 @@
 >
 > **MPGram API must not be used for bots, its only purpose is to make custom clients for legacy devices.**
 >
-> **Instance owners are advised to block any suspicious-looking User-Agents or IP addresses from data-centers.**
+> **Instance owners are advised to block any suspicious-looking User-Agents and IP addresses from data-centers.**
 
 Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets`
 
@@ -85,7 +85,7 @@ Object
   - `peer` (string, optional): [Peer ID](#Peer-ID) where original message was send, present if message is saved
   - `s` (boolean, optional): true if message is saved
   - `from_name` (string, optional): Name of original sender, present if profile is private
-- `media` (object or null, optional): Media information, present if message contains media. (~~null if media is disabled~~, **changed since v9**)
+- `media` (object or null, optional): Media information, present if message contains media. <br>(~~null if media is disabled~~, **changed since v9**)
   - General properties:
     - `type` (string): Type of media
     - `hide` (int, optional): 1 if media is disabled. **since v9**
@@ -202,7 +202,7 @@ Object
 - `k` (boolean, optional): true if user is listed in contacts. **since v5**
 - `s` (boolean, optional): true if user is online. **since v5**
 - `w` (int, optional): Date when user was last online. **since v5**
-- `a` (boolean, optional) true if user has admin rights, present only in `getParticipants` result.
+- `a` (boolean, optional) true if user has admin rights, present only in `getParticipants` response.
 
 ### Removed since v5
 - `first_name` (string): First name, replaced by `fn`
@@ -216,7 +216,7 @@ Object
 Object
 
 - `id` (string): [Peer ID](#Peer-ID), negative integer
-- `title` (string): Type of chat
+- `type` (string): Type of chat. **deprecated, will be deleted in v11**
 - `t` (string): Title of chat
 - `name` (string, optional): Public link
 - `p` (boolean, optional): true if chat has photo. **since v5**
@@ -224,6 +224,7 @@ Object
 - `l` (boolean, optional): true if logged user is not in this chat. **since v5**
 
 ### Removed since v5
+- `title` (string): Title of chat, **replaced by `t`**
 - `username` (string or null): Public link, **replaced by `name`**
 
 
@@ -460,9 +461,15 @@ TODO
 TODO
 
 ## `getContacts`
-TODO
+
+### Response
+Object
+- `res` (array): Array of [User](#User) objects 
 
 ## `getFolders`
+TODO
+
+## `getDialog`
 TODO
 
 
@@ -507,7 +514,7 @@ Returns server timezone.
 
 Does not require authorization.
 
-## Response
+### Response
 Object
 - `res` (int): Timezone offset in seconds 
 

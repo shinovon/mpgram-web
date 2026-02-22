@@ -116,7 +116,7 @@ try {
             $maxid = 0;
             $minmsg = null;
             $maxmsg = null;
-            foreach($updates as $update) {
+            foreach ($updates as $update) {
                 if ($update['update_id'] == $so) continue;
                 $type = $update['update']['_'];
                 $offset = $update['update_id'];

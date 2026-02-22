@@ -147,7 +147,7 @@ try {
                 if (str_contains($vote, '=')) continue;
                 $i = strpos($vote, '&');
                 if ($i !== false) $vote = substr($vote, 0, $i);
-                array_push($options, $vote);
+                $options[] = $vote;
             }
             $MP->messages->sendVote(['peer' => $id, 'msg_id' => $msgoffsetid, 'options' => $options]);
         } catch (Exception) {}
@@ -364,7 +364,7 @@ alert("'.str_replace('"', '\"', $alert).'");
             $status = $info['User']['status'] ?? null;
             $status_str = '';
             if ($status) {
-                switch($status['_']) {
+                switch ($status['_']) {
                 case 'userStatusOnline':
                     $status_str = MP::x($lng['online']);
                     break;

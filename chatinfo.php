@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);

@@ -110,7 +110,7 @@ class MPLocale {
             $tmp = $number;
             for ($i = 0; $i < count($a); $i++) {
                 $b = $a[$i];
-                switch($b) {
+                switch ($b) {
                 case "%":
                     $tmp %= $a[$i += 1];
                     break;
