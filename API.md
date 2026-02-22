@@ -158,11 +158,12 @@ Object
 - `id` (string): [Peer ID](#Peer-ID), positive integer
 - `fn` (string or null): First name
 - `ln` (string or null): Last name
-- `name` (string or null): Public link
+- `name` (string, optional): Public link
 - `p` (boolean, optional): true if user has photo. **since v5**
 - `k` (boolean, optional): true if user is listed in contacts. **since v5**
 - `s` (boolean, optional): true if user is online. **since v5**
 - `w` (int, optional): Date when user was last online. **since v5**
+- `a` (boolean, optional) true if user has admin rights, present only in `getParticipants` result.
 
 #### Removed since v5
 - `first_name` (string): First name, replaced by `fn`

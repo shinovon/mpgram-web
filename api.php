@@ -284,19 +284,25 @@ function findPeer($id, $r)
     return null;
 }
 
-function parsePeer($peer)
+function parsePeer($peer): string
 {
-    return getId($peer);
+    return strval(getId($peer) ?? error('Peer with null id detected'));
 }
 
 function parseDialog($rawDialog): array
 {
     global $v;
     $dialog = array();
-    $dialog['id'] = strval(getId($rawDialog['peer']));
-    if ($rawDialog['unread_count'] ?? 0 > 0) $dialog['unread'] = $rawDialog['unread_count'];
-    if ($rawDialog['unread_mentions_count'] ?? 0 > 0) $dialog['mentions'] = $rawDialog['unread_mentions_count'];
-    if ($rawDialog['pinned'] ?? false) $dialog['pin'] = true;
+    $dialog['id'] = parsePeer($rawDialog['peer']);
+    if (($rawDialog['unread_count'] ?? 0) > 0) {
+        $dialog[$v >= 5 ? 'unread' : 'unread_count'] = $rawDialog['unread_count'];
+    }
+    if ($rawDialog['pinned'] ?? false) {
+        $dialog[$v >= 5 ? 'pin' : 'pinned'] = true;
+    }
+    if ($v >= 5 && ($rawDialog['unread_mentions_count'] ?? 0) > 0) {
+        $dialog['mentions'] = $rawDialog['unread_mentions_count'];
+    }
     return $dialog;
 }
 
@@ -310,7 +316,9 @@ function parseUser($rawUser)
     $user['id'] = strval($rawUser['id']);
     $user[$v < 5 ? 'first_name' : 'fn'] = removeEmoji($rawUser['first_name'] ?? null);
     $user[$v < 5 ? 'last_name' : 'ln'] = removeEmoji($rawUser['last_name'] ?? null);
-    if ((isset($rawUser['username']) && $rawUser['username'] !== null) || $v < 5) $user[$v < 5 ? 'username' : 'name'] = $rawUser['username'] ?? null;
+    if ((isset($rawUser['username']) && $rawUser['username'] !== null) || $v < 5) {
+        $user[$v < 5 ? 'username' : 'name'] = $rawUser['username'] ?? null;
+    }
     if ($v >= 5) {
         if (isset($rawUser['photo'])) $user['p'] = true;
         if ($rawUser['contact'] ?? false) $user['k'] = true;
@@ -390,7 +398,7 @@ function parseMessage($rawMessage, $media=false, $short=false): array
             $fwd['msg'] = $rawFwd['saved_from_msg_id'] ?? $rawFwd['channel_post'];
         }
         if (isset($rawFwd['saved_from_peer'])) {
-            $fwd['peer'] = $rawFwd['saved_from_peer'];
+            $fwd['peer'] = parsePeer($rawFwd['saved_from_peer']);
         }
         if (isset($rawFwd['from_name'])) {
             $fwd['from_name'] = removeEmoji($rawFwd['from_name']);
@@ -491,7 +499,7 @@ function parseMessage($rawMessage, $media=false, $short=false): array
         $reply = [];
         $reply[$v < 5 ? 'msg' : 'id'] = $rawReply['reply_to_msg_id'] ?? null;
         if ($v >= 10 && isset($rawReply['reply_to_top_id'])) $reply['top'] = $rawReply['reply_to_msg_id'];
-        if (isset($rawReply['reply_to_peer_id'])) $reply['peer'] = $rawReply['reply_to_peer_id'];
+        if (isset($rawReply['reply_to_peer_id'])) $reply['peer'] = parsePeer($rawReply['reply_to_peer_id']);
         if (isset($rawReply['quote_text'])) $reply['quote'] = $rawReply['quote_text'];
         if ($v >= 5 && !$short && isset($reply['id'])) {
             $rawReplyMsg = null;
@@ -823,10 +831,10 @@ try {
             $mb = $b['message'] ?? null;
             if ($ma == null || $mb == null) {
                 foreach ($rawData['messages'] as $m) {
-                    if (parsePeer($m['peer_id']) == ($a['id'] ?? $a['peer'])) {
+                    if (getId($m['peer_id']) == ($a['id'] ?? $a['peer'])) {
                         $ma = $m;
                     }
-                    if (parsePeer($m['peer_id']) == ($b['id'] ?? $b['peer'])) {
+                    if (getId($m['peer_id']) == ($b['id'] ?? $b['peer'])) {
                         $mb = $m;
                     }
                     if ($ma !== null && $mb !== null) break;
@@ -1099,15 +1107,16 @@ try {
                 $dialog = parseDialog($rawDialog);
                 array_push($res['dialogs'], $dialog);
             }
-            function cmp($a, $b) {
+            function cmp($a, $b)
+            {
                 global $rawData;
                 $ma = null;
                 $mb = null;
                 foreach ($rawData['messages'] as $m) {
-                    if (parsePeer($m['peer_id']) == $a['id']) {
+                    if (getId($m['peer_id']) == $a['id']) {
                         $ma = $m;
                     }
-                    if (parsePeer($m['peer_id']) == $b['id']) {
+                    if (getId($m['peer_id']) == $b['id']) {
                         $mb = $m;
                     }
                     if ($ma !== null && $mb !== null) break;
