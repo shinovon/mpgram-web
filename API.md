@@ -2,6 +2,10 @@
 
 > [!WARNING]
 > API may change any time without notice.
+>
+> **MPGram API must not be used for bots, its only purpose is to make custom clients for legacy devices.**
+>
+> **Instance owners are advised to block any suspicious-looking User-Agents or IP addresses from data-centers**
 
 Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets`
 
@@ -12,7 +16,7 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
 - All methods requre authorization, unless stated otherwise.
 - All methods return JSON objects, unless stated otherwise.
 - All methods accept parameters with GET query, POST multipart or POST URL-encoded form.
-- All methods may return [Error object](#Error) in case of failure.
+- Any method may return [Error object](#Error) in case of failure.
 - For authorization, set `X-mpgram-user` request header or `user` parameter via GET or POST.
 
 ## Client request headers
@@ -29,6 +33,21 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
 - `X-Server-Api-Version`: Maximum supported API version
 - `X-file-rewrite-supported`: `1` If server supports `file/FILENAME?c=PEER_ID&m=MESSAGE_ID` links
 - `X-voice-conversion-supported`: `1` If server supports voice messages conversion
+
+## Authorization flow example
+
+1. Request: `method=phoneLogin&phone=+123`
+<br>Response: `{"res":"need_captcha","captcha_id":"zxc"}`
+
+2. Request: `method=getCaptchaImg&captcha_id=zxc`
+<br>Response: JPEG Image
+
+3. Request: `method=phoneLogin&phone=+123&captcha_id=zxc&captcha_key=54321`
+<br>Response: `{"res":"code_sent","user":"asdfgh","phone_code_hash":"dsa"}`
+
+4. Request: `method=completePhoneLogin&code=12345`
+<br>Header: `X-mpgram-user: asdfgh`
+<br>Response: `{"res":1}`
 
 ## Models
 
@@ -198,18 +217,19 @@ Object
 
 - `res` (string or int)
   - 1: Authorization completed, client should call `me`.
-  - `code_sent`: Authorization code is send, client must call `completePhoneLogin`.
+  - `code_sent`: Authorization code is sent, client must call `completePhoneLogin`.
   - `qr`: QR code is generated, `text` contains authorization link, client must call `qrLogin` after QR code is scanned.
   - `phone_code_invalid`: Authorization code is invalid, code will be resent, client must call `completePhoneLogin` again with correct code.
   - `phone_code_expired`: Authorization code is expired, code will be resent, client must call `completePhoneLogin` again with correct code.
   - `need_captcha`: Captcha required, client must call `getCaptchaImg` with provided `captcha_id`, then client must call method again with `captcha_id` and `captcha_key`.
   - `password`: Cloud password requested, must call `complete2faLogin`.
   - `auth_restart`: Authorization failed, client must call `phoneLogin` again.
-  - `phone_number_invalid`: Pphone number is invalid, cannot proceed.
+  - `phone_number_invalid`: Phone number is invalid, cannot proceed.
   - `no_password`: Cloud password is enabled but not set, cannot proceed.
   - `need_signup`: Phone number is unregistered, cannot proceed.
   - `exception`: Server side error occurred.
-- `user` (string, optional): User code, client must save it if present.
+- `user` (string, optional): User code, if present, client must save it and use it in all subsequent requests as `X-mpgram-user` header.
+- `phone_code_hash` (string, optional): Phone code hash to be used in `resendCode`, present in `phoneLogin` response or if `completePhoneLogin` was unsuccessful
 - `message` (string, optional): Error message
 
 
@@ -224,11 +244,12 @@ Object
 
 Most common error messages:
 - `API is disabled`: Server does not support API requests
-- `Instance password is required`: Server requires password
+- `Instance password is required`: Server requires password, client must provide valid `X-mpgram-instance-password` header
 - `Unsupported API version`: Client API version is outdated
 - `Login API is disabled`: Server does not accept authorization through API
 - `Invalid authorization`: Requested method requires valid authorization
 - `Could not get user info`, `Failed to load session`: Authorization session expired
+
 
 
 ## Authorization methods
@@ -276,10 +297,52 @@ Does not require authorization
 ### `qrLogin`
 
 #### Description
-Check QR code authorization status.
+Checks QR code authorization status, generates new link if authorization is not complete.
 
 #### Response
 [Authorization response object](#Authorization-response)
+
+
+
+### `completePhoneLogin`
+
+#### Description
+Checks authorization code
+
+#### Parameters
+- `code`
+
+#### Response
+[Authorization response object](#Authorization-response)
+
+
+
+### `complete2faLogin`
+
+#### Description
+Checks cloud password
+
+#### Parameters
+- `password`: Cloud password
+
+#### Response
+[Authorization response object](#Authorization-response)
+
+
+
+### `resendCode`
+
+#### Description
+Resends authorization code
+
+#### Parameters
+- `phone`: Phone number
+- `hash`: `phone_code_hash` provided in previous [authorization response](#Authorization-response)
+
+#### Response
+Object
+
+- `res`: 1 if request completed successfully
 
 
 
@@ -300,6 +363,29 @@ JPEG image
 ### `checkAuth`
 **Deprecated since v5, use [me](#me) method**
 
+#### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+
+
+### `completeSignup`
+**Removed since v2**
+
+#### Parameters
+- `first_name`: First name
+- `last_name`: Last name
+
+#### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+
+
+### `logout`
+**Removed since v2, you may use `login.php?logout=1` from web version**
 
 
 
@@ -397,6 +483,20 @@ Object
 
 
 
+## Additional endpoints
+
+### `file.php`
+
+TODO
+
+
+
+### `ava.php`
+
+TODO
+
+
+
 ## Methods availability by API versions
 v1:
 - `getCaptchaImg`
@@ -439,6 +539,7 @@ v5:
 - `editMessage`
 - `deleteMessage`
 - `resolvePhone`
+- `resendCode`
 
 v6:
 - `searchMessages`
