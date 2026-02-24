@@ -536,7 +536,7 @@ function parseMessage($rawMessage, $media=false, $short=false): array
                 foreach ($row['buttons'] ?? [] as $button) {
                     $r = ['text' => $button['text'] ?? ''];
                     if (isset($button['data'])) {
-                        $r['data'] = urlencode(base64_encode($button['data']));
+                        $r['data'] = base64_encode($button['data']);
                     } else if (isset($button['url'])) {
                         $r['url'] = $button['url'];
                     }
@@ -1739,21 +1739,21 @@ try {
                     $attr = true;
                 } else {
                     switch ($ext) {
-                        case 'jpg':
-                        case 'jpeg':
-                        case 'png':
-                            $newfile = $file.'.'.$ext;
-                            if (!move_uploaded_file($file, $newfile)) {
-                                json(['error' => ['message' => 'Failed to move file']]);
-                                break;
-                            }
-                            $type = 'inputMediaUploadedPhoto';
-                            $file = $newfile;
+                    case 'jpg':
+                    case 'jpeg':
+                    case 'png':
+                        $newfile = $file.'.'.$ext;
+                        if (!move_uploaded_file($file, $newfile)) {
+                            json(['error' => ['message' => 'Failed to move file']]);
                             break;
-                        default:
-                            $type = 'inputMediaUploadedDocument';
-                            $attr = true;
-                            break;
+                        }
+                        $type = 'inputMediaUploadedPhoto';
+                        $file = $newfile;
+                        break;
+                    default:
+                        $type = 'inputMediaUploadedDocument';
+                        $attr = true;
+                        break;
                     }
                 }
                 $attributes = [];
