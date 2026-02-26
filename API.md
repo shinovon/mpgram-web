@@ -1275,3 +1275,8 @@ v9:
 v10:
 - `sendBotCallback`
 - `qrLogin`
+
+v11 **FUTURE**:
+- `uninstallStickerSet`
+- `getPollResults`
+- `getMessageReadParticipants`
