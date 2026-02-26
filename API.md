@@ -203,7 +203,7 @@ Object
 - `k` (boolean, optional): true if user is listed in contacts. **since v5**
 - `s` (boolean, optional): true if user is online. **since v5**
 - `w` (int, optional): Date when user was last online. **since v5**
-- `a` (boolean, optional) true if user has admin rights, present only in `getParticipants` response.
+- `a` (boolean, optional) true if user has admin rights, present only in `getParticipants` response. **since v6**
 
 ### Removed since v5
 - `first_name` (string): First name, replaced by `fn`
@@ -599,6 +599,12 @@ Object
 
 
 
+## `searchChats`
+
+TODO
+
+
+
 # Messages methods
 
 ## `getHistory`
@@ -691,7 +697,10 @@ Deletes message.
 
 ### Parameters
 - `peer`: Peer ID
-- `id`: Comma-separated list of message IDs
+- `id`: Comma-separated list of message IDs. **since v9**
+
+#### Changed since v9
+- `id`: Message ID.
 
 ### Response
 Object
@@ -900,6 +909,17 @@ Object
 
 
 
+## `checkChatInvite`
+
+TODO
+
+
+
+## `importChatInvite`
+
+TODO
+
+
 
 # Channels methods
 
@@ -984,6 +1004,12 @@ TODO
 
 
 ## `ava.php`
+
+TODO
+
+
+
+## `voice.php`
 
 TODO
 
