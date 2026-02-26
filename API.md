@@ -230,6 +230,18 @@ Object
 
 
 
+## Messages history response
+
+Object
+
+- `count` (int, optional): Total count of messages
+- `off` (int, optional): Offset
+- `messages` (array, optional): Array of [Message](#Message) objects
+- `users` (object, optional): Map of [User](#User) objects by their [Peer IDs](#Peer-ID)
+- `chats` (object, optional): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
+
+
+
 ## Authorization response
 
 Object
@@ -237,7 +249,7 @@ Object
 - `res` (string or int)
   - 1: Authorization completed, client should call `me`.
   - `code_sent`: Authorization code is sent, client must call `completePhoneLogin`.
-  - `qr`: QR code is generated, `text` contains Base64-encoded authorization link, client must call `qrLogin` after QR code is scanned.
+  - `qr`: QR code is generated, `text` contains Base64 encoded authorization link, client must call `qrLogin` after QR code is scanned.
   - `phone_code_invalid`: Authorization code is invalid, code will be resent, client must call `completePhoneLogin` again with correct code.
   - `phone_code_expired`: Authorization code is expired, code will be resent, client must call `completePhoneLogin` again with correct code.
   - `need_captcha`: Captcha required, client must call `getCaptchaImg` with provided `captcha_id`, then client must call method again with `captcha_id` and `captcha_key`.
@@ -426,13 +438,21 @@ Returns information about of logged user.
 
 ## `getPeer`
 
+### Description
+Returns information about peer.
+
 ### Parameters
 - `id`: [Peer ID](#Peer-ID)
 
 ### Response
 [User](#User) or [Chat](#Chat) object
 
+
+
 ## `getPeers`
+
+### Description
+Returns information about list of peers.
 
 ### Parameters
 - `id`: Comma-separated [Peer IDs](#Peer-ID)
@@ -440,42 +460,469 @@ Returns information about of logged user.
 ### Response
 Object
 
-- `users`: Array of [User](#User) objects
-- `chats`: Array of [Chat](#Chat) objects
+- `users` (object): Map of [User](#User) objects by their [Peer IDs](#Peer-ID)
+- `chats` (object): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
+
+
 
 ## `getFullInfo`
-TODO
+
+### Description
+Returns detailed raw information about peer.
+
+Passed directly to MadelineProto API.
+
+See: https://docs.madelineproto.xyz/FullInfo.html
+
+### Parameters
+- `id`: [Peer ID](#Peer-ID)
+
+### Response
+MadelineProto `FullInfo` object
+
+
 
 ## `getInfo`
-TODO
+
+### Description
+Returns raw information about peer.
+
+Passed directly to MadelineProto API.
+
+See: https://docs.madelineproto.xyz/Info.html
+
+### Parameters
+- `id`: [Peer ID](#Peer-ID)
+
+### Response
+MadelineProto `Info` object
+
+
 
 ## `resolvePhone`
-TODO
+
+### Description
+Returns raw user information for provided phone number, if their privacy settings allow it.
+
+Passed directly to MadelineProto API.
+
+See: https://docs.madelineproto.xyz/API_docs/types/contacts.ResolvedPeer.html
+
+### Parameters
+- `phone`: Phone number
+
+### Response
+Object
+
+- `res` (object): MadelineProto `contacts.ResolvedPeer` object
 
 
 
 # Dialogs methods
 ## `getDialogs`
+
+### Description
 TODO
 
+### Parameters
+- `offset_id` (optional)
+- `offset_date` (optional)
+- `offset_limit` (optional)
+- `offset_id` (optional)
+- `f` (optional): Folder ID
+- `fields` (optional): Comma-separated list of possible values: `messages`, `users`, `chats`
+
+### Response
+- `dialogs` (array): Array of [Dialog](#Dialog) objects
+- `messsage` (object, optional): Map of [Message](#Message) objects by their [Peer IDs](#Peer-ID)
+- `users` (object, optional): Map of [User](#User) objects by their [Peer IDs](#Peer-ID)
+- `chats` (object, optional): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
+
+
+
 ## `getAllDialogs`
-TODO
+
+### Description
+Returns all dialogs of logged user.
+
+### Parameters
+- `fields` (optional): Comma-separated list of possible values: `messages`, `users`, `chats`
+
+### Response
+- `dialogs` (array): Array of [Dialog](#Dialog) objects
+- `messsage` (object, optional): Map of [Message](#Message) objects by their [Peer IDs](#Peer-ID)
+- `users` (object, optional): Map of [User](#User) objects by their [Peer IDs](#Peer-ID)
+- `chats` (object, optional): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
+
+
 
 ## `getContacts`
 
+### Description
+Returns list of contacts of logged user.
+
 ### Response
 Object
+
 - `res` (array): Array of [User](#User) objects 
 
+
+
 ## `getFolders`
-TODO
+
+### Description
+Returns list of dialog folders of logged user.
+
+### Response
+Object
+
+- `res` (array or null): Array of folders
+  - Folder (object)
+    - `id` (int): Folder ID
+    - `t` (string, optional): Folder title
+- `archive` (boolean. optional): true if user has archived chats
+
+
 
 ## `getDialog`
-TODO
+
+### Description
+Returns specific dialog. TODO
+
+### Parameters
+- `id`: [Peer ID](#Peer-ID)
+
+### Response
+Object
+
+- `res` (object)
 
 
 
 # Messages methods
+
+## `getHistory`
+
+### Description
+Returns history of messages. TODO
+
+### Parameters
+- `peer`: Peer ID
+- `offset_id` (optional)
+- `offset_date` (optional)
+- `add_offset` (optional)
+- `limit` (optional)
+- `max_id` (optional)
+- `min_id` (optional)
+- `read` (optional): Set to 1 to mark messages as read
+- `media` (optional): Set to 1 to include media in messages
+- `fields` (optional): Comma-separated list of possible values: `messages`, `users`, `chats`
+
+### Response
+[Messages history response](#Messages-history-response)
+
+
+
+## `getMessages`
+
+### Description
+Returns specific messages.
+
+### Parameters
+- `peer`: Peer ID
+- `id`: Comma-separated list of message IDs
+- `read` (optional): Set to 1 to mark messages as read
+- `media` (optional): Set to 1 to include media in messages
+- `fields` (optional): Comma-separated list of possible values: `messages`, `users`, `chats`
+
+### Response
+[Messages history response](#Messages-history-response)
+
+
+
+## `searchMessages`
+
+### Description
+Returns filtered history of messages. TODO
+
+### Parameters
+- `peer`: Peer ID
+- `q` (optional): Search query
+- `filter` (optional): One of values: `Photos`, `Video`, `Document`, `Music`, `Voice`
+- `offset_id` (optional): Offset message ID
+- `offset_date` (optional)
+- `add_offset` (optional)
+- `limit` (optional): Messages limit
+- `max_id` (optional): Maximum message ID
+- `min_id` (optional): Minimum message ID
+- `top_msg_id` (optional): Thread top message ID
+- `read` (optional): Set to 1 to mark messages as read
+- `media` (optional): Set to 1 to include media in messages
+- `fields` (optional): Comma-separated list of possible values: `messages`, `users`, `chats`
+
+### Response
+[Messages history response](#Messages-history-response)
+
+
+
+
+
+
+
+## `readMessages`
+
+### Description
+Marks messages as read.
+
+### Parameters
+- `peer`: Peer ID
+- `max`: Max message ID
+- `thread` (optional): Thread top message ID, used for forum chats
+
+### Response
+Nothing
+
+
+
+## `deleteMessage`
+
+### Description
+Deletes message.
+
+### Parameters
+- `peer`: Peer ID
+- `id`: Comma-separated list of message IDs
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+
+
+## `sendMessage`
+
+TODO
+
+
+
+## `sendMedia`
+
+TODO
+
+
+
+## `editMessage`
+
+TODO
+
+
+
+## `setTyping`
+
+### Description
+Updates typing status.
+
+### Parameters
+- `peer`: Peer ID
+- `action`: One of values: `Typing`, `Cancel`
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+
+
+## `getForumTopics`
+
+### Description
+Returns list of topics in forum chat. TODO
+
+### Parameters
+- `peer`: Peer ID
+- `limit`: Response limit
+
+### Reponse
+Object
+
+- `res` (array)
+  - Topic (object)
+    - `id` (int)
+    - `closed` (boolean)
+    - `pinned` (boolean)
+    - `date` (int)
+    - `top` (int): Thread top message ID
+    - `unread` (int)
+    - `read_max_id` (int)
+    - `title` (string, optional)
+
+
+
+## `sendVote`
+
+TODO
+
+
+
+## `pinMessage`
+
+### Description
+Pins message.
+
+### Parameters
+- `peer`: [Peer ID](#Peer-ID)
+- `id`: Message ID
+- `unpin` (optional): set 1 to unpin previous pinned message
+- `silent` (optional): set to 0 to send notification or 1 to not, 1 by default
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+
+
+## `getDiscussionMessage`
+
+### Description
+Returns information about post comments. TODO
+
+### Parameters
+`peer`: Peer ID
+`msg_id`: Message ID
+
+### Response
+Object
+
+- `id` (int): Message ID
+- `peer_id` (string): [Peer ID](#Peer-ID)
+- `unread` (int)
+- `ead` (int)
+- `max_id` (int)
+
+
+
+## `startBot`
+
+### Description
+TODO
+
+### Parameters
+- `id`: Peer ID
+- `start` (optional): Start parameter
+<!-- - `random` (optional): Random seed -->
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+
+
+## `sendBotCallback`
+(Alias `botCallback` **deprecated since v10**)
+
+### Description
+Sends bot callback
+
+See: https://docs.madelineproto.xyz/API_docs/types/messages.BotCallbackAnswer.html
+
+### Parameters
+- `peer`: Peer ID
+- `msg_id`: Message ID
+- `data`: Base64 encoded data
+- `timeout` (optional): Answer timeout in seconds, decimal
+
+### Response
+MadelineProto messages.BotCallbackAnswer object
+
+
+
+
+## `getStickerSets`
+
+### Description
+Returns sticker sets of logged user. TODO
+
+### Response
+Object
+
+- `res` (array)
+  - Sticker set (object)
+    - `id` (string)
+    - `access_hash` (string)
+    - `title` (string)
+    - `short_name` (string, optional)
+
+
+
+## `getStickerSet`
+
+### Description
+Returns specific sticker set.
+
+### Parameters
+- `id`: Sticker set ID
+- `access_hash`: Sticker set access hash
+- `slug`: Sticker set short name
+
+### Response
+Object
+- `id` (string): Sticker set ID
+- `access_hash`: Sticker set access hash
+- `title` (string, optional): Title
+- `short_name` (string, optional)
+- `installed` (int, optional): Date when sticker set was installed
+- `count` (int, optional): Count of stickers
+- `res` (array): Array of stickers
+  - Sticker (object)
+    - `id` (string): Document ID
+    - `access_hash` (string): Document access hash
+    - `mime` (string): MIME type
+
+
+
+## `installStickerSet`
+
+### Description
+Adds sticker set.
+
+### Parameters
+- `id`: Sticker set ID
+- `access_hash`: Sticker set access hash
+- `slug`: Sticker set short name
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+
+
+
+# Channels methods
+
+## `joinChannel`
+
+TODO
+
+
+
+## `leaveChannel`
+
+TODO
+
+
+
+## `getParticipants`
+
+TODO
+
+
+
+## `banMember`
+
 TODO
 
 
@@ -502,8 +949,15 @@ TODO
 TODO
 
 ## `getNotifySettings`
-TODO
 
+### Description
+Returns notification settings of logged user. TODO
+
+### Response
+Object
+- `users` (int)
+- `chats` (int)
+- `broadcasts` (int)
 
 
 # Misc methods
