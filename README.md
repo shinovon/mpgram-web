@@ -19,16 +19,16 @@ You can deploy your own instance quickly with Docker Compose - [see how](https:/
 - Deny access to sessions folder (`s/` by default, see in `config.php`) and `MadelineProto.log`
 - Install required php extensions: `gd`, `mbstring`, `xml`, `json`, `fileinfo`, `gmp`, `iconv`, `ffi`
 - Download and set [browscap](https://browscap.org/) database in `php.ini` to get better logged in device names
+- Set `session.gc_maxlifetime = 8640000` in `php.ini`
 - Install Composer v2+
 - Install MadelineProto and its dependencies with `composer update`
 - Apply MadelineProto patches:
-```
+```bash
 patch -p0 < patches/InternalDoc.php.patch
 patch -p0 < patches/Files.php.patch
 patch -p0 < patches/UpdateHandler.php.patch
 ```
 - Make a background script that restarts php service at least every hour
-- Set `session.gc_maxlifetime = 8640000` in `php.ini`
 - For more details on installing MadelineProto <a href="https://docs.madelineproto.xyz/docs/REQUIREMENTS.html">see here</a>
 
 ### Animated stickers conversion (Optional)
@@ -40,7 +40,7 @@ patch -p0 < patches/UpdateHandler.php.patch
 - Edit `config.php` by setting `CONVERT_TGS_STICKERS` to true, and `LOTTIE_DIR` to path, where lottie_to_gif.sh is contained.
 
 Example:
-```
+```php
 define('CONVERT_TGS_STICKERS', true);
 define('LOTTIE_DIR', '/opt/lottie/');
 ```

@@ -13,7 +13,7 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
 - Minimum compatible version: 2
 
 ## Methods rules
-- All methods requre authorization, unless stated otherwise.
+- All methods require authorization, unless stated otherwise.
 - All methods return JSON objects, unless stated otherwise.
 - All methods accept parameters with GET query, POST multipart or POST URL-encoded form.
 - Any method may return [Error object](#Error) in case of failure.
@@ -491,8 +491,6 @@ Object
 ### Description
 Returns raw detailed information about peer.
 
-Passed directly to MadelineProto API.
-
 See: https://docs.madelineproto.xyz/FullInfo.html
 
 Available since v5
@@ -510,8 +508,6 @@ MadelineProto `FullInfo` object
 ### Description
 Returns raw information about peer.
 
-Passed directly to MadelineProto API.
-
 See: https://docs.madelineproto.xyz/Info.html
 
 Available since v8
@@ -528,8 +524,6 @@ MadelineProto `Info` object
 
 ### Description
 Returns raw user information for provided phone number, if their privacy settings allow it.
-
-Passed directly to MadelineProto API.
 
 See: https://docs.madelineproto.xyz/API_docs/types/contacts.ResolvedPeer.html
 
@@ -571,7 +565,7 @@ Available since v1
 - `raw` (object, optional): Raw result. **Deprecated**
 
 #### Removed since v5
-- `messsage` (object, optional): Map of [Message](#Message) objects by their [Peer IDs](#Peer-ID).
+- `messages` (object, optional): Map of [Message](#Message) objects by their [Peer IDs](#Peer-ID).
 
 ---
 
@@ -592,7 +586,7 @@ Available since v1
 - `raw` (object, optional): Raw result. **Deprecated**
 
 #### Removed since v5
-- `messsage` (object, optional): Map of [Message](#Message) objects by their [Peer IDs](#Peer-ID). **since v5**
+- `messages` (object, optional): Map of [Message](#Message) objects by their [Peer IDs](#Peer-ID). **since v5**
 
 ---
 
@@ -884,7 +878,7 @@ Available since v6
 - `peer`: Peer ID
 - `limit`: Response limit
 
-### Reponse
+### Response
 Object
 
 - `res` (array)
@@ -1083,13 +1077,33 @@ Object
 
 ## `checkChatInvite`
 
-TODO
+### Description
+Returns raw invite link information
+
+See: https://docs.madelineproto.xyz/API_docs/types/ChatInvite.html
+
+### Parameters
+- `id`: Invite hash
+
+### Response
+Object
+
+- `res`: MadelineProto `ChatInvite` object
 
 ---
 
 ## `importChatInvite`
 
-TODO
+### Description
+Join chat by invite link
+
+### Parameters
+- `id`: Invite hash
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
 
 ---
 
@@ -1097,25 +1111,66 @@ TODO
 
 ## `joinChannel`
 
-TODO
+### Description
+Join public channel
+
+### Parameters
+- `id`: [Peer ID](#Peer-ID) of channel
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
 
 ---
 
 ## `leaveChannel`
 
-TODO
+### Description
+Leave channel
+
+### Parameters
+- `id`: [Peer ID](#Peer-ID) of channel
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
 
 ---
 
 ## `getParticipants`
 
-TODO
+### Description
+Returns chat participants. TODO
+
+### Parameters
+- `peer`: [Peer ID](#Peer-ID)
+- `filter` (optional): `Recent` by default
+- `offset` (optional)
+- `limit` (optional)
+
+### Response
+Object
+
+- `count` (int, optional): Count of chat participants
+- `res` (array): Array of [User](#User) objects
 
 ---
 
 ## `banMember`
 
-TODO
+### Description
+Bans an user from chat
+
+### Parameters
+- `peer`: [Peer ID](#Peer-ID)
+- `id`: User ID
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
 
 ---
 
