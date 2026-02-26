@@ -1578,7 +1578,11 @@ try {
         $id = getParam('id');
         $start = getParam('start', null);
         $random = getParam('random', null);
-        $MP->messages->startBot(['start_param' => $start, 'bot' => $id, 'random_id' => $random]);
+        $p = ['start_param' => $start, 'bot' => $id, 'random_id' => $random];
+        if (!isParamEmpty('peer')) {
+            $p['peer'] = getParam(peer);
+        }
+        $MP->messages->startBot($p);
     
         json(['res' => 1]);
         break;
@@ -2050,6 +2054,12 @@ try {
             )]);
 
         json(['res' => '1']);
+        break;
+    case 'getPollResults':
+        // TODO
+        break;
+    case 'getMessageReadParticipants':
+        // TODO
         break;
     default:
         error(['message' => "Method \"$METHOD\" is undefined"]);
