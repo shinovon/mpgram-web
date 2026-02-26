@@ -202,8 +202,8 @@ Object
 - `name` (string, optional): Public link
 - `p` (boolean, optional): true if user has photo. **since v5**
 - `k` (boolean, optional): true if user is listed in contacts. **since v5**
-- `s` (boolean, optional): true if user is online. **since v5**
-- `w` (int, optional): Date when user was last online. **since v5**
+- `s` (boolean, optional): true if user is online, present if `status` is listed in `fields` parameter. **since v5**
+- `w` (int, optional): Date when user was last online or 0 if hidden, present if `status` is listed in `fields` parameter. **since v5**
 - `a` (boolean, optional) true if user has admin rights, present only in `getParticipants` response. **since v6**
 
 ### Removed since v5
@@ -431,7 +431,7 @@ Object
 ---
 
 ## `logout`
-**Removed since v2, you may use `login.php?logout=1` from web version**
+**Removed since v2**
 
 ---
 
@@ -560,7 +560,7 @@ Available since v1
 - `offset_date` (optional)
 - `offset_peer` (optional)
 - `limit` (optional): Dialogs limit
-- `f` (optional): Folder ID. **since v5**
+- `f` (optional): Folder ID, set to 1 for archived chats. **since v5**
 - `fields` (optional): Comma-separated list of possible values: `dialogs`, `users`, `chats`, ~~`raw`~~, ~~`messages`~~
 
 ### Response
@@ -631,7 +631,9 @@ Object
 ## `getDialog`
 
 ### Description
-Returns specific dialog. TODO
+Returns raw information about specific dialog.
+
+See: https://docs.madelineproto.xyz/API_docs/types/Dialog.html
 
 Available since v9
 
@@ -641,7 +643,7 @@ Available since v9
 ### Response
 Object
 
-- `res` (object)
+- `res` (object): MadelineProto `Dialog` object
 
 ---
 
@@ -949,12 +951,14 @@ Object
 ## `startBot`
 
 ### Description
-TODO
+
+Starts conversation with a bot.
 
 Available since v5
 
 ### Parameters
-- `id`: Peer ID
+- `id`: Bot [Peer ID](#Peer-ID)
+- `peer` (optional): [Peer ID](#Peer-ID). **since v11**
 - `start` (optional): Start parameter
 <!-- - `random` (optional): Random seed -->
 
@@ -1151,6 +1155,7 @@ Returns notification settings of logged user. TODO
 
 ### Response
 Object
+
 - `users` (int)
 - `chats` (int)
 - `broadcasts` (int)
@@ -1168,6 +1173,7 @@ Does not require authorization.
 
 ### Response
 Object
+
 - `res` (int): Timezone offset in seconds 
 
 ---
