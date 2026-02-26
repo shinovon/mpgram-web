@@ -719,7 +719,7 @@ Available since v6
 ### Parameters
 - `peer`: Peer ID
 - `q` (optional): Search query
-- `filter` (optional): One of values: `Photos`, `Video`, `Document`, `Music`, `Voice`
+- `filter` (optional): Possible values: `Photos`, `Video`, `Document`, `Music`, `Voice`
 - `top_msg_id` (optional): Thread top message ID
 - `offset_id` (optional): Offset message ID
 - `offset_date` (optional)
@@ -864,7 +864,7 @@ Available since v6
 
 ### Parameters
 - `peer`: Peer ID
-- `action`: One of values: `Typing`, `Cancel`
+- `action`: Possible values: `Typing`, `Cancel`
 
 ### Response
 Object
@@ -983,7 +983,7 @@ See: https://docs.madelineproto.xyz/API_docs/types/messages.BotCallbackAnswer.ht
 - `peer`: Peer ID
 - `msg_id`: Message ID
 - `data`: Base64 encoded data
-- `timeout` (optional): Answer timeout in seconds, decimal
+- `timeout` (optional): Answer timeout in seconds, positive decimal, 0.5 by default
 
 ### Response
 MadelineProto messages.BotCallbackAnswer object
