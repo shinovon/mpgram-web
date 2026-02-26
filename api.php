@@ -1642,6 +1642,7 @@ try {
     case 'getParticipants':
         checkAuth();
         setupMadelineProto();
+        // TODO private chat
         $p = ['channel' => getParam('peer'), 'filter' => ['_' => 'channelParticipants'.getParam('filter', 'Recent')]];
         addParamToArray($p, 'offset', 'int');
         addParamToArray($p, 'limit', 'int');
@@ -1651,7 +1652,9 @@ try {
         $res['res'] = [];
         foreach ($rawData['participants'] as $p) {
             $r = parseUser(findPeer(getId($p), $rawData));
-            if (isset($p['admin_rights'])) $r['a'] = true;
+            if ($r && isset($p['admin_rights'])) {
+                $r['a'] = true;
+            }
             $res['res'][] = $r;
         }
         if (isset($rawData['count'])) $res['count'] = $rawData['count'];
@@ -1805,7 +1808,8 @@ try {
     case 'banMember':
         checkAuth();
         setupMadelineProto();
-        
+
+        // TODO private chat
         $MP->channels->editBanned(['channel' => (int) getParam('peer'), 'participant' => (int) getParam('id'), 'banned_rights' => [
             '_' => 'chatBannedRights',
             'until_date' => 1,
