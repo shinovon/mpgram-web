@@ -158,7 +158,7 @@ Object
 - `reply`
   - `msg` (int or null): **replaced by `id`**
 
-
+---
 
 ## Dialog
 
@@ -178,7 +178,7 @@ Object
 
 - `type` (string): Type of peer, possible values: "user", "chat", or "channel".
 
-
+---
 
 ## Peer ID
 
@@ -189,7 +189,7 @@ String
 - -1000000000000 to -2000000000000 exclusive: Channel
 - from -2000000000000 to -Infinity exclusive: Secret chat **(Unsupported!)**
 
-
+---
 
 ## User
 
@@ -210,7 +210,7 @@ Object
 - `last_name` (string): Last name, replaced by `ln`
 - `username` (string or null): Public link, **replaced by `name`**
 
-
+---
 
 ## Chat
 
@@ -228,7 +228,7 @@ Object
 - `title` (string): Title of chat, **replaced by `t`**
 - `username` (string or null): Public link, **replaced by `name`**
 
-
+---
 
 ## Messages history response
 
@@ -240,7 +240,7 @@ Object
 - `users` (object, optional): Map of [User](#User) objects by their [Peer IDs](#Peer-ID)
 - `chats` (object, optional): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
 
-
+---
 
 ## Authorization response
 
@@ -263,7 +263,7 @@ Object
 - `phone_code_hash` (string, optional): Phone code hash to be used in `resendCode`, present in `phoneLogin` response or if `completePhoneLogin` was unsuccessful
 - `message` (string, optional): Error message
 
-
+---
 
 ## Error
 
@@ -281,7 +281,7 @@ Most common error messages:
 - `Invalid authorization`: Requested method requires valid authorization
 - `Could not get user info`, `Failed to load session`: Authorization session expired
 
-
+---
 
 # Authorization methods
 
@@ -302,7 +302,7 @@ Does not require authorization
 #### Response
 [Authorization response object](#Authorization-response)
 
-
+---
 
 ## `initLogin`
 
@@ -323,7 +323,7 @@ Does not require authorization
 ### Response
 [Authorization response object](#Authorization-response)
 
-
+---
 
 ## `qrLogin`
 
@@ -333,7 +333,7 @@ Checks QR code authorization status, generates new link if authorization is not 
 ### Response
 [Authorization response object](#Authorization-response)
 
-
+---
 
 ## `completePhoneLogin`
 
@@ -346,7 +346,7 @@ Checks authorization code
 ### Response
 [Authorization response object](#Authorization-response)
 
-
+---
 
 ## `complete2faLogin`
 
@@ -359,7 +359,7 @@ Checks cloud password
 #### Response
 [Authorization response object](#Authorization-response)
 
-
+---
 
 ## `resendCode`
 
@@ -375,7 +375,7 @@ Object
 
 - `res`: 1 if request completed successfully
 
-
+---
 
 ## `getCaptchaImg`
 ### Description
@@ -389,7 +389,7 @@ Does not require authorization
 ### Response
 JPEG image
 
-
+---
 
 ## `checkAuth`
 **Deprecated since v5, use [me](#me) method**
@@ -399,7 +399,7 @@ Object
 
 - `res`: 1 if request completed successfully
 
-
+---
 
 ## `completeSignup`
 **Removed since v2**
@@ -413,12 +413,12 @@ Object
 
 - `res`: 1 if request completed successfully
 
-
+---
 
 ## `logout`
 **Removed since v2, you may use `login.php?logout=1` from web version**
 
-
+---
 
 # Peers methods
 
@@ -434,7 +434,7 @@ Returns information about of logged user.
 ### Response
 [User](#User) object
 
-
+---
 
 ## `getPeer`
 
@@ -447,7 +447,7 @@ Returns information about peer.
 ### Response
 [User](#User) or [Chat](#Chat) object
 
-
+---
 
 ## `getPeers`
 
@@ -463,7 +463,7 @@ Object
 - `users` (object): Map of [User](#User) objects by their [Peer IDs](#Peer-ID)
 - `chats` (object): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
 
-
+---
 
 ## `getFullInfo`
 
@@ -480,7 +480,7 @@ See: https://docs.madelineproto.xyz/FullInfo.html
 ### Response
 MadelineProto `FullInfo` object
 
-
+---
 
 ## `getInfo`
 
@@ -497,7 +497,7 @@ See: https://docs.madelineproto.xyz/Info.html
 ### Response
 MadelineProto `Info` object
 
-
+---
 
 ## `resolvePhone`
 
@@ -516,7 +516,7 @@ Object
 
 - `res` (object): MadelineProto `contacts.ResolvedPeer` object
 
-
+---
 
 # Dialogs methods
 ## `getDialogs`
@@ -538,7 +538,7 @@ TODO
 - `users` (object, optional): Map of [User](#User) objects by their [Peer IDs](#Peer-ID)
 - `chats` (object, optional): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
 
-
+---
 
 ## `getAllDialogs`
 
@@ -554,7 +554,7 @@ Returns all dialogs of logged user.
 - `users` (object, optional): Map of [User](#User) objects by their [Peer IDs](#Peer-ID)
 - `chats` (object, optional): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
 
-
+---
 
 ## `getContacts`
 
@@ -566,7 +566,7 @@ Object
 
 - `res` (array): Array of [User](#User) objects 
 
-
+---
 
 ## `getFolders`
 
@@ -582,7 +582,7 @@ Object
     - `t` (string, optional): Folder title
 - `archive` (boolean. optional): true if user has archived chats
 
-
+---
 
 ## `getDialog`
 
@@ -597,13 +597,22 @@ Object
 
 - `res` (object)
 
-
+---
 
 ## `searchChats`
 
-TODO
+### Description
+Search dialogs.
 
+### Parameters
+- `q`: Search query
 
+### Response
+Object
+
+- `res` (array): Array of [User](#User) and [Chat](#Chat) objects
+
+---
 
 # Messages methods
 
@@ -627,7 +636,7 @@ Returns history of messages. TODO
 ### Response
 [Messages history response](#Messages-history-response)
 
-
+---
 
 ## `getMessages`
 
@@ -644,7 +653,7 @@ Returns specific messages.
 ### Response
 [Messages history response](#Messages-history-response)
 
-
+---
 
 ## `searchMessages`
 
@@ -669,11 +678,7 @@ Returns filtered history of messages. TODO
 ### Response
 [Messages history response](#Messages-history-response)
 
-
-
-
-
-
+---
 
 ## `readMessages`
 
@@ -688,7 +693,7 @@ Marks messages as read.
 ### Response
 Nothing
 
-
+---
 
 ## `deleteMessage`
 
@@ -696,7 +701,7 @@ Nothing
 Deletes message.
 
 ### Parameters
-- `peer`: Peer ID
+- `peer`: [Peer ID](#Peer-ID)
 - `id`: Comma-separated list of message IDs. **since v9**
 
 #### Changed since v9
@@ -707,25 +712,87 @@ Object
 
 - `res`: 1 if request completed successfully
 
-
+---
 
 ## `sendMessage`
 
-TODO
+### Description
+Sends message.
 
+Combined with message forwarding method, set `fwd_from` and `id` to forward a message before sending.
 
+### Parameters
+- `peer`: [Peer ID](#Peer-ID)
+- `text` (optional): Text of message
+- `html` (optional): Set to 1 to enable HTML parsing
+- `reply` (optional): Message ID to reply
+
+- `fwd_from` (optional): Peer ID to forward message from
+- `id` (optional): Message ID to forward, required if `fwd_from` is set
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+---
 
 ## `sendMedia`
 
-TODO
+### Description
+Sends media message.
 
+Combined with message forwarding method, set `fwd_from` and `id` to forward a message before sending.
 
+Either `file`, or `doc_id` with `doc_access_hash` have to be set.
+
+### Parameters
+- `peer`: [Peer ID](#Peer-ID)
+- `text` (optional): Text of message
+- `html` (optional): Set to 1 to enable HTML parsing
+- `reply` (optional): Message ID to reply
+
+- `file` (optional): File
+- `uncompressed` (optional): Set to 1 to send media uncompressed
+- `spoiler` (optional): Set to 1 to hide media under spoiler
+- `doc_id` (optional): Document ID
+- `doc_access_hash`: Document access hash
+
+- `fwd_from` (optional): Peer ID to forward message from
+- `id` (optional): Message ID to forward, required if `fwd_from` is set
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+---
 
 ## `editMessage`
 
-TODO
+### Description
+Edits sent message.
 
+### Parameters
+- `peer`: [Peer ID](#Peer-ID)
 
+- `id`: Message ID
+- `text` (optional): Text of message
+- `html` (optional): Set to 1 to enable HTML parsing
+- `reply` (optional): Message ID to reply
+
+- `file` (optional): File
+- `uncompressed` (optional): Set to 1 to send media uncompressed
+- `spoiler` (optional): Set to 1 to hide media under spoiler
+- `doc_id` (optional): Document ID
+- `doc_access_hash`: Document access hash
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+---
 
 ## `setTyping`
 
@@ -741,7 +808,7 @@ Object
 
 - `res`: 1 if request completed successfully
 
-
+---
 
 ## `getForumTopics`
 
@@ -766,13 +833,13 @@ Object
     - `read_max_id` (int)
     - `title` (string, optional)
 
-
+---
 
 ## `sendVote`
 
 TODO
 
-
+---
 
 ## `pinMessage`
 
@@ -790,7 +857,7 @@ Object
 
 - `res`: 1 if request completed successfully
 
-
+---
 
 ## `getDiscussionMessage`
 
@@ -810,7 +877,7 @@ Object
 - `ead` (int)
 - `max_id` (int)
 
-
+---
 
 ## `startBot`
 
@@ -827,7 +894,7 @@ Object
 
 - `res`: 1 if request completed successfully
 
-
+---
 
 ## `sendBotCallback`
 (Alias `botCallback` **deprecated since v10**)
@@ -846,8 +913,7 @@ See: https://docs.madelineproto.xyz/API_docs/types/messages.BotCallbackAnswer.ht
 ### Response
 MadelineProto messages.BotCallbackAnswer object
 
-
-
+---
 
 ## `getStickerSets`
 
@@ -864,7 +930,7 @@ Object
     - `title` (string)
     - `short_name` (string, optional)
 
-
+---
 
 ## `getStickerSet`
 
@@ -890,7 +956,7 @@ Object
     - `access_hash` (string): Document access hash
     - `mime` (string): MIME type
 
-
+---
 
 ## `installStickerSet`
 
@@ -907,19 +973,19 @@ Object
 
 - `res`: 1 if request completed successfully
 
-
+---
 
 ## `checkChatInvite`
 
 TODO
 
-
+---
 
 ## `importChatInvite`
 
 TODO
 
-
+---
 
 # Channels methods
 
@@ -927,46 +993,54 @@ TODO
 
 TODO
 
-
+---
 
 ## `leaveChannel`
 
 TODO
 
-
+---
 
 ## `getParticipants`
 
 TODO
 
-
+---
 
 ## `banMember`
 
 TODO
 
-
+---
 
 # Updates methods
 
 ## `updates`
 TODO
 
+---
+
 ## `getLastUpdate`
 TODO
+
+---
 
 ## `cancelUpdates`
 TODO
 
+---
+
 ## `updateStatus`
 TODO
 
-
+---
 
 # Notifications methods
 
 ## `notifications`
 TODO
+
+---
 
 ## `getNotifySettings`
 
@@ -979,6 +1053,7 @@ Object
 - `chats` (int)
 - `broadcasts` (int)
 
+---
 
 # Misc methods
 
@@ -993,7 +1068,7 @@ Does not require authorization.
 Object
 - `res` (int): Timezone offset in seconds 
 
-
+---
 
 # Additional endpoints
 
@@ -1001,19 +1076,19 @@ Object
 
 TODO
 
-
+---
 
 ## `ava.php`
 
 TODO
 
-
+---
 
 ## `voice.php`
 
 TODO
 
-
+---
 
 # Methods availability by API versions
 v1:

@@ -1677,7 +1677,7 @@ try {
         setupMadelineProto();
         $peer = (int) getParam('peer');
         
-        if (!isParamEmpty('fwd_from')) {
+        if ($METHOD != 'editMessage' && !isParamEmpty('fwd_from')) {
             $MP->messages->forwardMessages([
             'from_peer' => (int) getParam('fwd_from'),
             'to_peer' => $peer,
