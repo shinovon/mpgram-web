@@ -2037,6 +2037,20 @@ try {
         }
         json(['res' => $r]);
         break;
+    // v11
+    case 'uninstallStickerSet':
+        checkAuth();
+        setupMadelineProto();
+
+        $MP->messages->uninstallStickerSet(['stickerset' =>
+            (isParamEmpty('slug') ? ['_' => 'inputStickerSetID',
+                'id' => (int) getParam('id'),
+                'access_hash' => getParam('access_hash')]
+                : ['_' => 'inputStickerSetShortName', 'short_name' => getParam('slug')]
+            )]);
+
+        json(['res' => '1']);
+        break;
     default:
         error(['message' => "Method \"$METHOD\" is undefined"]);
     }
