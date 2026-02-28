@@ -2068,14 +2068,17 @@ try {
         setupMadelineProto();
 
         $res = [];
-
         $rawData = $MP->messages->getMessageReadParticipants(
             peer: getParam('peer'),
             msg_id: (int) getParam('id')
         );
 
         foreach ($rawData as $raw) {
-            $res[] = ['id' => parsePeer($raw['user_id']), 'date' => $raw['date']];
+            $r = ['date' => $raw['date'], 'id' => parsePeer($raw['user_id'])];
+            try {
+                $r = array_merge($r, parseUser($MP->getInfo($raw['user_id'])['User']));
+            } catch (Exception) {}
+            $res[] = $r;
         }
 
         json(['res' => $res]);
