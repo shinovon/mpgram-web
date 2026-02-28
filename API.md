@@ -574,6 +574,8 @@ Available since v1
 ### Description
 Returns all dialogs of logged user.
 
+**Deprecated, do not use**
+
 Available since v1
 
 ### Parameters
@@ -625,7 +627,7 @@ Object
 ## `getDialog`
 
 ### Description
-Returns raw information about specific dialog.
+Returns raw information about dialog.
 
 See: https://docs.madelineproto.xyz/API_docs/types/Dialog.html
 
@@ -1006,7 +1008,7 @@ Object
 ## `getStickerSet`
 
 ### Description
-Returns specific sticker set.
+Returns sticker set information.
 
 Either `id` with `access_hash` or `slug` have to be set.
 
@@ -1112,7 +1114,7 @@ Object
 ## `joinChannel`
 
 ### Description
-Join public channel
+Join public channel.
 
 ### Parameters
 - `id`: [Peer ID](#Peer-ID) of channel
@@ -1127,7 +1129,7 @@ Object
 ## `leaveChannel`
 
 ### Description
-Leave channel
+Leave channel.
 
 ### Parameters
 - `id`: [Peer ID](#Peer-ID) of channel
@@ -1161,7 +1163,7 @@ Object
 ## `banMember`
 
 ### Description
-Bans an user from chat
+Bans a user from channel.
 
 ### Parameters
 - `peer`: [Peer ID](#Peer-ID)
@@ -1269,7 +1271,7 @@ v1:
 - `logout` **Removed since v2**
 - `getServerTimeOffset`
 - `getDialogs`
-- `getAllDialogs`
+- `getAllDialogs` **Deprecated**
 - `getHistory`
 
 v2:
@@ -1341,3 +1343,8 @@ v11 **FUTURE**:
 - `uninstallStickerSet`
 - `getPollResults`
 - `getMessageReadParticipants`
+- `getExportedChatInvites`
+- `exportChatinvite`
+- `addChatUser`
+- `deleteChatUser`
+- `inviteToChannel`

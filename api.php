@@ -27,7 +27,7 @@ function exceptions_error_handler($severity, $message, $filename, $lineno)
 set_error_handler('exceptions_error_handler');
 
 
-function json($json, $headers=true): void
+function json($json, $headers = true): void
 {
     if (defined("json")) return;
     global $PARAMS;
@@ -38,8 +38,8 @@ function json($json, $headers=true): void
     if ($headers) {
         $time = time();
         $sv = API_VERSION;
-        header("X-Server-Time: {$time}");
-        header("X-Server-Api-Version: {$sv}");
+        header("X-Server-Time: $time");
+        header("X-Server-Api-Version: $sv");
         if (defined('FILE_REWRITE') && FILE_REWRITE) header("X-file-rewrite-supported: 1");
         if (defined('CONVERT_VOICE_MESSAGES') && CONVERT_VOICE_MESSAGES) header("X-voice-conversion-supported: 1");
         header("Content-Type: application/json");
@@ -73,13 +73,13 @@ function checkField($field, $def = def)
     if (!isset($PARAMS['fields'])) {
         return $def;
     }
-    return in_array($field, explode(',',$PARAMS['fields']));
+    return in_array($field, explode(',', $PARAMS['fields']));
 }
 
-function checkCount($count, $def=100): bool
+function checkCount($count, $def = 100): bool
 {
     global $PARAMS;
-    if (!isset($PARAMS['count']) || empty($PARAMS['count'])) {
+    if (empty($PARAMS['count'])) {
         return $count < $def;
     }
     return $count < (int) $PARAMS['count'];
@@ -88,26 +88,26 @@ function checkCount($count, $def=100): bool
 function isParamEmpty($param): bool
 {
     global $PARAMS;
-    return !isset($PARAMS[$param]) || empty($PARAMS[$param]);
+    return empty($PARAMS[$param]);
 }
 
 function checkParamEmpty($param): void
 {
     if (isParamEmpty($param)) {
-        error(['message'=>"Required parameter '$param' is not set"]);
+        error(['message' => "Required parameter '$param' is not set"]);
     }
 }
 
-function getParam($param, $def=false)
+function getParam($param, $def = false)
 {
     global $PARAMS;
     if (!isset($PARAMS[$param])) {
         if ($def === false) {
-            error(['message'=>"Required parameter '$param' is not set"]);
+            error(['message' => "Required parameter '$param' is not set"]);
         }
         return $def;
     }
-    
+
     return $PARAMS[$param];
 }
 
@@ -122,7 +122,7 @@ function addParamToArray(&$array, $param, $type = null): void
         switch ($type) {
         case 'int':
             if (!is_numeric($value)) {
-                error(['message'=>"Given parameter '$param' is not integer"]);
+                error(['message' => "Given parameter '$param' is not integer"]);
             }
             $value = intval($value);
             break;
@@ -133,7 +133,7 @@ function addParamToArray(&$array, $param, $type = null): void
             } elseif ($value == 'false' || $value == '0') {
                 $value = false;
             } else {
-                error(['message'=>"Given parameter '$param' is not boolean"]);
+                error(['message' => "Given parameter '$param' is not boolean"]);
             }
             break;
         }
@@ -148,8 +148,8 @@ function checkAuth(): void
     } else return;
     global $PARAMS;
     $user = $_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user'] ?? null;
-    
-    if ($user == null || empty($user)
+
+    if (empty($user)
         || strlen($user) < 32 || strlen($user) > 200
         || str_contains($user, '\\')
         || str_contains($user, '/')
@@ -157,13 +157,13 @@ function checkAuth(): void
         || str_contains($user, ';')
         || str_contains($user, ':')
         || str_contains($user, ' ')
-        || !file_exists(sessionspath.$user.'.madeline')) {
+        || !file_exists(sessionspath . $user . '.madeline')) {
         http_response_code(401);
-        error(['message'=>'Invalid authorization']);
+        error(['message' => 'Invalid authorization']);
     }
 }
 
-function setupMadelineProto($user=null): void
+function setupMadelineProto($user = null): void
 {
     global $MP;
     global $PARAMS;
@@ -180,7 +180,7 @@ function setupMadelineProto($user=null): void
     $app->setApiId(api_id);
     $app->setApiHash(api_hash);
     $app->setShowPrompt(false);
-    
+
     $app->setAppVersion($_SERVER['HTTP_X_MPGRAM_APP_VERSION'] ?? 'api');
     if (isset($_SERVER['HTTP_X_MPGRAM_DEVICE'])) {
         $app->setDeviceModel($_SERVER['HTTP_X_MPGRAM_DEVICE']);
@@ -190,7 +190,7 @@ function setupMadelineProto($user=null): void
     }
     $sets->setAppInfo($app);
     try {
-        $MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline', $sets);
+        $MP = new \danog\MadelineProto\API(sessionspath . $user . '.madeline', $sets);
     } catch (Exception $e) {
         http_response_code(401);
         error(['message' => "Failed to load session", 'stack_trace' => strval($e)]);
@@ -203,7 +203,7 @@ function getId($a)
     return $a['user_id'] ?? $a['chat_id'] ?? $a['channel_id'] ?? null;
 }
 
-function getAllDialogs($limit = 0, $folder_id = -1): array
+function getAllDialogs($folder_id = -1): array
 {
     global $MP;
     $p = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];
@@ -318,7 +318,7 @@ function parseUser($rawUser)
     $user['id'] = strval($rawUser['id']);
     $user[$v < 5 ? 'first_name' : 'fn'] = removeEmoji($rawUser['first_name'] ?? null);
     $user[$v < 5 ? 'last_name' : 'ln'] = removeEmoji($rawUser['last_name'] ?? null);
-    if ((isset($rawUser['username']) && $rawUser['username'] !== null) || $v < 5) {
+    if (isset($rawUser['username']) || $v < 5) {
         $user[$v < 5 ? 'username' : 'name'] = $rawUser['username'] ?? null;
     }
     if ($v >= 5) {
@@ -340,7 +340,7 @@ function parseChat($rawChat): array
     if ($v < 11) $chat['type'] = $rawChat['_'];
     $chat['id'] = strval($rawChat['id']);
     $chat[$v < 5 ? 'title' : 't'] = removeEmoji($rawChat['title'] ?? null);
-    if ((isset($rawChat['username']) && $rawChat['username'] !== null) || $v < 5) {
+    if (isset($rawChat['username']) || $v < 5) {
         $chat[$v < 5 ? 'username' : 'name'] = $rawChat['username'] ?? null;
     }
     if ($v >= 5) {
@@ -363,7 +363,7 @@ function getCaptchaText($length): string
     return $s;
 }
 
-function parseMessage($rawMessage, $media=false, $short=false): array
+function parseMessage($rawMessage, $media = false, $short = false): array
 {
     global $v;
     $message = [];
@@ -374,13 +374,12 @@ function parseMessage($rawMessage, $media=false, $short=false): array
         $t = $rawMessage['message'];
         if ($short) {
             if (utflen($t) > 150) {
-                $t = trim(utfsubstr($t, 0, 150)).'..';
+                $t = trim(utfsubstr($t, 0, 150)) . '..';
             }
         } else if ($v >= 5 && isset($rawMessage['entities']) && count($rawMessage['entities']) != 0) {
             $message['entities'] = $rawMessage['entities'];
         }
         $message['text'] = $t;
-        
     }
     if (isset($rawMessage['out'])) $message['out'] = $rawMessage['out'];
     if (isset($rawMessage['peer_id'])) {
@@ -506,15 +505,12 @@ function parseMessage($rawMessage, $media=false, $short=false): array
         if (isset($rawReply['reply_to_peer_id'])) $reply['peer'] = parsePeer($rawReply['reply_to_peer_id']);
         if (isset($rawReply['quote_text'])) $reply['quote'] = $rawReply['quote_text'];
         if ($v >= 5 && !$short && isset($reply['id'])) {
-            $rawReplyMsg = null;
             try {
                 global $MP;
                 $peer = $message['peer_id'];
-                if ((int) $peer < 0) {
-                    $rawReplyMsg = $MP->channels->getMessages(['channel' => $peer, 'id' => [$reply['id']]]);
-                } else {
-                    $rawReplyMsg = $MP->messages->getMessages(['peer' => $peer, 'id' => [$reply['id']]]);
-                }
+                $rawReplyMsg = (int) $peer < 0 ?
+                    $MP->channels->getMessages(['channel' => $peer, 'id' => [$reply['id']]]) :
+                    $MP->messages->getMessages(['peer' => $peer, 'id' => [$reply['id']]]);
                 if ($rawReplyMsg && isset($rawReplyMsg['messages']) && isset($rawReplyMsg['messages'][0])) {
                     $reply['msg'] = parseMessage($rawReplyMsg['messages'][0], false, true);
                 }
@@ -524,7 +520,7 @@ function parseMessage($rawMessage, $media=false, $short=false): array
     }
     if ($v >= 5) {
         if (isset($rawMessage['grouped_id'])) $message['group'] = $rawMessage['grouped_id'];
-        
+
         if ($media && isset($rawMessage['reply_markup'])) {
             $rows = $rawMessage['reply_markup']['rows'] ?? [];
             if ($rawMessage['reply_markup']['single_use'] ?? false) {
@@ -544,7 +540,7 @@ function parseMessage($rawMessage, $media=false, $short=false): array
                 }
                 $markup[] = $markupRow;
             }
-            
+
             $message['markup'] = $markup;
         }
     }
@@ -626,7 +622,7 @@ try {
             error(['message' => "Login API is disabled"]);
         }
         checkParamEmpty('captcha_id');
-        session_id('API'.$PARAMS['captcha_id']);
+        session_id('API' . $PARAMS['captcha_id']);
         session_start(['use_cookies' => '0']);
         if (empty($_SESSION['captcha_key'])) {
             error(['message' => 'Captcha id expired']);
@@ -657,20 +653,20 @@ try {
             error(['message' => "Login API is disabled"]);
         }
         $id = $PARAMS['captcha_id'] ?? md5(random_bytes(32));
-        session_id('API'.$id);
+        session_id('API' . $id);
         session_start(['use_cookies' => '0']);
         if (!isset($PARAMS['captcha_id']) || !isset($PARAMS['captcha_key'])) {
             $c = getCaptchaText(rand(6, 10));
-            $_SESSION['captcha_key'] = $c; 
+            $_SESSION['captcha_key'] = $c;
             json(['res' => 'need_captcha', 'captcha_id' => $id]);
             session_write_close();
             die;
         }
         if (isParamEmpty('qr')) checkParamEmpty('phone');
-        if (!isset($_SESSION['captcha_key']) || empty($_SESSION['captcha_key'])) {
+        if (empty($_SESSION['captcha_key'])) {
             unset($_SESSION['captcha_key']);
             $c = getCaptchaText(rand(6, 10));
-            $_SESSION['captcha_key'] = $c; 
+            $_SESSION['captcha_key'] = $c;
             json(['res' => 'captcha_expired', 'captcha_id' => $id]);
             session_write_close();
             die;
@@ -678,19 +674,19 @@ try {
         if (strtolower($PARAMS['captcha_key']) != $_SESSION['captcha_key']) {
             unset($_SESSION['captcha_key']);
             $c = getCaptchaText(rand(6, 10));
-            $_SESSION['captcha_key'] = $c; 
+            $_SESSION['captcha_key'] = $c;
             json(['res' => 'wrong_captcha', 'captcha_id' => $id]);
             session_write_close();
             die;
         }
         unset($_SESSION['captcha_key']);
         session_write_close();
-        
+
         $phone = getParam('phone', 'qr');
         $user = $_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user'] ?? null;
         // generate user id
         if ($user === null) {
-            $user = rtrim(strtr(base64_encode(hash('sha384', sha1(md5($phone.rand(0,1000).random_bytes(6))).random_bytes(30), true)), '+/', '-_'), '=');
+            $user = rtrim(strtr(base64_encode(hash('sha384', sha1(md5($phone . rand(0, 1000) . random_bytes(6))) . random_bytes(30), true)), '+/', '-_'), '=');
         }
         setupMadelineProto($user);
         try {
@@ -722,7 +718,7 @@ try {
         checkParamEmpty('hash');
         checkAuth();
         setupMadelineProto();
-        
+
         $MP->auth->resendCode(['phone' => $PARAMS['phone'], 'phone_code_hash' => $PARAMS['hash']]);
         json(['res' => 1]);
         break;
@@ -791,13 +787,13 @@ try {
         try {
             $MP->complete2faLogin($PARAMS['password']);
             json(['res' => 1]);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             if (str_contains($e->getMessage(), 'PASSWORD_HASH_INVALID')) {
                 json(['res' => 'password_hash_invalid']);
             } else {
                 error(['message' => $e->getMessage()]);
             }
-        }    
+        }
         break;
     case 'getServerTimeOffset':
         $dtz = new DateTimeZone(date_default_timezone_get());
@@ -827,7 +823,7 @@ try {
     case 'getDialogs':
         checkAuth();
         setupMadelineProto();
-        
+
         function cmp($a, $b): int
         {
             global $rawData;
@@ -852,10 +848,10 @@ try {
             }
             return ($ma['date'] > $mb['date']) ? -1 : 1;
         }
-        
+
         $f = $v < 5 ? null : getParam('f', null);
         $rawData = null;
-        
+
         $p = [];
         addParamToArray($p, 'offset_id', 'int');
         addParamToArray($p, 'offset_date', 'int');
@@ -943,7 +939,6 @@ try {
                                 $dialogs[] = $d;
                             break;
                         }
-                        continue;
                     }
                 }
                 if (count($folder['exclude_peers']) > 0) {
@@ -1023,7 +1018,7 @@ try {
                 $res['dialogs'][] = $dialog;
             }
             if ($sort) usort($res['dialogs'], 'cmp');
-            for ($i = count($rawData['dialogs'])-1; $i >= 0; $i--) {
+            for ($i = count($rawData['dialogs']) - 1; $i >= 0; $i--) {
                 if (!checkCount($i)) {
                     unset($res['dialogs'][$i]);
                 } else {
@@ -1111,7 +1106,7 @@ try {
                 $dialog = parseDialog($rawDialog);
                 $res['dialogs'][] = $dialog;
             }
-            function cmp($a, $b)
+            function cmp($a, $b): int
             {
                 global $rawData;
                 $ma = null;
@@ -1133,8 +1128,9 @@ try {
                 }
                 return ($ma['date'] > $mb['date']) ? -1 : 1;
             }
+
             usort($res['dialogs'], 'cmp');
-            for ($i = count($rawData['dialogs'])-1; $i >= 0; $i--) {
+            for ($i = count($rawData['dialogs']) - 1; $i >= 0; $i--) {
                 if (!checkCount($i)) {
                     unset($res['dialogs'][$i]);
                 } else {
@@ -1192,10 +1188,10 @@ try {
         setupMadelineProto();
         $p = [];
         addParamToArray($p, 'peer');
-        
+
         $peer = getParam('peer');
         $thread = getParam('top_msg_id', null);
-        
+
         if ($METHOD == 'getMessages') {
             $p['id'] = explode(',', getParam('id'));
             $rawData = $MP->messages->getMessages($p);
@@ -1209,7 +1205,7 @@ try {
             addParamToArray($p, 'q');
             addParamToArray($p, 'top_msg_id');
             if (!isParamEmpty('filter')) {
-                $p['filter'] = ['_' => 'inputMessagesFilter'.getParam('filter')];
+                $p['filter'] = ['_' => 'inputMessagesFilter' . getParam('filter')];
             }
             $rawData = $METHOD == 'searchMessages' ? $MP->messages->search($p) : $MP->messages->getHistory($p);
         }
@@ -1283,18 +1279,18 @@ try {
         } elseif (isset($r['Chat']) && (!isset($PARAMS['type']) || $PARAMS['type'] == 'chat')) {
             json(parseChat($r['Chat']));
         } else {
-            error(['message'=>'']);
+            error(['message' => '']);
         }
         break;
     case 'getPeers':
         checkParamEmpty('id');
         checkAuth();
         setupMadelineProto();
-        $users = ['0'=>0];
-        $chats = ['0'=>0];
+        $users = ['0' => 0];
+        $chats = ['0' => 0];
         foreach (explode(',', getParam('id')) as $id) {
             $id = (int) trim($id);
-            if ($id == 0) error(['message'=>'Invalid id']);
+            if ($id == 0) error(['message' => 'Invalid id']);
             $r = $MP->getInfo($PARAMS['id']);
             if (isset($r['User'])) {
                 $users[strval($id)] = parseUser($r['User']);
@@ -1307,9 +1303,9 @@ try {
     case 'getLastUpdate':
         checkAuth();
         setupMadelineProto();
-        
+
         $res = null;
-        
+
         if (isset($PARAMS['peer']) && isset($PARAMS['id'])) {
             $peer = (int) getParam('peer');
             $id = (int) getParam('id');
@@ -1322,12 +1318,11 @@ try {
                         continue;
                     }
                     if ($msg['id'] < $id) continue;
+                    $res = $update;
                     if ($msg['id'] == $id) {
-                        $res = $update;
                         $res['exact'] = true;
                         break;
                     }
-                    $res = $update;
                 }
             }
             if ($res === null) $res = end($updates);
@@ -1344,7 +1339,7 @@ try {
         if ($timeout > 120) $timeout = 120;
         $offset = (int) getParam('offset');
         $peer = (int) getParam('peer', '0');
-        $message = (int) getParam('message', '0'); 
+        $message = (int) getParam('message', '0');
         $types = isParamEmpty('types') ? false : explode(',', getParam('types'));
         $exclude = isParamEmpty('exclude') ? false : explode(',', getParam('exclude'));
         $limit = (int) getParam('limit', '100');
@@ -1372,19 +1367,19 @@ try {
             'updateReadChannelOutbox'
             ];
         }
-        
+
         $time = microtime(true);
         $so = $offset;
         $i = $message;
         $maxmsg = 0;
         $res = [];
         $selfid = strval($MP->getSelf()['id']);
-        
+
         http_response_code(200);
         header("X-Accel-Buffering: no");
         set_time_limit(0);
         ob_implicit_flush(true);
-        
+
         try {
             while (true) {
                 echo ' ';
@@ -1479,7 +1474,7 @@ try {
                         }
                     }
                     // TODO updateDeleteMessages
-                    
+
                     if ($peer) continue;
                     $res[] = $update;
                 }
@@ -1502,13 +1497,13 @@ try {
                         }
                     } catch (Exception) {}
                 }
-                json(['res'=>$res], false);
+                json(['res' => $res], false);
             }
         } catch (Exception $e) {
             if ($e->getMessage() == 'cancel') {
                 echo '{"cancel":1}';
             } else {
-                json(['error' => ['message' => $e->getMessage(), 'stack_trace' =>strval($e)]], false);
+                json(['error' => ['message' => $e->getMessage(), 'stack_trace' => strval($e)]], false);
             }
         }
         break;
@@ -1521,7 +1516,7 @@ try {
         if ($r) {
             json($r);
         } else {
-            error(['message'=>'']);
+            error(['message' => '']);
         }
         break;
     case 'getFolders':
@@ -1531,7 +1526,7 @@ try {
         if (($folders['_'] ?? '') == 'messages.dialogFilters')
             $folders = $folders['filters'];
         $hasArchiveChats = count($MP->messages->getDialogs([
-            'limit' => 1, 
+            'limit' => 1,
             'exclude_pinned' => true,
             'folder_id' => 1
             ])['dialogs']) > 0;
@@ -1555,11 +1550,11 @@ try {
     case 'readMessages':
         checkAuth();
         setupMadelineProto();
-        
+
         $id = getParam('peer');
         $maxid = (int) getParam('max');
         $thread = getParam('thread', null);
-        
+
         if ($thread != null) {
             $MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => (int) $thread]);
             $MP->messages->readMentions(['peer' => $id, 'top_msg_id' => (int) $thread]);
@@ -1574,7 +1569,7 @@ try {
     case 'startBot':
         checkAuth();
         setupMadelineProto();
-        
+
         $id = getParam('id');
         $start = getParam('start', null);
         $random = getParam('random', null);
@@ -1583,13 +1578,13 @@ try {
             $p['peer'] = getParam('peer');
         }
         $MP->messages->startBot($p);
-    
+
         json(['res' => 1]);
         break;
     case 'getContacts':
         checkAuth();
         setupMadelineProto();
-        
+
         $rawData = $MP->contacts->getContacts();
         $res = [];
         foreach ($rawData['contacts'] as $contact) {
@@ -1643,7 +1638,7 @@ try {
         checkAuth();
         setupMadelineProto();
         // TODO private chat
-        $p = ['channel' => getParam('peer'), 'filter' => ['_' => 'channelParticipants'.getParam('filter', 'Recent')]];
+        $p = ['channel' => getParam('peer'), 'filter' => ['_' => 'channelParticipants' . getParam('filter', 'Recent')]];
         addParamToArray($p, 'offset', 'int');
         addParamToArray($p, 'limit', 'int');
         $rawData = $MP->channels->getParticipants($p);
@@ -1663,16 +1658,18 @@ try {
     case 'setTyping':
         checkAuth();
         setupMadelineProto();
-        
-        $MP->messages->setTyping(['peer' => (int) getParam('peer'),
-        'action' => ['_' => 'sendMessage'.getParam('action').'Action']]);
-        
+
+        $MP->messages->setTyping([
+            'peer' => (int) getParam('peer'),
+            'action' => ['_' => 'sendMessage' . getParam('action') . 'Action']
+        ]);
+
         json(['res' => 1]);
         break;
     case 'updateStatus':
         checkAuth();
         setupMadelineProto();
-        
+
         $MP->account->updateStatus(['offline' => !isParamEmpty('off')]);
         json(['res' => 1]);
         break;
@@ -1683,19 +1680,19 @@ try {
         checkAuth();
         setupMadelineProto();
         $peer = (int) getParam('peer');
-        
+
         if ($METHOD != 'editMessage' && !isParamEmpty('fwd_from')) {
             $MP->messages->forwardMessages([
-            'from_peer' => (int) getParam('fwd_from'),
-            'to_peer' => $peer,
-            'id' => explode(',', getParam('id'))
+                'from_peer' => (int) getParam('fwd_from'),
+                'to_peer' => $peer,
+                'id' => explode(',', getParam('id'))
             ]);
             if (!isset($_FILES['file']) && isParamEmpty('text')) {
                 json(['res' => '1']);
                 break;
             }
         }
-        
+
         $p = [];
         addParamToArray($p, 'peer');
         $p['message'] = getParam('text', '');
@@ -1706,15 +1703,15 @@ try {
         if (!isParamEmpty('html')) {
             $p['parse_mode'] = 'HTML';
         }
-        
+
         if (!isset($_FILES['file'])) {
             if ($METHOD == 'sendMedia' && (isParamEmpty('doc_id') || isParamEmpty('doc_access_hash'))) {
-                json(['error' => ['message' => 'No file: '.var_export($_FILES,true)]]);
+                json(['error' => ['message' => 'No file: ' . var_export($_FILES, true)]]);
                 break;
             }
         } else {
             if (($_FILES['file']['error'] ?? false) && $_FILES['file']['error'] != 4) {
-                json(['error' => ['message' => 'File error: '.$_FILES['file']['error']]]);
+                json(['error' => ['message' => 'File error: ' . $_FILES['file']['error']]]);
                 break;
             }
         }
@@ -1731,14 +1728,14 @@ try {
                     json(['error' => ['message' => 'File is too large']]);
                     break;
                 }
-                
+
                 $filename = $_FILES['file']['name'];
                 $extidx = strrpos($filename, '.');
                 if ($extidx === false) {
                     json(['error' => ['message' => 'Invalid file extension']]);
                     break;
                 }
-                $ext = strtolower(substr($filename, $extidx+1));
+                $ext = strtolower(substr($filename, $extidx + 1));
                 $attr = false;
                 $type = null;
                 if (!isParamEmpty('uncompressed')) {
@@ -1749,7 +1746,7 @@ try {
                     case 'jpg':
                     case 'jpeg':
                     case 'png':
-                        $newfile = $file.'.'.$ext;
+                        $newfile = $file . '.' . $ext;
                         if (!move_uploaded_file($file, $newfile)) {
                             json(['error' => ['message' => 'Failed to move file']]);
                             break;
@@ -1771,7 +1768,7 @@ try {
             } else if (!isParamEmpty('doc_id')) {
                 $p['media'] = ['_' => 'document', 'id' => (int) getParam('doc_id'), 'access_hash' => getParam('doc_access_hash')];
             }
-            
+
             if ($METHOD == 'editMessage') {
                 $MP->messages->editMessage($p);
             } else if ($METHOD == 'sendMedia') {
@@ -1786,13 +1783,13 @@ try {
                 } catch (Exception) {}
             }
         }
-        
+
         json(['res' => '1']);
         break;
     case 'searchChats':
         checkAuth();
         setupMadelineProto();
-        
+
         $rawData = $MP->contacts->search(['q' => getParam('q')]);
         $res = [];
         foreach ($rawData['my_results'] as $c) {
@@ -1809,32 +1806,33 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        // TODO private chat
-        $MP->channels->editBanned(['channel' => (int) getParam('peer'), 'participant' => (int) getParam('id'), 'banned_rights' => [
+        $peer = (int) getParam('peer');
+        $user = (int) getParam('id');
+
+        $MP->channels->editBanned(['channel' => $peer, 'participant' => $user, 'banned_rights' => [
             '_' => 'chatBannedRights',
             'until_date' => 1,
             'view_messages' => true,
             'send_messages' => true
-            ]]);
-            
-            
+        ]]);
+
         json(['res' => '1']);
         break;
     case 'getForumTopics':
         checkAuth();
         setupMadelineProto();
-        
+
         $rawData = $MP->messages->getForumTopics(['peer' => getParam('peer'), 'limit' => (int) getParam('limit', 30)]);
         $res = [];
         foreach ($rawData['topics'] as $t) {
             $r = [
-            'closed' => $t['closed'] ?? false,
-            'pinned' => $t['pinned'] ?? false,
-            'id' => $t['id'],
-            'date' => $t['date'] ?? 0,
-            'top' => $t['top_message'] ?? 0,
-            'unread' => $t['unread_count'] ?? 0,
-            'read_max_id' => $t['read_inbox_max_id'] ?? 0
+                'closed' => $t['closed'] ?? false,
+                'pinned' => $t['pinned'] ?? false,
+                'id' => $t['id'],
+                'date' => $t['date'] ?? 0,
+                'top' => $t['top_message'] ?? 0,
+                'unread' => $t['unread_count'] ?? 0,
+                'read_max_id' => $t['read_inbox_max_id'] ?? 0
             ];
             if (isset($t['title'])) $r['title'] = $t['title'];
             $res[] = $r;
@@ -1845,20 +1843,20 @@ try {
     case 'sendBotCallback': // v10
         checkAuth();
         setupMadelineProto();
-        
+
         $timeout = (float) getParam('timeout', '0.5');
-        
+
         $rawData = async(
             $MP->messages->getBotCallbackAnswer(...),
             ['peer' => (int) getParam('peer'), 'msg_id' => (int) getParam('id'), 'data' => base64_decode(getParam('data'))]
         )->await(Tools::getTimeoutCancellation($timeout));
-        
+
         json($rawData);
         break;
     case 'sendVote':
         checkAuth();
         setupMadelineProto();
-        
+
         $votes = explode('vote=', $_SERVER['QUERY_STRING']);
         $options = [];
         foreach ($votes as $vote) {
@@ -1868,35 +1866,35 @@ try {
             $options[] = $vote;
         }
         $rawData = $MP->messages->sendVote(['peer' => getParam('peer'), 'msg_id' => getParam('id'), 'options' => $options]);
-        
+
         json($rawData);
         break;
     case 'getStickerSets':
         checkAuth();
         setupMadelineProto();
-        
+
         $rawData = $MP->messages->getAllStickers();
-        
+
         $res = [];
         foreach ($rawData['sets'] as $set) {
             $r = ['id' => strval($set['id']), 'access_hash' => strval($set['access_hash']), 'title' => $set['title'] ?? ''];
             if (isset($set['short_name'])) $r['short_name'] = $set['short_name'];
             $res[] = $r;
         }
-        
+
         json(['res' => $res]);
         break;
     case 'getStickerSet':
         checkAuth();
         setupMadelineProto();
-        
+
         $rawData = $MP->messages->getStickerSet(['stickerset' =>
         (isParamEmpty('slug') ? ['_' => 'inputStickerSetID',
             'id' => (int) getParam('id'),
             'access_hash' => getParam('access_hash')]
         : ['_' => 'inputStickerSetShortName', 'short_name' => getParam('slug')]
         )]);
-        
+
         $res = [];
         $res['res'] = [];
         if (isset($rawData['set']['count'])) $res['count'] = $rawData['set']['count'];
@@ -1909,42 +1907,42 @@ try {
             $r = ['id' => strval($doc['id']), 'access_hash' => strval($doc['access_hash']), 'mime' => $doc['mime_type']];
             $res['res'][] = $r;
         }
-        
+
         json($res);
         break;
     // v6
     case 'pinMessage':
         checkAuth();
         setupMadelineProto();
-        
+
         $MP->messages->updatePinnedMessage([
-        'silent' => ((int) getParam('silent', '1')) == 1,
-        'unpin' => !isParamEmpty('unpin'),
-        'peer' => (int) getParam('peer'),
-        'id' => (int) getParam('id')
+            'silent' => ((int) getParam('silent', '1')) == 1,
+            'unpin' => !isParamEmpty('unpin'),
+            'peer' => (int) getParam('peer'),
+            'id' => (int) getParam('id')
         ]);
-        
+
         json(['res' => '1']);
         break;
     // v7
     case 'installStickerSet':
         checkAuth();
         setupMadelineProto();
-        
+
         $MP->messages->installStickerSet(['stickerset' =>
         (isParamEmpty('slug') ? ['_' => 'inputStickerSetID',
             'id' => (int) getParam('id'),
             'access_hash' => getParam('access_hash')]
         : ['_' => 'inputStickerSetShortName', 'short_name' => getParam('slug')]
         )]);
-        
+
         json(['res' => '1']);
         break;
     // v8
     case 'getNotifySettings':
         checkAuth();
         setupMadelineProto();
-        
+
         json([
             'users' => $MP->account->getNotifySettings(peer: ['_' => 'inputNotifyUsers'])['mute_until'] ?? 0,
             'chats' => $MP->account->getNotifySettings(peer: ['_' => 'inputNotifyChats'])['mute_until'] ?? 0,
@@ -1954,7 +1952,7 @@ try {
     case 'notifications':
         checkAuth();
         setupMadelineProto();
-        
+
         $offset = (int) getParam('offset');
         $media = !isParamEmpty('media');
         $peers = isParamEmpty('peers') ? false : explode(',', getParam('peers'));
@@ -1964,14 +1962,14 @@ try {
         $users = getParam($old ? 'mute_users' : 'mu', '0');
         $chats = getParam($old ? 'mute_chats' : 'mc', '0');
         $broadcasts = getParam($old ? 'mute_broadcasts' : 'mb', '0');
-        
+
         if (!isParamEmpty('online')) {
             $MP->account->updateStatus(['offline' => false]);
         }
-        
+
         $so = $offset;
         $res = [];
-        
+
         $updates = $MP->getUpdates(['offset' => $offset, 'limit' => $limit, 'timeout' => 1]);
         foreach ($updates as $update) {
             if ($update['update_id'] == $so) continue;
@@ -2001,19 +1999,19 @@ try {
     case 'getDiscussionMessage':
         checkAuth();
         setupMadelineProto();
-        
+
         $r = $MP->messages->getDiscussionMessage([
-        'peer' => getParam('peer'),
-        'msg_id' => (int) getParam('id')
+            'peer' => getParam('peer'),
+            'msg_id' => (int) getParam('id')
         ]);
         $msg = $r['messages'][0];
-        
+
         json([
-        'id' => $msg['id'],
-        'peer_id' => strval(getId($msg['peer_id'])),
-        'unread' => $r['unread_count'] ?? 0,
-        'read' => max($r['read_inbox_max_id'] ?? 0, $r['read_outbox_max_id'] ?? 0, $msg['id']),
-        'max_id' => $r['max_id'] ?? 0
+            'id' => $msg['id'],
+            'peer_id' => strval(getId($msg['peer_id'])),
+            'unread' => $r['unread_count'] ?? 0,
+            'read' => max($r['read_inbox_max_id'] ?? 0, $r['read_outbox_max_id'] ?? 0, $msg['id']),
+            'max_id' => $r['max_id'] ?? 0
         ]);
         break;
     case 'getInfo':
@@ -2024,7 +2022,7 @@ try {
         if ($r) {
             json($r);
         } else {
-            error(['message'=>'']);
+            error(['message' => '']);
         }
         break;
     // v9
@@ -2082,10 +2080,73 @@ try {
 
         json(['res' => $res]);
         break;
+    case 'getExportedChatInvites':
+        checkAuth();
+        setupMadelineProto();
+
+        $res = $MP->messages->getExportedChatInvites(
+            peer: getParam('peer'),
+            admin_id: 'me'
+        )['invites'];
+
+        json(['res' => $res]);
+        break;
+    case 'exportChatInvite':
+        checkAuth();
+        setupMadelineProto();
+
+        $res = $MP->messages->exportChatInvite(
+            peer: getParam('peer')
+        );
+
+        json(['res' => $res]);
+        break;
+    case 'addChatUser':
+        checkAuth();
+        setupMadelineProto();
+
+        $peer = getParam('peer');
+        $user = getParam('id');
+
+        $MP->messages->addChatUser(
+            chat_id: $peer,
+            user_id: $user
+        );
+
+        json(['res' => 1]);
+        break;
+    case 'deleteChatUser':
+        checkAuth();
+        setupMadelineProto();
+
+        $peer = getParam('peer');
+        $user = getParam('id');
+
+        $MP->messages->deleteChatUser(
+            chat_id: $peer,
+            user_id: $user
+        );
+
+        json(['res' => 1]);
+        break;
+    case 'inviteToChannel':
+        checkAuth();
+        setupMadelineProto();
+
+        $peer = getParam('peer');
+        $users = explode(',', getParam('id'));
+
+        $MP->channels->inviteToChannel(
+            channel: $peer,
+            users: $users
+        );
+
+        json(['res' => 1]);
+        break;
     default:
         error(['message' => "Method \"$METHOD\" is undefined"]);
     }
 } catch (Throwable $e) {
     http_response_code(500);
-    error(['message' => "Unhandled exception: ".$e->getMessage(), 'stack_trace' => strval($e)]);
+    error(['message' => 'Unhandled exception: ' . $e->getMessage(), 'stack_trace' => strval($e)]);
 }
