@@ -2042,12 +2042,6 @@ try {
 
         json(['res' => '1']);
         break;
-    case 'getPollResults':
-        checkAuth();
-        setupMadelineProto();
-
-        // TODO
-        break;
     case 'getMessageReadParticipants':
         checkAuth();
         setupMadelineProto();
@@ -2124,12 +2118,12 @@ try {
         $peer = getParam('peer');
         $users = explode(',', getParam('id'));
 
-        $MP->channels->inviteToChannel(
+        $r = $MP->channels->inviteToChannel(
             channel: $peer,
             users: $users
         );
 
-        json(['res' => 1]);
+        json(['res' => count($r['missing_invitees'] ?? [])]);
         break;
     case 'sendVote':
         checkAuth();

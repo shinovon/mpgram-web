@@ -909,12 +909,6 @@ Object
 
 ---
 
-## `sendVote`
-
-TODO
-
----
-
 ## `pinMessage`
 
 ### Description
@@ -1122,6 +1116,94 @@ Object
 
 ---
 
+## `getExportedChatInvites`
+
+### Description
+Returns created invite links.
+
+See: https://docs.madelineproto.xyz/API_docs/types/messages.ExportedChatInvites.html
+
+### Parameters
+- `peer` [Peer ID](#Peer-ID)
+
+### Response
+Object
+
+- `res`: MadelineProto `messages.exportedChatInvites` object
+
+---
+
+## `exportChatInvite`
+
+### Description
+Creates invite link.
+
+See: https://docs.madelineproto.xyz/API_docs/types/ExportedChatInvite.html
+
+### Parameters
+- `peer` [Peer ID](#Peer-ID)
+
+### Response
+Object
+
+- `res`: MadelineProto `ExportedChatInvite` object
+
+---
+
+## `addChatUser`
+
+### Description
+Adds a user to a chat.
+
+### Parameters
+- `peer`: [Peer ID](#Peer-ID) of chat
+- `id`: User ID
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+---
+
+## `deleteChatUser`
+
+### Description
+Removes a user from a chat.
+
+### Parameters
+- `peer`: [Peer ID](#Peer-ID) of chat
+- `id`: User ID
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
+
+---
+
+## `inviteToChannel`
+
+### Description
+Invites users to a channel.
+
+### Parameters
+- `peer`: [Peer ID](#Peer-ID) of channel
+- `id`: Comma-separated list of users
+
+### Response
+Object
+
+- `res` (int): Count of missing invitees, 0 if every invite was sent successfully.
+
+---
+
+## `sendVote`
+
+TODO
+
+---
+
 # Channels methods
 
 ## `joinChannel`
@@ -1157,13 +1239,15 @@ Object
 ## `getParticipants`
 
 ### Description
-Returns chat participants. TODO
+Returns chat participants.
+
+**Currently supports only channels.**
 
 ### Parameters
 - `peer`: [Peer ID](#Peer-ID)
 - `filter` (optional): `Recent` by default
-- `offset` (optional)
-- `limit` (optional)
+- `offset` (optional): Offset, for pagination.
+- `limit` (optional): Limit of users per response, for pagination.
 
 ### Response
 Object
@@ -1179,7 +1263,7 @@ Object
 Bans a user from channel.
 
 ### Parameters
-- `peer`: [Peer ID](#Peer-ID)
+- `peer`: [Peer ID](#Peer-ID) of channel.
 - `id`: User ID
 
 ### Response
@@ -1205,7 +1289,7 @@ Available since v5
 - `types` (optional): Comma-separated list of update types to filter.
 - `exclude` (optional): Comma-separated list of update types to exclude.
 - `longpoll` (optional): Set to 0 disable long-poll, if set, method will not wait for new updates, 1 by default.
-- `timeout` (optional): Timeout of long-poll, 10 by default.
+- `timeout` (optional): Timeout of long-poll in seconds, positive integer, 10 by default.
 - `peer` (optional): Peer ID, if set, method will return only updates related to that peer.
 - `top_msg` (optional): Top message ID of thread, set for forum chats with `peer`.
 - `read` (optional): Set to 1 to automatically mark received messages as read, works only in `peer` mode.
@@ -1249,7 +1333,7 @@ Object
 
 #### Removed since v11
 
-- `res` (boolean): true if request completed successfully
+- `res` (boolean): true if request completed successfully. **Changed type to int.**
 
 ---
 
@@ -1458,7 +1542,6 @@ v10:
 
 v11 **FUTURE**:
 - `uninstallStickerSet`
-- `getPollResults`
 - `getMessageReadParticipants`
 - `getExportedChatInvites`
 - `exportChatInvite`
