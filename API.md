@@ -9,7 +9,7 @@
 
 Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets`
 
-- Current version: 10
+- Current version: 11
 - Minimum compatible version: 2
 
 ## Methods rules
@@ -588,10 +588,10 @@ Supports folder filters since v5.
 Available since v1
 
 ### Parameters
-- `offset_id` (optional)
-- `offset_date` (optional)
-- `offset_peer` (optional)
-- `limit` (optional): Dialogs limit
+- `offset_id` (optional): Used for pagination, does not work if `f` is set.
+- `offset_date` (optional): Used for pagination, does not work if `f` is set.
+- `offset_peer` (optional): Used for pagination, does not work if `f` is set.
+- `limit` (optional): Limit of dialogs per response, 100 by default.
 - `f` (optional): Folder ID, set to 1 for archived chats. **since v5**
 - `fields` (optional): Comma-separated list of possible values: `dialogs`, `users`, `chats`, ~~`raw`~~, ~~`messages`~~
 
@@ -617,6 +617,7 @@ Returns all dialogs of logged user.
 Available since v1
 
 ### Parameters
+- `limit` (optional): Limit of dialogs, 100 by default.
 - `fields` (optional): Comma-separated list of possible values: `dialogs`, `users`, `chats`, ~~`raw`~~, ~~`messages`~~
 
 ### Response
@@ -1042,7 +1043,7 @@ Object
 ### Description
 Returns sticker set information.
 
-Either `id` with `access_hash` or `slug` have to be set.
+Either `id` with `access_hash`, or `slug` have to be set.
 
 Available since v6
 
@@ -1072,7 +1073,7 @@ Object
 ### Description
 Saves sticker set.
 
-Either `id` with `access_hash` or `slug` have to be set.
+Either `id` with `access_hash`, or `slug` have to be set.
 
 Available since v7
 
@@ -1093,7 +1094,7 @@ Object
 ### Description
 Removes sticker set from saved.
 
-Either `id` with `access_hash` or `slug` have to be set.
+Either `id` with `access_hash`, or `slug` have to be set.
 
 Available since v11
 
@@ -1602,7 +1603,7 @@ v10:
 - `sendBotCallback`
 - `qrLogin`
 
-v11 **FUTURE**:
+v11:
 - `uninstallStickerSet`
 - `getMessageReadParticipants`
 - `getExportedChatInvites`

@@ -79,10 +79,10 @@ function checkField($field, $def = def)
 function checkCount($count, $def = 100): bool
 {
     global $PARAMS;
-    if (empty($PARAMS['count'])) {
+    if (empty($PARAMS['limit'])) {
         return $count < $def;
     }
-    return $count < (int) $PARAMS['count'];
+    return $count < (int) $PARAMS['limit'];
 }
 
 function isParamEmpty($param): bool
