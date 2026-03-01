@@ -512,7 +512,7 @@ function parseMessage($rawMessage, $media = false, $short = false): array
                         if (isset($v['voters'])) {
                             $option['voters'] = $v['voters'];
                         }
-                        $option['data'] = $v['option']['bytes'];
+                        $option['data'] = strval($v['option']);
                         $media['options'][] = $option;
                     }
                 }
