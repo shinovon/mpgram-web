@@ -233,6 +233,17 @@ Object
 
 ---
 
+## Update
+
+Object
+
+- `update` (object): Almost raw MadelineProto `Update` object, see [https://docs.madelineproto.xyz/API_docs/types/Update.html](https://docs.madelineproto.xyz/API_docs/types/Update.html)
+  - `_` (string): Type of update
+  - `message` (object, optional): [Message](#Message) object
+- `update_id` (int): Update ID
+
+---
+
 ## Messages history response
 
 Object
@@ -1181,29 +1192,123 @@ Object
 # Updates methods
 
 ## `updates`
-TODO
+
+### Description
+Get updates.
+
+Available since v5
+
+### Parameters
+
+- `offset`: Update ID offset, exclusive.
+- `limit` (optional): Limit of updates per response, 100 by default.
+- `types` (optional): Comma-separated list of update types to filter.
+- `exclude` (optional): Comma-separated list of update types to exclude.
+- `longpoll` (optional): Set to 0 disable long-poll, if set, method will not wait for new updates, 1 by default.
+- `timeout` (optional): Timeout of long-poll, 10 by default.
+- `peer` (optional): Peer ID, if set, method will return only updates related to that peer.
+- `top_msg` (optional): Top message ID of thread, set for forum chats with `peer`.
+- `read` (optional): Set to 1 to automatically mark received messages as read, works only in `peer` mode.
+- `media` (optional): Set to 1 to include media in messages.
+
+### Response
+Object
+
+- `res` (array, optional): Array of [Update](#Update) objects
+- `cancel` (int, optional): 1, if request was cancelled by [cancelUpdates](#cancelUpdates) method. **since v9**
 
 ---
 
 ## `getLastUpdate`
-TODO
+
+### Description
+Returns last received update.
+
+Available since v6
+
+### Response
+Object
+
+- `res` (object): [Update](#Update) object
 
 ---
 
 ## `cancelUpdates`
-TODO
+
+### Description
+
+Cancels [updates](#updates) method long-poll.
+
+Available since v9
+
+### Response
+
+Object
+
+- `res` (int): 1 if request completed successfully
+
+#### Removed since v11
+
+- `res` (boolean): true if request completed successfully
 
 ---
 
 ## `updateStatus`
-TODO
+
+### Description
+
+Updates online state of logged user.
+
+Available since v6
+
+### Parameters
+
+- `off` (optional): set to 1 for offline
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
 
 ---
 
-# Notifications methods
-
 ## `notifications`
-TODO
+
+### Descriptions
+Returns message updates.
+<br>
+Unlike [updates](#updates) method, this method is not long-polled, it should be called periodically in interval defined by user.
+<br>
+Cannot be used while [updates](#updates) method is active.
+
+Available since v8
+
+### Parameters
+
+- `offset`: Update offset ID
+- `limit` (optional): Limit of updates per response, 1000 by default.
+- `include_muted` (optional): Set to 1 to include messages from muted peers.
+- `peers` (optional): Comma-separated list of Peer IDs to filter.
+- `media` (optional): Set to 1 to include media in messages
+- `mu` (optional): set to 1 to mute users, see [getNotifySettings](#getNotifySettings) method.
+- `mc` (optional): set to 1 to mute chats, see [getNotifySettings](#getNotifySettings) method.
+- `mb` (optional): set to 1 to mute broadcast channels, see [getNotifySettings](#getNotifySettings) method.
+
+#### Removed since v10
+
+- `mute_users` (optional): set to 1 to mute users, see [getNotifySettings](#getNotifySettings) method. **replaced by `mu`**
+- `mute_chats` (optional): set to 1 to mute chats, see [getNotifySettings](#getNotifySettings) method. **replaced by `mc`**
+- `mute_broadcasts` (optional): set to 1 to mute broadcast channels, see [getNotifySettings](#getNotifySettings) method **replaced by `mb`**
+
+### Response
+Object
+
+- `res` (array): Array of notifications
+  - Notification (object)
+    - `_` (string): Type of update
+    - `message` (object): [Message](#Message) object
+    - `mute` (boolean, optional): true if message is from muted peer, present if `include_muted` is set.
+- `offset` (int): Offset for next request
 
 ---
 
@@ -1211,6 +1316,8 @@ TODO
 
 ### Description
 Returns notification settings of logged user. TODO
+
+Available since v8
 
 ### Response
 Object
@@ -1259,7 +1366,16 @@ TODO
 
 ## `qrcode.php`
 
-TODO
+### Description
+Utility for creating authorization QR code.
+
+Does not require authorization.
+
+### GET Parameters
+- `t`: Base64 encoded text
+
+### Response
+PNG Image
 
 ---
 
@@ -1345,7 +1461,7 @@ v11 **FUTURE**:
 - `getPollResults`
 - `getMessageReadParticipants`
 - `getExportedChatInvites`
-- `exportChatinvite`
+- `exportChatInvite`
 - `addChatUser`
 - `deleteChatUser`
 - `inviteToChannel`

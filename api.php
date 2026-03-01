@@ -2013,7 +2013,8 @@ try {
     case 'cancelUpdates':
         checkAuth();
         setupMadelineProto();
-        json(['res' => $MP->cancelGetUpdates()]);
+        $res = $MP->cancelGetUpdates();
+        json(['res' => $v < 11 ? $res : ($res ? 1 : 0)]);
         break;
     case 'getDialog':
         checkParamEmpty('id');
