@@ -134,7 +134,7 @@ Object
     - `options` (array)
       - Option (object)
         - `text` (string): Text
-        - `data` (string): Data for voting
+        - `data` (string): Data for [sendVote](#sendVote)
         - `chosen` (boolean, optional): true if option is chosen by logged user
         - `correct` (boolean, optional): true if option is correct, present if poll is quiz.
         - `voters` (int, optional): Count of votes for this option
