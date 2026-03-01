@@ -478,7 +478,7 @@ function parseMessage($rawMessage, $media = false, $short = false): array
                     if (isset($rawMedia['results']['total_voters'])) {
                         $media['voted'] = $rawMedia['results']['total_voters'];
                     }
-                    $media['poll'] = $poll['id'];
+                    $media['id'] = strval($poll['id']);
                     $media['closed'] = $poll['closed'] ?? false;
                     if ($poll['public_votes'] ?? false) {
                         $media['public'] = true;
