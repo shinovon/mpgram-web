@@ -618,6 +618,15 @@ function parseMessage($rawMessage, $media = false, $short = false): array
 }
 
 try {
+    // Sanity checks
+    if (!defined('sessionspath')
+        || empty(sessionspath) || sessionspath == '/'
+        || !defined('api_id')
+        || !defined('api_hash')
+        || api_id == 0 || api_hash == '') {
+        error(['message' => "Bad server configuration"]);
+    }
+
     if (!defined('ENABLE_API') || !ENABLE_API) {
         error(['message' => "API is disabled"]);
     }
@@ -860,6 +869,54 @@ try {
     case 'checkAuth':
         checkAuth();
         setupMadelineProto();
+        json(['res' => '1']);
+        break;
+    case 'logout': // v11
+        checkAuth();
+        $user = $_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user'];
+
+        if (!isParamEmpty('s')) {
+            try {
+                setupMadelineProto();
+                $MP->logout();
+                $MP->stop();
+            } catch (Exception) {}
+        }
+
+        $session = sessionspath . $user . '.madeline';
+        if (is_dir($session)) {
+            $files = scandir($session);
+            foreach ($files as $file) {
+                if ($file == '.' || $file == '..') continue;
+                try {
+                    unlink($session.DIRECTORY_SEPARATOR.$file);
+                } catch (Exception) {}
+            }
+            try {
+                rmdir($session);
+            } catch (Exception) {}
+        } else {
+            // old madeline sessions
+            try {
+                unlink($session.'callback.ipc');
+            } catch (Exception) {}
+            try {
+                unlink($session.'.ipcState');
+            } catch (Exception) {}
+            try {
+                unlink($session.'.ipc');
+            } catch (Exception) {}
+            try {
+                unlink($session.'.lightState.php');
+            } catch (Exception) {}
+            try {
+                unlink($session.'.safe.php');
+            } catch (Exception) {}
+            try {
+                unlink($session);
+            } catch (Exception) {}
+        }
+
         json(['res' => '1']);
         break;
     case 'getDialogs':
@@ -2171,11 +2228,13 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        // TODO
-        $votes = explode(',', getParam('options'));
-        //$rawData = $MP->messages->sendVote(['peer' => getParam('peer'), 'msg_id' => getParam('id'), 'options' => $options]);
+        $options = [];
+        foreach (explode(',', getParam('options')) as $v) {
+            $options[] = base64_decode($v);
+        }
+        $MP->messages->sendVote(['peer' => getParam('peer'), 'msg_id' => getParam('id'), 'options' => $options]);
 
-        //json($rawData);
+        json(['res' => 1]);
         break;
     default:
         error(['message' => "Method \"$METHOD\" is undefined"]);

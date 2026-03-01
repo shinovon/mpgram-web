@@ -457,7 +457,19 @@ Object
 ---
 
 ## `logout`
-**Removed since v2**
+
+### Description
+Destroys user authorization code
+
+Available since v11
+
+### Parameters
+- `s`: Set to 1 to only delete session files
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
 
 ---
 
@@ -1104,6 +1116,8 @@ Returns raw invite link information
 
 See: https://docs.madelineproto.xyz/API_docs/types/ChatInvite.html
 
+Available since v5
+
 ### Parameters
 - `id`: Invite hash
 
@@ -1118,6 +1132,8 @@ Object
 
 ### Description
 Join chat by invite link
+
+Available since v5
 
 ### Parameters
 - `id`: Invite hash
@@ -1136,6 +1152,8 @@ Returns created invite links.
 
 See: https://docs.madelineproto.xyz/API_docs/types/messages.ExportedChatInvites.html
 
+Available since v11
+
 ### Parameters
 - `peer` [Peer ID](#Peer-ID)
 
@@ -1153,6 +1171,8 @@ Creates invite link.
 
 See: https://docs.madelineproto.xyz/API_docs/types/ExportedChatInvite.html
 
+Available since v11
+
 ### Parameters
 - `peer` [Peer ID](#Peer-ID)
 
@@ -1167,6 +1187,8 @@ Object
 
 ### Description
 Adds a user to a chat.
+
+Available since v11
 
 ### Parameters
 - `peer`: [Peer ID](#Peer-ID) of chat
@@ -1184,6 +1206,8 @@ Object
 ### Description
 Removes a user from a chat.
 
+Available since v11
+
 ### Parameters
 - `peer`: [Peer ID](#Peer-ID) of chat
 - `id`: User ID
@@ -1200,6 +1224,8 @@ Object
 ### Description
 Invites users to a channel.
 
+Available since v11
+
 ### Parameters
 - `peer`: [Peer ID](#Peer-ID) of channel
 - `id`: Comma-separated list of users
@@ -1213,7 +1239,20 @@ Object
 
 ## `sendVote`
 
-TODO
+### Description
+Votes in a poll.
+
+Available since v11
+
+### Parameters
+- `peer`: [Peer ID](#Peer-ID)
+- `id`: Message ID
+- `options`: Comma-separated list of options data
+
+### Response
+Object
+
+- `res`: 1 if request completed successfully
 
 ---
 
@@ -1223,6 +1262,8 @@ TODO
 
 ### Description
 Join public channel.
+
+Available since v5
 
 ### Parameters
 - `id`: [Peer ID](#Peer-ID) of channel
@@ -1238,6 +1279,8 @@ Object
 
 ### Description
 Leave channel.
+
+Available since v5
 
 ### Parameters
 - `id`: [Peer ID](#Peer-ID) of channel
@@ -1255,6 +1298,8 @@ Object
 Returns chat participants.
 
 **Currently supports only channels.**
+
+Available since v6
 
 ### Parameters
 - `peer`: [Peer ID](#Peer-ID)
@@ -1274,6 +1319,8 @@ Object
 
 ### Description
 Bans a user from channel.
+
+Available since v6
 
 ### Parameters
 - `peer`: [Peer ID](#Peer-ID) of channel.
@@ -1434,6 +1481,8 @@ Returns server timezone.
 
 Does not require authorization.
 
+Available since v1
+
 ### Response
 Object
 
@@ -1483,7 +1532,7 @@ v1:
 - `completePhoneLogin`
 - `complete2faLogin`
 - `completeSignup` **Removed since v2**
-- `logout` **Removed since v2**
+- `logout` **Removed since v2, reintroduced in v11**
 - `getServerTimeOffset`
 - `getDialogs`
 - `getAllDialogs` **Deprecated**
@@ -1562,3 +1611,4 @@ v11 **FUTURE**:
 - `deleteChatUser`
 - `inviteToChannel`
 - `sendVote`
+- `logout`
