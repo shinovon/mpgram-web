@@ -124,14 +124,20 @@ Object
     - `long` (string or null): Longitude
   - Poll. **since v11**
     - `type`: `poll`
+    - `text` (string): Question
+    - `id` (string): Poll ID
     - `voted` (int, optional): Count of voters
     - `closed` (boolean): true if poll is closed
     - `public` (boolean, optional): true if poll is not anonymous
     - `multi` (boolean, optional): true if poll has multiple options
-    - `text` (string): Question
+    - `quiz` (boolean, optional): true if poll has correct answer
     - `options` (array)
       - Option (object)
-        - TODO
+        - `text` (string): Text
+        - `data` (string): Data for voting
+        - `chosen` (boolean, optional): true if option is chosen by logged user
+        - `correct` (boolean, optional): true if option is correct, present if poll is quiz.
+        - `voters` (int, optional): Count of votes for this option
   - Undefined
     - `type`: `undefined`
     - `_` (string): Raw MadelineProto type of media
