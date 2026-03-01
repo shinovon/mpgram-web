@@ -26,7 +26,7 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
 - `X-mpgram-app-version`: Client app version
 - `X-mpgram-device`: Device information
 - `X-mpgram-system`: System information
-- `X-mpgram-unicode`: Set to 1 to mark that client supports UTF-8
+- `X-mpgram-unicode`: Set to 1 to mark that client supports UTF-8 decoding properly, otherwise Unicode characters will be escaped in responses.
 - `X-mpgram-keep-emoji`: Set to 1 to keep emoji symbols in names. **since v7**
 
 ## Server response headers
@@ -122,9 +122,16 @@ Object
     - `type`: `geo`
     - `lat` (string or null): Latitude
     - `long` (string or null): Longitude
-  - Poll (Unfinished)
+  - Poll. **since v11**
     - `type`: `poll`
-    - `voted` (int): Count of voters
+    - `voted` (int, optional): Count of voters
+    - `closed` (boolean): true if poll is closed
+    - `public` (boolean, optional): true if poll is not anonymous
+    - `multi` (boolean, optional): true if poll has multiple options
+    - `text` (string): Question
+    - `options` (array)
+      - Option (object)
+        - TODO
   - Undefined
     - `type`: `undefined`
     - `_` (string): Raw MadelineProto type of media

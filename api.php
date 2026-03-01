@@ -473,7 +473,35 @@ function parseMessage($rawMessage, $media = false, $short = false): array
                 $media['long'] = str_replace(',', '.', strval($rawMedia['geo']['long'])) ?? null;
             } elseif (isset($rawMedia['poll'])) {
                 $media['type'] = 'poll';
-                $media['voted'] = $media['results']['total_voters'] ?? 0;
+                $media['raw'] = $rawMedia;
+                $poll = $rawMedia['poll'];
+                if (isset($poll['results']['total_voters'])) {
+                    $media['voted'] = $poll['results']['total_voters'];
+                }
+                $media['closed'] = $poll['closed'] ?? false;
+                if ($poll['public'] ?? false) {
+                    $media['public'] = true;
+                }
+                if ($poll['multiple'] ?? false) {
+                    $media['multi'] = true;
+                }
+                if (isset($poll['question']['text'])) {
+                    $media['text'] = $poll['question']['text'];
+                } else {
+                    $media['text'] = $poll['question'] ?? '';
+                }
+                $media['options'] = [];
+                foreach ($rawMedia['results']['results'] ?? $poll['answers'] as $k => $v) {
+                    $option = [];
+                    $t = $poll['answers'][$k]['text'];
+                    if (isset($t['text'])) {
+                        $option['text'] = $t['text'];
+                    } else {
+                        $option['text'] = $t;
+                    }
+                    if ($v['chosen'] ?? false) $option['chosen'] = true;
+                    $media['options'][] = $option;
+                }
             } else {
                 // TODO
                 $media['type'] = 'undefined';
