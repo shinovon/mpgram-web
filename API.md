@@ -1200,7 +1200,7 @@ Available since v5
 
 ### Parameters
 
-- `offset`: Update ID offset, exclusive.
+- `offset`: Update ID offset, inclusive.
 - `limit` (optional): Limit of updates per response, 100 by default.
 - `types` (optional): Comma-separated list of update types to filter.
 - `exclude` (optional): Comma-separated list of update types to exclude.
@@ -1285,7 +1285,7 @@ Available since v8
 
 ### Parameters
 
-- `offset`: Update offset ID
+- `offset`: Update offset ID, inclusive.
 - `limit` (optional): Limit of updates per response, 1000 by default.
 - `include_muted` (optional): Set to 1 to include messages from muted peers.
 - `peers` (optional): Comma-separated list of Peer IDs to filter.
