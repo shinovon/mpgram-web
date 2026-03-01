@@ -26,6 +26,8 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
 - `X-mpgram-app-version`: Client app version
 - `X-mpgram-device`: Device information
 - `X-mpgram-system`: System information
+- `X-mpgram-unicode`: Set to 1 to mark that client supports UTF-8
+- `X-mpgram-keep-emoji`: Set to 1 to keep emoji symbols in names. **since v7**
 
 ## Server response headers
 
@@ -156,7 +158,7 @@ Object
 
 ### Removed since v5
 - `reply`
-  - `msg` (int or null): **replaced by `id`**
+  - `msg` (int or null): **Repurposed, replaced by `id`**
 
 ---
 
@@ -1317,7 +1319,6 @@ v6:
 - `banMember`
 - `getForumTopics`
 - `botCallback` **Deprecated since v10, replaced by `sendBotCallback`**
-- `sendVote`
 - `getStickerSets`
 - `getStickerSet`
 
@@ -1348,3 +1349,4 @@ v11 **FUTURE**:
 - `addChatUser`
 - `deleteChatUser`
 - `inviteToChannel`
+- `sendVote`

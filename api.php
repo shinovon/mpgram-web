@@ -1853,22 +1853,6 @@ try {
 
         json($rawData);
         break;
-    case 'sendVote':
-        checkAuth();
-        setupMadelineProto();
-
-        $votes = explode('vote=', $_SERVER['QUERY_STRING']);
-        $options = [];
-        foreach ($votes as $vote) {
-            if (str_contains($vote, '=')) continue;
-            $i = strpos($vote, '&');
-            if ($i !== false) $vote = substr($vote, 0, $i);
-            $options[] = $vote;
-        }
-        $rawData = $MP->messages->sendVote(['peer' => getParam('peer'), 'msg_id' => getParam('id'), 'options' => $options]);
-
-        json($rawData);
-        break;
     case 'getStickerSets':
         checkAuth();
         setupMadelineProto();
@@ -2145,6 +2129,16 @@ try {
         );
 
         json(['res' => 1]);
+        break;
+    case 'sendVote':
+        checkAuth();
+        setupMadelineProto();
+
+        // TODO
+        $votes = explode(',', getParam('options'));
+        //$rawData = $MP->messages->sendVote(['peer' => getParam('peer'), 'msg_id' => getParam('id'), 'options' => $options]);
+
+        //json($rawData);
         break;
     default:
         error(['message' => "Method \"$METHOD\" is undefined"]);
