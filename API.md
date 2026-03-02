@@ -7,7 +7,7 @@
 >
 > **Instance owners are advised to block any suspicious-looking User-Agents and IP addresses from data-centers.**
 
-Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets`
+Usage example: `https://MPGRAM_INSTANCE/api.php?v=11&method=getPeer&id=nnmidlets`
 
 - Current version: 11
 - Minimum compatible version: 2
@@ -16,7 +16,7 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
 - All methods require authorization, unless stated otherwise.
 - All methods return JSON objects, unless stated otherwise.
 - All methods accept parameters with GET query, POST multipart or POST URL-encoded form.
-- Any method may return [Error object](#Error) in case of failure.
+- Any method may return [Error](#Error) object in case of failure.
 - For authorization, set `X-mpgram-user` request header or `user` parameter via GET or POST.
 
 ## Client request headers
@@ -172,7 +172,7 @@ Object
 <details>
 <summary>Changes</summary>
 
-### Changes since v9
+### Changed since v9
 - `media` can no longer be null
 
 ### Removed since v5
@@ -353,7 +353,7 @@ Available since v2
 - `captcha_key` (optional): Captcha text
 
 #### Response
-[Authorization response object](#Authorization-response)
+[Authorization response](#Authorization-response) object
 
 ---
 
@@ -374,7 +374,7 @@ Available since v10
 - `captcha_key` (optional): Captcha text
 
 ### Response
-[Authorization response object](#Authorization-response)
+[Authorization response](#Authorization-response) object
 
 ---
 
@@ -386,7 +386,7 @@ Checks QR code authorization status, generates new link if authorization is not 
 Available since v10
 
 ### Response
-[Authorization response object](#Authorization-response)
+[Authorization response](#Authorization-response) object
 
 ---
 
@@ -401,7 +401,7 @@ Available since v1
 - `code`
 
 ### Response
-[Authorization response object](#Authorization-response)
+[Authorization response](#Authorization-response) object
 
 ---
 
@@ -416,7 +416,7 @@ Available since v1
 - `password`: Cloud password
 
 #### Response
-[Authorization response object](#Authorization-response)
+[Authorization response](#Authorization-response) object
 
 ---
 
@@ -1347,7 +1347,7 @@ Object
 ### Description
 Returns chat participants.
 
-**Currently supports only channels.**
+**Supports only channels currently.**
 
 Available since v6
 
@@ -1409,7 +1409,7 @@ Available since v5
 Object
 
 - `res` (array, optional): Array of [Update](#Update) objects
-- `cancel` (int, optional): 1, if request was cancelled by [cancelUpdates](#cancelUpdates) method. **since v9**
+- `cancel` (int, optional): 1, if request was canceled by [cancelUpdates](#cancelUpdates) method. **since v9**
 
 ---
 
@@ -1431,7 +1431,7 @@ Object
 
 ### Description
 
-Cancels [updates](#updates) method long-poll.
+Cancels `[updates](#updates)` method long-poll.
 
 Available since v9
 
@@ -1446,7 +1446,7 @@ Object
 
 #### Removed since v11
 
-- `res` (boolean): true if request completed successfully. **Changed type to int.**'
+- `res` (boolean): true if request completed successfully. **Changed type to int.**
 
 </details>
 
@@ -1527,9 +1527,8 @@ Available since v8
 Object
 
 - `users` (long): Date until users are muted, or 0 if notifications are enabled.
-- `chats` (long): Date until users are muted, or 0 if notifications are enabled.
-- `broadcasts` (long): Date until users are muted, or 0 if notifications are enabled.
-
+- `chats` (long): Date until chats are muted, or 0 if notifications are enabled.
+- `broadcasts` (long): Date until broadcast channels are muted, or 0 if notifications are enabled.
 
 ---
 
@@ -1643,7 +1642,7 @@ File
 ## `voice.php`
 
 ### Description
-Converts voice message from message to MP3 64 kbit/s.
+Converts voice message from message to MP3 64 KBit/s.
 
 ### GET Parameters
 - `c`: Peer ID
