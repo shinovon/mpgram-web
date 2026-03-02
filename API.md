@@ -163,7 +163,7 @@ Object
 - `silent` (boolean, optional): true if message sent without notification. **since v8**
 - `mention` (boolean, optional): true if user is mentioned in message. **since v8**
 - `comments` (object, optional): Post comments information, present if message is broadcast post that has comments. **since v8**
-  - `count` (int): Count messages. 
+  - `count` (int): Count of messages. 
   - `peer` (string): [Peer ID](#Peer-ID) of discussion chat.
   - `read` (int, optional): Message ID of max read message, present if discussion thread was read once.
 - `reacts` (object, optional): Reacts information. **since v10** (Unfinished)
@@ -911,7 +911,7 @@ Object
 ## `getForumTopics`
 
 ### Description
-Returns list of topics in forum chat. TODO
+Returns list of topics in forum chat.
 
 Available since v6
 
@@ -923,7 +923,7 @@ Available since v6
 Object
 
 - `res` (array)
-  - Topic (object)
+  - Topic (object) TODO
     - `id` (int)
     - `closed` (boolean)
     - `pinned` (boolean)
@@ -1460,7 +1460,7 @@ Object
 ## `getNotifySettings`
 
 ### Description
-Returns notification settings of logged user. TODO
+Returns notification settings of logged user.
 
 Available since v8
 
@@ -1470,6 +1470,8 @@ Object
 - `users` (int)
 - `chats` (int)
 - `broadcasts` (int)
+
+TODO
 
 ---
 
@@ -1495,19 +1497,102 @@ Object
 
 ## `file.php`
 
-TODO
+### GET Parameters
+**Sticker:**
+- `sticker`: Sticker ID
+- `access_hash`: Sticker access hash
+- `p` (optional): Conversion parameters, see below. If not set, will return webp.
+- `s` (optional): Size parameter for `p`, 180 by default
+
+**Message file:**
+- `c`: Peer ID
+- `m`: Message ID
+- `p` (optional): Conversion parameters, see below.
+- `s` (optional): Size parameter for `p`, 180 by default
+- `tw` (optional): Target width for `p=rview`
+- `th` (optional): Target height for `p=rview`
+
+**`p` format:**
+
+Parsed in order:
+
+- `tgss`: Convert TGS to static PNG, end.
+- `tgs`: Convert TGS to GIF, end.
+- `thumb`: Get thumbnail of document
+- `r`: Resize or convert
+  - `stickerp`: (Sticker PNG) Convert to PNG, resize to fit width `s`, end.
+  - `png`: Convert to PNG, end.
+  - `r`: Rotate to 270 degrees
+  - `orig`: Set JPEG quality to 80, keep original size, end.
+  - `prev`: Set JPEG quality to 50, resize to fit `s` in both dimensions, end.
+  - `min`: Set JPEG quality to 30, resize to fit 180x90, end.
+  - `sticker`: Set JPEG quality to 75, resize to fit width `s` or height 90, end.
+  - `sprev`: (Sticker preview) Set JPEG quality to 30, resize to fit width 100 or height 80, end.
+  - `audio`: (Audio file): Set JPEG quality to 50, resize to fit height 36 or width 36, end.
+  - `sprevs`: (Sticker preview with custom size): Set JPEG quality to 30, resize to fit width `s` or height `s`, end.
+  - `view`: Set JPEG quality to 70, fit to `tw`x`th`, end.
+
+Examples:
+
+- `p=rprev&s=200`: Convert to JPEG with quality 50, resize to fit 200x200.
+- `p=rview&tw=240&th=320`: Convert to JPEG with quality 70, resize to fit 240x320.
+- `p=rrview&tw=320&th=240`: Convert to JPEG with quality 70, rotate to 270 degrees, resize to fit 320x240.
+- `p=thumbraudio`: Get thumbnail of document, convert to JPEG with quality 50, resize to fit 36x36.
+- `p=rpng`: Convert to PNG.
+- `p=rorig`: Convert to JPEG.
+- `p=rstickerp&s=120`: Convert to PNG, resize to fit 120x120.
+
+
+### Errors
+- HTTP 400: file is too large to download
+- HTTP 401: unauthorized
+- HTTP 403: feature is not enabled
+- HTTP 500: server error
+
+### Response
+File
 
 ---
 
 ## `ava.php`
 
-TODO
+### Description
+Returns profile picture.
+
+### GET Parameters
+- `c`: Peer ID
+- `a` (optional): Set to 1 to return HTTP 404 on fail.
+- `p`: Conversion parameters, see below.
+
+**`p` format:**
+
+- `r`
+  - `p`: Convert to PNG
+  - `orig`: Keep original size, end.
+  - integer: Resize, end.
+
+Examples:
+- `p=r36`: Convert to JPEG, resize to 36x36.
+- `p=r48`, Convert to PNG, resize to 48x48.
+- `p=rorig`, Convert to JPEG, keep original size.
+- `p=rporig`, Convert to PNG, keep original size.
+
+### Response
+File
 
 ---
 
 ## `voice.php`
 
-TODO
+### Description
+Converts voice message from message to MP3 64 kbit/s.
+
+### GET Parameters
+- `c`: Peer ID
+- `m`: Message ID
+
+### Response
+MP3 file
 
 ---
 

@@ -10,6 +10,7 @@ set_error_handler('exceptions_error_handler');
 try {
     include 'mp.php';
     if (!defined('CONVERT_VOICE_MESSAGES') || !CONVERT_VOICE_MESSAGES) {
+        http_response_code(403);
         echo 'Voice messages converting disabled';
         die;
     }
