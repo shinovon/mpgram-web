@@ -75,32 +75,32 @@ Usage example: `https://MPGRAM_INSTANCE/api.php?v=10&method=getPeer&id=nnmidlets
 Object
 
 - `id` (int): Positive integer
-- `date` (int): Time when message was sent
+- `date` (long): Time when message was sent
 - `text` (string, optional): Text of message
 - `out` (boolean, optional): true if outbox message
 - `peer_id` (string, optional): [Peer ID](#Peer-ID) where message was sent
 - `from_id` (string, optional): [Peer ID](#Peer-ID) of sender
 - `fwd` (object, optional): Forward information, present if message is forwarded
   - `from_id` (string, optional): [Peer ID](#Peer-ID) of original sender
-  - `date` (int, optional): Time when original message was sent
+  - `date` (long, optional): Time when original message was sent
   - `msg` (int, optional): Original message ID, present if message is saved
   - `peer` (string, optional): [Peer ID](#Peer-ID) where original message was send, present if message is saved
   - `s` (boolean, optional): true if message is saved
   - `from_name` (string, optional): Name of original sender, present if profile is private
-- `media` (object or null, optional): Media information, present if message contains media. <br>(~~null if media is disabled~~, **changed since v9**)
+- `media` (object, optional): Media information, present if message contains media.
   - General properties:
     - `type` (string): Type of media
     - `hide` (int, optional): 1 if media is disabled. **since v9**
   - Photo:
     - `type`: `photo`
     - `id` (string): ID of photo
-    - `date` (int or null): Date of photo
+    - `date` (long or null): Date of photo
     - `w` (int): Width of photo. **since v9**
     - `h` (int): Height of photo. **since v9**
   - Document:
     - `type`: `document`
     - `id` (string)
-    - `date` (int, optional)
+    - `date` (long, optional)
     - `size` (int or null)
     - `mime` (string or null)
     - `thumb` (boolean): Has thumbnail?
@@ -158,20 +158,28 @@ Object
       - `data` (string, optional): Data to be sent with `sendBotCallback`, present if button is callback.
       - `url` (string, optional): URL, present if button is hyperlink
 - `entities` (array, optional): Array of raw MadelineProto [MessageEntity](https://docs.madelineproto.xyz/API_docs/types/MessageEntity.html) objects. **since v5**
-- `group` (int, optional): Message group ID, present if media message is grouped. **since v5**
-- `edit` (int, optional): Date of edition, present if message was edited. **since v7**
+- `group` (long, optional): Message group ID, present if media message is grouped. **since v5**
+- `edit` (long, optional): Date of edition, present if message was edited. **since v7**
 - `silent` (boolean, optional): true if message sent without notification. **since v8**
 - `mention` (boolean, optional): true if user is mentioned in message. **since v8**
 - `comments` (object, optional): Post comments information, present if message is broadcast post that has comments. **since v8**
   - `count` (int): Count of messages. 
   - `peer` (string): [Peer ID](#Peer-ID) of discussion chat.
   - `read` (int, optional): Message ID of max read message, present if discussion thread was read once.
-- `reacts` (object, optional): Reacts information. **since v10** (Unfinished)
+- `reacts` (object, optional): Reacts information. **since v10**
   - `count` (int): Count of reacts
+
+<details>
+<summary>Changes</summary>
+
+### Changes since v9
+- `media` can no longer be null
 
 ### Removed since v5
 - `reply`
   - `msg` (int or null): **Repurposed, replaced by `id`**
+
+</details>
 
 ---
 
@@ -185,6 +193,10 @@ Object
 - `mentions` (int, optional): Count of unread mentions, present if more than 0
 - `msg` (object, optional): Last message, present in `getDialogs` response. **since v5**
 
+
+<details>
+<summary>Changes</summary>
+
 ### Removed since v5
 
 - `pinned` (boolean, optional): true if dialog is pinned, **replaced by `pin`**
@@ -193,6 +205,8 @@ Object
 ### Removed since v2
 
 - `type` (string): Type of peer, possible values: "user", "chat", or "channel".
+
+</details>
 
 ---
 
@@ -218,13 +232,18 @@ Object
 - `p` (boolean, optional): true if user has photo. **since v5**
 - `k` (boolean, optional): true if user is listed in contacts. **since v5**
 - `s` (boolean, optional): true if user is online, present if `status` is listed in `fields` parameter. **since v5**
-- `w` (int, optional): Date when user was last online or 0 if hidden, present if `status` is listed in `fields` parameter. **since v5**
+- `w` (long, optional): Date when user was last online or 0 if hidden, present if `status` is listed in `fields` parameter. **since v5**
 - `a` (boolean, optional) true if user has admin rights, present only in `getParticipants` response. **since v6**
+
+<details>
+<summary>Changes</summary>
 
 ### Removed since v5
 - `first_name` (string): First name, replaced by `fn`
 - `last_name` (string): Last name, replaced by `ln`
 - `username` (string or null): Public link, **replaced by `name`**
+
+</details>
 
 ---
 
@@ -240,9 +259,14 @@ Object
 - `c` (boolean, optional): true if broadcast channel. **since v5**
 - `l` (boolean, optional): true if logged user is not in this chat. **since v5**
 
+<details>
+<summary>Changes</summary>
+
 ### Removed since v5
 - `title` (string): Title of chat, **replaced by `t`**
 - `username` (string or null): Public link, **replaced by `name`**
+
+</details>
 
 ---
 
@@ -302,7 +326,7 @@ Object
 
 Most common error messages:
 - `API is disabled`: Server does not support API requests
-- `Instance password is required`: Server requires password, client must provide valid `X-mpgram-instance-password` header
+- `Instance password is required`, `Wrong instance password`: Server requires password, client must provide valid `X-mpgram-instance-password` header
 - `Unsupported API version`: Client API version is outdated
 - `Login API is disabled`: Server does not accept authorization through API
 - `Invalid authorization`: Requested method requires valid authorization
@@ -410,7 +434,7 @@ Available since v5
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -438,7 +462,7 @@ Available since v2
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -452,7 +476,7 @@ Object
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -469,7 +493,7 @@ Available since v11
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -602,8 +626,13 @@ Available since v1
 - `chats` (object, optional): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
 - `raw` (object, optional): Raw result. **Deprecated**
 
+<details>
+<summary>Changes</summary>
+
 #### Removed since v5
 - `messages` (object, optional): Map of [Message](#Message) objects by their [Peer IDs](#Peer-ID).
+
+</details>
 
 ---
 
@@ -626,8 +655,13 @@ Available since v1
 - `chats` (object, optional): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
 - `raw` (object, optional): Raw result. **Deprecated**
 
+<details>
+<summary>Changes</summary>
+
 #### Removed since v5
 - `messages` (object, optional): Map of [Message](#Message) objects by their [Peer IDs](#Peer-ID). **since v5**
+
+</details>
 
 ---
 
@@ -805,7 +839,7 @@ Available since v5
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -829,7 +863,7 @@ Combined with message forwarding method, set `fwd_from` and `id` to forward a me
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -849,18 +883,18 @@ Available since v6
 - `text` (optional): Text of message
 - `html` (optional): Set to 1 to enable HTML parsing
 - `reply` (optional): Message ID to reply
-- `file` (optional): File
+- `file` (optional): File via multipart request
 - `uncompressed` (optional): Set to 1 to send media uncompressed
 - `spoiler` (optional): Set to 1 to hide media under spoiler
 - `doc_id` (optional): Document ID
-- `doc_access_hash`: Document access hash
+- `doc_access_hash` (optional): Document access hash
 - `fwd_from` (optional): Peer ID to forward message from
 - `id` (optional): Message ID to forward, required if `fwd_from` is set
 
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -886,7 +920,7 @@ Available since v5
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -904,7 +938,7 @@ Available since v6
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -917,21 +951,21 @@ Available since v6
 
 ### Parameters
 - `peer`: Peer ID
-- `limit`: Response limit
+- `limit` (optional): Response limit, 30 by default.
 
 ### Response
 Object
 
 - `res` (array)
-  - Topic (object) TODO
-    - `id` (int)
-    - `closed` (boolean)
-    - `pinned` (boolean)
-    - `date` (int)
-    - `top` (int): Thread top message ID
-    - `unread` (int)
-    - `read_max_id` (int)
-    - `title` (string, optional)
+  - Topic (object)
+    - `id` (int): Topic ID
+    - `closed` (boolean): true if no messages can be sent in this topic
+    - `pinned` (boolean): true if topic is pinned
+    - `date` (long): Topic creating date
+    - `top` (int): Last message ID in this topic
+    - `unread` (int): Count of unread messages
+    - `read_max_id` (int): Maximum ID of read messages
+    - `title` (string, optional): Title of topic
 
 ---
 
@@ -951,7 +985,7 @@ Available since v7
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -989,12 +1023,11 @@ Available since v5
 - `id`: Bot [Peer ID](#Peer-ID)
 - `peer` (optional): [Peer ID](#Peer-ID). **since v11**
 - `start` (optional): Start parameter
-<!-- - `random` (optional): Random seed -->
 
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -1058,7 +1091,7 @@ Object
 - `access_hash`: Sticker set access hash
 - `title` (string, optional): Title
 - `short_name` (string, optional)
-- `installed` (int, optional): Date when sticker set was installed
+- `installed` (long, optional): Date when sticker set was installed, not present if sticker set is not installed.
 - `count` (int, optional): Count of stickers
 - `res` (array): Array of stickers
   - Sticker (object)
@@ -1085,7 +1118,7 @@ Available since v7
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -1106,7 +1139,7 @@ Available since v11
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -1142,7 +1175,7 @@ Available since v5
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -1198,7 +1231,7 @@ Available since v11
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -1216,7 +1249,7 @@ Available since v11
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -1253,7 +1286,23 @@ Available since v11
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
+
+---
+
+## `getMessageReadParticipants`
+
+### Descriptions
+Returns list of participants who read a message in a chat.
+
+### Parameters
+- `peer`: [Peer ID](#Peer-ID)
+- `id`: Message ID
+
+### Response
+Object
+
+- `res` (array): Array of [User](#User) objects 
 
 ---
 
@@ -1272,7 +1321,7 @@ Available since v5
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -1289,7 +1338,7 @@ Available since v5
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -1330,7 +1379,7 @@ Available since v6
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -1392,9 +1441,14 @@ Object
 
 - `res` (int): 1 if request completed successfully
 
+<details>
+<summary>Changes</summary>
+
 #### Removed since v11
 
-- `res` (boolean): true if request completed successfully. **Changed type to int.**
+- `res` (boolean): true if request completed successfully. **Changed type to int.**'
+
+</details>
 
 ---
 
@@ -1413,7 +1467,7 @@ Available since v6
 ### Response
 Object
 
-- `res`: 1 if request completed successfully
+- `res` (int): 1 if request completed successfully
 
 ---
 
@@ -1439,11 +1493,16 @@ Available since v8
 - `mc` (optional): set to 1 to mute chats, see [getNotifySettings](#getNotifySettings) method.
 - `mb` (optional): set to 1 to mute broadcast channels, see [getNotifySettings](#getNotifySettings) method.
 
+<details>
+<summary>Changes</summary>
+
 #### Removed since v10
 
 - `mute_users` (optional): set to 1 to mute users, see [getNotifySettings](#getNotifySettings) method. **replaced by `mu`**
 - `mute_chats` (optional): set to 1 to mute chats, see [getNotifySettings](#getNotifySettings) method. **replaced by `mc`**
 - `mute_broadcasts` (optional): set to 1 to mute broadcast channels, see [getNotifySettings](#getNotifySettings) method **replaced by `mb`**
+
+</details>
 
 ### Response
 Object
@@ -1467,11 +1526,10 @@ Available since v8
 ### Response
 Object
 
-- `users` (int)
-- `chats` (int)
-- `broadcasts` (int)
+- `users` (long): Date until users are muted, or 0 if notifications are enabled.
+- `chats` (long): Date until users are muted, or 0 if notifications are enabled.
+- `broadcasts` (long): Date until users are muted, or 0 if notifications are enabled.
 
-TODO
 
 ---
 
