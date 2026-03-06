@@ -1781,11 +1781,15 @@ try {
         $peer = (int) getParam('peer');
 
         if ($METHOD != 'editMessage' && !isParamEmpty('fwd_from')) {
-            $MP->messages->forwardMessages([
+            $p = [
                 'from_peer' => (int) getParam('fwd_from'),
                 'to_peer' => $peer,
                 'id' => explode(',', getParam('id'))
-            ]);
+            ];
+            if (!isParamEmpty('reply')) {
+                $p['reply_to'] = getParam('reply');
+            }
+            $MP->messages->forwardMessages($p);
             if (!isset($_FILES['file']) && isParamEmpty('text')) {
                 json(['res' => '1']);
                 break;
