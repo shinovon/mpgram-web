@@ -2283,6 +2283,9 @@ try {
             if (($raw['full']['participants_count'] ?? 0) > 0) {
                 $r['count'] = $raw['full']['participants_count'];
             }
+            if ($raw['full']['can_view_participants'] ?? false) {
+                $r['can_view_participants'] = true;
+            }
             if ($chat['left'] ?? false) {
                 $r['left'] = true;
             }

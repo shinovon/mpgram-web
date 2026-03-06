@@ -623,6 +623,7 @@ Object
 - `phone` (string, optional)
 - `admin_rights` (object, optional)
 - `count` (int, optional)
+- `can_view_participants` (boolean, optional)
 - `left` (boolean, optional)
 
 ---
