@@ -638,18 +638,6 @@ try {
     if (!defined('ENABLE_API') || !ENABLE_API) {
         error(['message' => "API is disabled"]);
     }
-    if (defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
-        $ipass = $_SERVER['HTTP_X_MPGRAM_INSTANCE_PASSWORD'] ?? null;
-        if ($ipass != null) {
-            if ($ipass != INSTANCE_PASSWORD) {
-                http_response_code(403);
-                error(['message' => "Wrong instance password"]);
-            }
-        } else {
-            http_response_code(403);
-            error(['message' => "Instance password is required"]);
-        }
-    }
     global $MP;
     // Parameters
     $PARAMS = [];
@@ -710,6 +698,18 @@ try {
         if (!defined('ENABLE_LOGIN_API') || !ENABLE_LOGIN_API) {
             http_response_code(403);
             error(['message' => "Login API is disabled"]);
+        }
+        if (defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
+            $ipass = $_SERVER['HTTP_X_MPGRAM_INSTANCE_PASSWORD'] ?? null;
+            if ($ipass != null) {
+                if ($ipass != INSTANCE_PASSWORD) {
+                    http_response_code(403);
+                    error(['message' => "Wrong instance password"]);
+                }
+            } else {
+                http_response_code(403);
+                error(['message' => "Instance password is required"]);
+            }
         }
         $id = $PARAMS['captcha_id'] ?? md5(random_bytes(32));
         session_id('API' . $id);
@@ -2296,7 +2296,7 @@ try {
         if (($raw['full']['pinned_msg_id'] ?? 0) != 0) {
             $r['pinned'] = $raw['full']['pinned_msg_id'];
         }
-        json(['res' => $r]);
+        json($r);
         break;
     default:
         error(['message' => "Method \"$METHOD\" is undefined"]);

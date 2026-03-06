@@ -616,15 +616,14 @@ Available since v11
 ### Response
 Object
 
-- `res` (object)
-  - `username` (string, optional)
-  - `about` (string, optional)
-  - `bot` (boolean, optional)
-  - `status` (object, optional)
-  - `phone` (string, optional)
-  - `admin_rights` (object, optional)
-  - `count` (int, optional)
-  - `left` (boolean, optional)
+- `username` (string, optional)
+- `about` (string, optional)
+- `bot` (boolean, optional)
+- `status` (object, optional)
+- `phone` (string, optional)
+- `admin_rights` (object, optional)
+- `count` (int, optional)
+- `left` (boolean, optional)
 
 ---
 
