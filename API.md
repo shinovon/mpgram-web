@@ -192,6 +192,8 @@ Object
 - `unread` (int, optional): Count of unread messages, present if more than 0
 - `mentions` (int, optional): Count of unread mentions, present if more than 0
 - `msg` (object, optional): Last message, present in `getDialogs` response. **since v5**
+- `read_in` (int, optional): TODO **since v11**
+- `read_out` (int, optional): TODO **since v11**
 
 
 <details>
@@ -601,6 +603,31 @@ Object
 
 ---
 
+## `getPeerInfo`
+
+### Description
+TODO
+
+Available since v11
+
+### Parameters
+- `id`: [Peer ID](#Peer-ID)
+
+### Response
+Object
+
+- `res` (object)
+  - `username` (string, optional)
+  - `about` (string, optional)
+  - `bot` (boolean, optional)
+  - `status` (object, optional)
+  - `phone` (string, optional)
+  - `admin_rights` (object, optional)
+  - `count` (int, optional)
+  - `left` (boolean, optional)
+
+---
+
 # Dialogs methods
 ## `getDialogs`
 
@@ -702,8 +729,6 @@ Object
 ### Description
 Returns raw information about dialog.
 
-See: https://docs.madelineproto.xyz/API_docs/types/Dialog.html
-
 Available since v9
 
 ### Parameters
@@ -712,7 +737,18 @@ Available since v9
 ### Response
 Object
 
+- `res` (object): [Dialog](#Dialog) object
+
+<details>
+<summary>Changes</summary>
+
+#### Removed since v11
+
 - `res` (object): MadelineProto `Dialog` object
+
+See: https://docs.madelineproto.xyz/API_docs/types/Dialog.html
+
+</details>
 
 ---
 

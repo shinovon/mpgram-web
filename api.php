@@ -305,6 +305,14 @@ function parseDialog($rawDialog): array
     if ($v >= 5 && ($rawDialog['unread_mentions_count'] ?? 0) > 0) {
         $dialog['mentions'] = $rawDialog['unread_mentions_count'];
     }
+    if ($v >= 11) {
+        if (($rawDialog['read_outbox_max_id'] ?? 0) > 0) {
+            $dialog['read_out'] = $rawDialog['read_outbox_max_id'];
+        }
+        if (($rawDialog['read_inbox_max_id'] ?? 0) > 0) {
+            $dialog['read_in'] = $rawDialog['read_inbox_max_id'];
+        }
+    }
     return $dialog;
 }
 
@@ -2124,7 +2132,11 @@ try {
         checkAuth();
         setupMadelineProto();
         $ids = explode(',', getParam('id'));
-        $r = $MP->messages->getPeerDialogs(peers: $ids)['dialogs'];
+        $rawData = $MP->messages->getPeerDialogs(peers: $ids)['dialogs'];
+        $r = [];
+        foreach ($rawData as $raw) {
+            $r[] = parseDialog($raw);
+        }
         if (count($ids) == 1) {
             json(['res' => $r[0]]);
             break;
@@ -2239,6 +2251,52 @@ try {
         $MP->messages->sendVote(['peer' => getParam('peer'), 'msg_id' => getParam('id'), 'options' => $options]);
 
         json(['res' => 1]);
+        break;
+    case 'getPeerInfo':
+        checkAuth();
+        setupMadelineProto();
+
+        $raw = $MP->getFullInfo(getParam('id')) ?? null;
+        $r = [];
+        if (isset($raw['User'])) {
+            $user = $raw['User'];
+            if ($user['bot'] ?? false) {
+                $r['bot'] = true;
+            }
+            if (isset($user['status'])) {
+                $r['status'] = $user['status'];
+            }
+            if (isset($user['phone'])) {
+                $r['phone'] = $user['phone'];
+            }
+            if (isset($user['about'])) {
+                $r['about'] = $user['about'];
+            }
+            if (isset($user['username'])) {
+                $r['username'] = $user['username'];
+            }
+        } else if (isset($raw['Chat'])) {
+            $chat = $raw['Chat'];
+            if (isset($chat['admin_rights'])) {
+                $r['admin_rights'] = $chat['admin_rights'];
+            }
+            if (($raw['full']['participants_count'] ?? 0) > 0) {
+                $r['count'] = $raw['full']['participants_count'];
+            }
+            if ($chat['left'] ?? false) {
+                $r['left'] = true;
+            }
+            if (isset($chat['about'])) {
+                $r['about'] = $chat['about'];
+            }
+            if (isset($chat['username'])) {
+                $r['username'] = $chat['username'];
+            }
+        }
+        if (($raw['full']['pinned_msg_id'] ?? 0) != 0) {
+            $r['pinned'] = $raw['full']['pinned_msg_id'];
+        }
+        json(['res' => $r]);
         break;
     default:
         error(['message' => "Method \"$METHOD\" is undefined"]);
