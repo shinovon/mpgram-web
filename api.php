@@ -312,8 +312,8 @@ function parseDialog($rawDialog): array
         if (($rawDialog['read_inbox_max_id'] ?? 0) > 0) {
             $dialog['read_in'] = $rawDialog['read_inbox_max_id'];
         }
-        if (($rawDialog['notify_settings']['silent'] ?? false) || (($rawDialog['notify_settings']['mute_until'] ?? 0) != 0)) {
-            $dialog['silent'] = true;
+        if (isset($rawDialog['notify_settings']['mute_until'])) {
+            $dialog['silent'] = $rawDialog['notify_settings']['mute_until'] != 0;
         }
     }
     return $dialog;
