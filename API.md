@@ -192,8 +192,9 @@ Object
 - `unread` (int, optional): Count of unread messages, present if more than 0
 - `mentions` (int, optional): Count of unread mentions, present if more than 0
 - `msg` (object, optional): Last message, present in `getDialogs` response. **since v5**
-- `read_in` (int, optional): TODO **since v11**
-- `read_out` (int, optional): TODO **since v11**
+- `read_in` (int, optional): Maximum inbox read message ID. **since v11**
+- `read_out` (int, optional): Maximum outbox read message ID. **since v11**
+- `silent` (boolean, optional): true if dialog is muted. **since v11**
 
 
 <details>
@@ -1791,3 +1792,4 @@ v11:
 - `inviteToChannel`
 - `sendVote`
 - `logout`
+- `getPeerInfo`

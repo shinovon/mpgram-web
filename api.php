@@ -312,16 +312,19 @@ function parseDialog($rawDialog): array
         if (($rawDialog['read_inbox_max_id'] ?? 0) > 0) {
             $dialog['read_in'] = $rawDialog['read_inbox_max_id'];
         }
+        if ($rawDialog['notify_settings']['silent'] ?? false) {
+            $dialog['silent'] = true;
+        }
     }
     return $dialog;
 }
 
-function parseUser($rawUser)
+function parseUser($rawUser): array
 {
     global $v;
-    if (!$rawUser) {
-        return false;
-    }
+//    if (!$rawUser) {
+//        return false;
+//    }
     $user = [];
     $user['id'] = strval($rawUser['id']);
     $user[$v < 5 ? 'first_name' : 'fn'] = removeEmoji($rawUser['first_name'] ?? null);
@@ -559,8 +562,8 @@ function parseMessage($rawMessage, $media = false, $short = false): array
                 global $MP;
                 $peer = $message['peer_id'];
                 $rawReplyMsg = (int) $peer < 0 ?
-                    $MP->channels->getMessages(['channel' => $peer, 'id' => [$reply['id']]]) :
-                    $MP->messages->getMessages(['peer' => $peer, 'id' => [$reply['id']]]);
+                    $MP->channels->getMessages(channel: $peer, id: [$reply['id']]) :
+                    $MP->messages->getMessages(id: [$reply['id']]);
                 if ($rawReplyMsg && isset($rawReplyMsg['messages']) && isset($rawReplyMsg['messages'][0])) {
                     $reply['msg'] = parseMessage($rawReplyMsg['messages'][0], false, true);
                 }
@@ -778,7 +781,7 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        $MP->auth->resendCode(['phone' => $PARAMS['phone'], 'phone_code_hash' => $PARAMS['hash']]);
+        $MP->auth->resendCode(phone_number: $PARAMS['phone'], phone_code_hash: $PARAMS['hash']);
         json(['res' => 1]);
         break;
     case 'completePhoneLogin':
@@ -1320,14 +1323,14 @@ try {
             if (!isParamEmpty('read') && isset($rawData['messages'][0])) {
                 $maxid = $rawData['messages'][0]['id'];
                 if ($thread != null) {
-                    $MP->messages->readDiscussion(['peer' => $peer, 'read_max_id' => $maxid, 'msg_id' => (int) $thread]);
-                    $MP->messages->readMentions(['peer' => $peer, 'top_msg_id' => (int) $thread]);
+                    $MP->messages->readDiscussion(peer: $peer, msg_id: (int) $thread, read_max_id: $maxid);
+                    $MP->messages->readMentions(peer: $peer, top_msg_id: (int) $thread);
                 } else if ((int) $peer < 0 && Magic::ZERO_CHANNEL_ID >= (int) $peer) {
-                    $MP->channels->readHistory(['channel' => $peer, 'max_id' => $maxid]);
-                    $MP->messages->readMentions(['peer' => $peer]);
+                    $MP->channels->readHistory(channel: $peer, max_id: $maxid);
+                    $MP->messages->readMentions(peer: $peer);
                 } else {
-                    $MP->messages->readHistory(['peer' => $peer, 'max_id' => $maxid]);
-                    $MP->messages->readMentions(['peer' => $peer]);
+                    $MP->messages->readHistory(peer: $peer, max_id: $maxid);
+                    $MP->messages->readMentions(peer: $peer);
                 }
             }
         } catch (Exception) {}
@@ -1371,7 +1374,7 @@ try {
         }
         if (!isParamEmpty('status')) {
             try {
-                $MP->account->updateStatus(['offline' => false]);
+                $MP->account->updateStatus(offline: false);
             } catch (Exception) {}
         }
         json(parseUser($r));
@@ -1594,13 +1597,13 @@ try {
                     try {
                         if ($chatPeer && Magic::ZERO_CHANNEL_ID >= (int) $peer) {
                             if ($thread) {
-                                $MP->messages->readDiscussion(['peer' => $peer, 'read_max_id' => $maxmsg, 'msg_id' => $thread]);
-                                $MP->messages->readMentions(['peer' => $peer, 'top_msg_id' => $thread]);
+                                $MP->messages->readDiscussion(peer: $peer, msg_id: $thread, read_max_id: $maxmsg);
+                                $MP->messages->readMentions(peer: $peer, top_msg_id: $thread);
                             } else {
-                                $MP->channels->readHistory(['channel' => $peer, 'max_id' => $maxmsg]);
+                                $MP->channels->readHistory(channel: $peer, max_id: $maxmsg);
                             }
                         } else {
-                            $MP->messages->readHistory(['peer' => $peer, 'max_id' => $maxmsg]);
+                            $MP->messages->readHistory(peer: $peer, max_id: $maxmsg);
                         }
                     } catch (Exception) {}
                 }
@@ -1632,11 +1635,11 @@ try {
         $folders = $MP->messages->getDialogFilters();
         if (($folders['_'] ?? '') == 'messages.dialogFilters')
             $folders = $folders['filters'];
-        $hasArchiveChats = count($MP->messages->getDialogs([
-            'limit' => 1,
-            'exclude_pinned' => true,
-            'folder_id' => 1
-            ])['dialogs']) > 0;
+        $hasArchiveChats = count($MP->messages->getDialogs(
+            exclude_pinned: true,
+            folder_id: 1,
+            limit: 1
+        )['dialogs']) > 0;
         if (count($folders) == 0 && !$hasArchiveChats) {
             json(['res' => null]);
             break;
@@ -1663,14 +1666,14 @@ try {
         $thread = getParam('thread', null);
 
         if ($thread != null) {
-            $MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => (int) $thread]);
-            $MP->messages->readMentions(['peer' => $id, 'top_msg_id' => (int) $thread]);
+            $MP->messages->readDiscussion(peer: $id, msg_id: (int) $thread, read_max_id: $maxid);
+            $MP->messages->readMentions(peer: $id, top_msg_id: (int) $thread);
         } else if ((int) $id < 0 && Magic::ZERO_CHANNEL_ID >= (int) $id) {
-            $MP->channels->readHistory(['channel' => $id, 'max_id' => $maxid]);
-            $MP->messages->readMentions(['peer' => $id]);
+            $MP->channels->readHistory(channel: $id, max_id: $maxid);
+            $MP->messages->readMentions(peer: $id);
         } else {
-            $MP->messages->readHistory(['peer' => $id, 'max_id' => $maxid]);
-            $MP->messages->readMentions(['peer' => $id]);
+            $MP->messages->readHistory(peer: $id, max_id: $maxid);
+            $MP->messages->readMentions(peer: $id);
         }
         break;
     case 'startBot':
@@ -1702,13 +1705,13 @@ try {
     case 'joinChannel':
         checkAuth();
         setupMadelineProto();
-        $MP->channels->joinChannel(['channel' => getParam('id')]);
+        $MP->channels->joinChannel(channel: getParam('id'));
         json(['res' => 1]);
         break;
     case 'leaveChannel':
         checkAuth();
         setupMadelineProto();
-        $MP->channels->leaveChannel(['channel' => getParam('id')]);
+        $MP->channels->leaveChannel(channel: getParam('id'));
         json(['res' => 1]);
         break;
     case 'checkChatInvite':
@@ -1730,9 +1733,9 @@ try {
         $peer = getParam('peer');
         $ids = explode(',', getParam('id'));
         if (is_numeric($peer) && ((int) $peer > 0 || (int) $peer > Magic::ZERO_CHANNEL_ID)) {
-            $MP->messages->deleteMessages(['id' => $ids]);
+            $MP->messages->deleteMessages(id: $ids);
         } else {
-            $MP->channels->deleteMessages(['channel' => $peer, 'id' => $ids]);
+            $MP->channels->deleteMessages(channel: $peer, id: $ids);
         }
         json(['res' => '1']);
         break;
@@ -1766,10 +1769,10 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        $MP->messages->setTyping([
-            'peer' => (int) getParam('peer'),
-            'action' => ['_' => 'sendMessage' . getParam('action') . 'Action']
-        ]);
+        $MP->messages->setTyping(
+            action: ['_' => 'sendMessage' . getParam('action') . 'Action'],
+            peer: (int) getParam('peer')
+        );
 
         json(['res' => 1]);
         break;
@@ -1777,7 +1780,7 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        $MP->account->updateStatus(['offline' => !isParamEmpty('off')]);
+        $MP->account->updateStatus(offline: !isParamEmpty('off'));
         json(['res' => 1]);
         break;
     case 'sendMessage':
@@ -1901,7 +1904,7 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        $rawData = $MP->contacts->search(['q' => getParam('q')]);
+        $rawData = $MP->contacts->search(q: getParam('q'));
         $res = [];
         foreach ($rawData['my_results'] as $c) {
             $r = findPeer(getId($c), $rawData);
@@ -1920,12 +1923,12 @@ try {
         $peer = (int) getParam('peer');
         $user = (int) getParam('id');
 
-        $MP->channels->editBanned(['channel' => $peer, 'participant' => $user, 'banned_rights' => [
+        $MP->channels->editBanned(banned_rights: [
             '_' => 'chatBannedRights',
             'until_date' => 1,
             'view_messages' => true,
             'send_messages' => true
-        ]]);
+        ], channel: $peer, participant: $user);
 
         json(['res' => '1']);
         break;
@@ -1933,7 +1936,7 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        $rawData = $MP->messages->getForumTopics(['peer' => getParam('peer'), 'limit' => (int) getParam('limit', 30)]);
+        $rawData = $MP->messages->getForumTopics(peer: getParam('peer'), limit: (int) getParam('limit', 30));
         $res = [];
         foreach ($rawData['topics'] as $t) {
             $r = [
@@ -2010,12 +2013,12 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        $MP->messages->updatePinnedMessage([
-            'silent' => ((int) getParam('silent', '1')) == 1,
-            'unpin' => !isParamEmpty('unpin'),
-            'peer' => (int) getParam('peer'),
-            'id' => (int) getParam('id')
-        ]);
+        $MP->messages->updatePinnedMessage(
+            silent: ((int) getParam('silent', '1')) == 1,
+            unpin: !isParamEmpty('unpin'),
+            peer: (int) getParam('peer'),
+            id: (int) getParam('id')
+        );
 
         json(['res' => '1']);
         break;
@@ -2059,7 +2062,7 @@ try {
         $broadcasts = getParam($old ? 'mute_broadcasts' : 'mb', '0');
 
         if (!isParamEmpty('online')) {
-            $MP->account->updateStatus(['offline' => false]);
+            $MP->account->updateStatus(offline: false);
         }
 
         $so = $offset;
@@ -2095,10 +2098,10 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        $r = $MP->messages->getDiscussionMessage([
-            'peer' => getParam('peer'),
-            'msg_id' => (int) getParam('id')
-        ]);
+        $r = $MP->messages->getDiscussionMessage(
+            peer: getParam('peer'),
+            msg_id: (int) getParam('id')
+        );
         $msg = $r['messages'][0];
 
         json([
@@ -2248,7 +2251,7 @@ try {
         foreach (explode(',', getParam('options')) as $v) {
             $options[] = base64_decode($v);
         }
-        $MP->messages->sendVote(['peer' => getParam('peer'), 'msg_id' => getParam('id'), 'options' => $options]);
+        $MP->messages->sendVote(peer: getParam('peer'), msg_id: getParam('id'), options: $options);
 
         json(['res' => 1]);
         break;
