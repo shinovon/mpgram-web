@@ -211,7 +211,6 @@ try {
                                 $dialogs[] = $d;
                             break;
                         }
-                        continue;
                     }
                 }
                 if (count($folder['exclude_peers']) > 0) {

@@ -185,7 +185,7 @@ try {
             echo '<form action="'.$file.'">';
             echo '<input type="hidden" name="c" value="'.$id.'">';
             echo '<input type="hidden" name="join" value="1">';
-            echo '<input type="hidden" name="r" value="'. \base64_encode(random_bytes(16)).'">';
+            echo '<input type="hidden" name="r" value="' .  base64_encode(random_bytes(16)).'">';
             echo '<input type="submit" value="'.MP::x($lng['join']).'">';
             echo '</form>';
         } elseif (!$ch || $canpost) {
@@ -194,7 +194,7 @@ try {
             $watchos = str_contains($ua, 'Watch OS');
             echo '<form action="write.php"'.($post ? ' method="post"' : '').' class="in">';
             echo '<input type="hidden" name="c" value="'.$id.'">';
-            echo '<input type="hidden" name="r" value="'. \base64_encode(random_bytes(16)).'">';
+            echo '<input type="hidden" name="r" value="' . base64_encode(random_bytes(16)).'">';
             if ($watchos) {
                 echo '<input required name="msg" value="" style="width: 100%; height: 2em"><br>';
             } else {

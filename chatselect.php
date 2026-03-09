@@ -68,11 +68,11 @@ try {
     $folders = $MP->messages->getDialogFilters();
     if (($folders['_'] ?? '') == 'messages.dialogFilters')
         $folders = $folders['filters'];
-    $hasArchiveChats = count($MP->messages->getDialogs([
-        'limit' => 1, 
-        'exclude_pinned' => true,
-        'folder_id' => 1
-        ])['dialogs']) > 0;
+    $hasArchiveChats = count($MP->messages->getDialogs(
+        exclude_pinned: true,
+        folder_id: 1,
+        limit: 1
+    )['dialogs']) > 0;
     $url = 'chatselect.php?';
     if ($fwdchat !== null) {
         $url .= 'c='.$fwdchat.'&';
@@ -180,7 +180,6 @@ try {
                                 $dialogs[] = $d;
                             break;
                         }
-                        continue;
                     }
                 }
                 if (count($folder['exclude_peers']) > 0) {

@@ -845,12 +845,12 @@ class MP {
             if (str_contains($user, ', ')) {
                 $user = substr($user, 0, strpos($user, ', '));
             }
-        } elseif (isset($_SESSION) && isset($_SESSION['user'])) {
+        } elseif (isset($_SESSION['user'])) {
             $user = $_SESSION['user'];
         } elseif (isset($_SERVER['HTTP_X_MPGRAM_USER'])) {
             $user = $_SERVER['HTTP_X_MPGRAM_USER'];
         } 
-        if ($user == null || empty($user)
+        if (empty($user)
         || strlen($user) < 32 || strlen($user) > 200
         || str_contains($user, '\\')
         || str_contains($user, '/')

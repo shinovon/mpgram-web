@@ -26,7 +26,7 @@ header('Cache-Control: private, no-cache, no-store');
 
 $id = $_GET['c'] ?? $_GET['peer'] ?? die;
 $filter = $_GET['f'] ?? 'photos';
-$filter = strtoupper(substr($filter, 0, 1)).\substr($filter, 1);
+$filter = strtoupper(substr($filter, 0, 1)) . substr($filter, 1);
 $file = htmlentities($_SERVER['PHP_SELF']);
 $query = $_GET['q'] ?? null;
 $msgoffset = 0;

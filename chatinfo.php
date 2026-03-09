@@ -56,7 +56,7 @@ try {
             foreach ($members as $i => $m) {
                 if (isset($m['kicked_by'])) {
                     unset($members[$i]);
-                } elseif (isset($m['user']) && isset($m['user']['status']) && $m['user']['status']['_'] == 'userStatusOnline') {
+                } elseif (isset($m['user']['status']) && $m['user']['status']['_'] == 'userStatusOnline') {
                     $onlines ++;
                 }
             }

@@ -195,7 +195,7 @@ try {
             $name = $info['Chat']['title'];
         }
         $ar = $info['Chat']['admin_rights'] ?? null;
-    } elseif (isset($info['User']) && isset($info['User']['first_name'])) {
+    } elseif (isset($info['User']['first_name'])) {
         $name = $info['User']['first_name'];
         $pm = true;
     }

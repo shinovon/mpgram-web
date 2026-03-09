@@ -55,7 +55,7 @@ try {
         }
     } catch (Exception) {}
     
-    $inpath = VOICE_TMP_DIR.\hash('crc32',$user).$cid.'_'.$mid;
+    $inpath = VOICE_TMP_DIR . hash('crc32',$user).$cid.'_'.$mid;
     $outpath = $inpath.'.mp3';
     if (!file_exists($outpath)) {
         $MP->downloadToFile($di, $inpath);
