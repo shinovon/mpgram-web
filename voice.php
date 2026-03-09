@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 function exceptions_error_handler($severity, $message, $filename, $lineno) {
     throw new ErrorException($message, 0, $severity, $filename, $lineno);
@@ -25,11 +25,11 @@ try {
     $mid = $_GET['m'];
     if (!is_numeric($cid) || !is_numeric($mid)) die;
     if (MP::isChannel($cid)) {
-        $msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
+        $msg = $MP->channels->getMessages(channel: $cid, id: [$mid]);
     } else {
-        $msg = $MP->messages->getMessages(['peer' => $cid, 'id' => [$mid]]);
+        $msg = $MP->messages->getMessages(id: [$mid]);
     }
-    if ($msg && isset($msg['messages']) && isset($msg['messages'][0])) {
+    if ($msg && isset($msg['messages'][0])) {
         $msg = $msg['messages'][0];
     }
     $di = $MP->getDownloadInfo($msg['media']);

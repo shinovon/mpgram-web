@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 include 'redirect.php';
 
@@ -60,18 +60,15 @@ try {
         $id = MP::getId($info);
     }
     $name = $info['Chat']['title'] ?? $info['User']['first_name'] ?? $info['User']['last_name'] ?? null;
-    $r = $MP->messages->search([
-    'peer' => $id,
-    'limit' => $msglimit,
-    'filter' => ['_' => 'inputMessagesFilter'.$filter],
-    'q' => $query,
-    'offset_id' => $msgoffsetid,
-    'offset_date' => 0,
-    'add_offset' => $msgoffset,
-    'max_id' => $msgmaxid,
-    'min_id' => 0,
-    'hash' => 0
-    ]);
+    $r = $MP->messages->search(
+        filter: ['_' => 'inputMessagesFilter'.$filter],
+        peer: $id,
+        q: $query,
+        offset_id: $msgoffsetid,
+        add_offset: $msgoffset,
+        limit: $msglimit,
+        max_id: $msgmaxid
+    );
     $id_offset = null;
     if (isset($r['offset_id_offset'])) {
         $id_offset = $r['offset_id_offset'];

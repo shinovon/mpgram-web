@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 ini_set('error_reporting', E_ERROR);
 ini_set('display_errors', 0);
@@ -36,9 +36,9 @@ if ($msg !== null) {
     try {
         $MP = MP::getMadelineAPI($user);
         if (isset($_GET["format"]) || isset($_POST["format"])) {
-            $MP->messages->sendMessage(['peer' => $id, 'message' => $msg, 'parse_mode' => 'HTML']);
+            $MP->messages->sendMessage(peer: $id, message: $msg, parse_mode: \danog\MadelineProto\ParseMode::HTML);
         } else {
-            $MP->messages->sendMessage(['peer' => $id, 'message' => $msg]);
+            $MP->messages->sendMessage(peer: $id, message: $msg);
         }
     } catch (Exception $e) {
     //    echo $e->getMessage();
@@ -52,7 +52,7 @@ echo '<body>';
 echo '<form action="write.php" method="post">';
 echo '<input type="hidden" name="c" value="'.$id.'">';
 echo '<input type="text" value="" name="msg"><br>';
-echo '<input type="hidden" name="r" value="'. \base64_encode(random_bytes(16)).'">';
+echo '<input type="hidden" name="r" value="' . base64_encode(random_bytes(16)).'">';
 echo '<input type="submit">';
 echo '</form>';
 if ($name) {

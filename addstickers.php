@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
@@ -33,12 +33,12 @@ try {
     $MP = MP::getMadelineAPI($user);
     if (isset($_GET['c'])) {
         if (!$returnurl) $returnurl = '/chats.php';
-        $MP->messages->installStickerSet(['stickerset' => $stickerset, 'archived' => false]);
+        $MP->messages->installStickerSet(archived: false, stickerset: $stickerset);
         header("Location: $returnurl");
         die;
     }
     if (!$returnurl) $returnurl = $_SERVER['HTTP_REFERER'] ?? '';
-    $r = $MP->messages->getStickerSet(['stickerset' => $stickerset]);
+    $r = $MP->messages->getStickerSet(stickerset: $stickerset);
     echo '<html><head><title>'.MP::x($r['set']['title']).'</title>';
     echo Themes::head();
     echo '</head>';

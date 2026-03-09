@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 ini_set('error_reporting', E_ERROR);
 ini_set('display_errors', 0);
@@ -50,36 +50,40 @@ try {
         switch ($act) {
         case 'delete':
             if (is_numeric($id) && (int)$id > 0) {
-                $MP->messages->deleteMessages(['id' => [(int)$msg]]);
+                $MP->messages->deleteMessages(id: [(int)$msg]);
             } else {
-                $MP->channels->deleteMessages(['channel' => $id, 'id' => [(int)$msg]]);
+                $MP->channels->deleteMessages(channel: $id, id: [(int)$msg]);
             }
             header('Location: chat.php?c='.$id);
             break;
         case 'fwdh':
-            $MP->messages->forwardMessages(['from_peer' => $id, 'to_peer' => $id, 'id' => [(int)$msg]]);
+            $MP->messages->forwardMessages(from_peer: $id, id: [(int)$msg], to_peer: $id);
             header('Location: chat.php?c='.$id);
             break;
         case 'fwd':
-            $MP->messages->forwardMessages(['from_peer' => $id, 'to_peer' => $_GET['c2'], 'id' => [(int)$msg]]);
+            $MP->messages->forwardMessages(from_peer: $id, id: [(int)$msg], to_peer: $_GET['c2']);
             header('Location: chat.php?c='.$id);
             break;
         case 'save':
-            $MP->messages->forwardMessages(['from_peer' => $id, 'to_peer' => 'me', 'id' => [(int)$msg]]);
+            $MP->messages->forwardMessages(from_peer: $id, id: [(int)$msg], to_peer: 'me');
             header('Location: chat.php?c='.$id);
             break;
         case 'ban':
-            $msg = $MP->channels->getMessages(['channel' => $id, 'id' => [(int)$msg]]);
+            $msg = $MP->channels->getMessages(channel: $id, id: [(int)$msg]);
             if (($msg = $msg['messages'] ?? null) === null || count($msg) < 1) {
                 echo "Message not found";
                 die;
             }
-            $MP->channels->editBanned(['channel' => $id, 'participant' => $msg[0]['from_id'], 'banned_rights' => [
-            '_' => 'chatBannedRights',
-            'until_date' => 1,
-            'view_messages' => true,
-            'send_messages' => true
-            ]]);
+            $MP->channels->editBanned(
+                banned_rights: [
+                '_' => 'chatBannedRights',
+                'until_date' => 1,
+                'view_messages' => true,
+                'send_messages' => true
+                ],
+                channel: $id,
+                participant: $msg[0]['from_id']
+            );
             header('Location: chat.php?c='.$id);
             break;
         }
@@ -249,8 +253,10 @@ try {
                         }
                         if ($edit) {
                             $params['id'] = $msg;
+                            /** @noinspection PhpParamsInspection */
                             $MP->messages->editMessage($params);
                         } else {
+                            /** @noinspection PhpParamsInspection */
                             $MP->messages->sendMessage($params);
                         }
                         header('Location: chat.php?c='.$id);
@@ -276,6 +282,7 @@ try {
                     if (isset($_GET["format"]) || isset($_POST["format"])) {
                         $params['parse_mode'] = 'HTML';
                     }
+                    /** @noinspection PhpParamsInspection */
                     $MP->messages->sendMedia($params);
                     try {
                         unlink($file);
@@ -366,7 +373,7 @@ if (!$ch) {
         echo '<br><input type="checkbox" id="sp" name="sp">';
         echo '<label for="sp">'.MP::x($lng['send_spoiler']).'</label>';
     }
-    echo '<input type="hidden" name="r" value="'. \base64_encode(random_bytes(16)).'">';
+    echo '<input type="hidden" name="r" value="'. base64_encode(random_bytes(16)).'">';
     echo '<br><input type="submit" value="'.MP::x($lng['send']).'">';
     if ($edit) {
         echo '<input type="hidden" name="edit" value="1">';

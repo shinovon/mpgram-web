@@ -4,7 +4,7 @@ Lightweight Telegram web client based on MadelineProto.
 
 ## Setup
 
-- Generate your own API id by creating a Telegram app at <a href="https://my.telegram.org/apps">https://my.telegram.org/apps</a> 
+- Generate your own API id by creating a Telegram app at [https://my.telegram.org/apps](https://my.telegram.org/apps)
 - Create `api_value.php` from the `api_values.php.example` using the `api_id` and `api_hash` you generated
 - Create `config.php` from the `config.php.example`
 

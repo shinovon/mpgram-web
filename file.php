@@ -42,11 +42,11 @@ try {
         $mid = $_GET['m'];
         if (!is_numeric($cid) || !is_numeric($mid)) die;
         if (MP::isChannel($cid)) {
-            $msg = $MP->channels->getMessages(['channel' => $cid, 'id' => [$mid]]);
+            $msg = $MP->channels->getMessages(channel: $cid, id: [$mid]);
         } else {
-            $msg = $MP->messages->getMessages(['peer' => $cid, 'id' => [$mid]]);
+            $msg = $MP->messages->getMessages(id: [$mid]);
         }
-        if ($msg && isset($msg['messages']) && isset($msg['messages'][0])) {
+        if ($msg && isset($msg['messages'][0])) {
             $msg = $msg['messages'][0];
         }
         
@@ -116,7 +116,7 @@ try {
             $p = substr($p, 3);
             $png = str_starts_with($p, 'p');
             $gif = LOTTIE_TO_GIF && !str_contains($p, 's');
-            $prefix = TGS_TMP_DIR.\hash('crc32',$user).(isset($_GET['sticker']) ? (int)$_GET['sticker'] : ($cid.'_'.$mid));
+            $prefix = TGS_TMP_DIR . hash('crc32',$user).(isset($_GET['sticker']) ? (int)$_GET['sticker'] : ($cid.'_'.$mid));
             $outpath = $prefix.($gif?'.gif':'.png');
             $inpath = $prefix.'.tgs';
             if (!file_exists($outpath)) {

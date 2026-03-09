@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 if (!isset($_GET['id'])) die;
 $i = intval($_GET['m'] ?? 0);
@@ -21,7 +21,8 @@ if (isset($_GET['th'])) {
     $thread = (int) $_GET['th'];
 }    
 
-function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
+function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset): void
+{
     global $id;
     global $limit;
     global $lng;
@@ -90,11 +91,11 @@ function printMsgs($MP, $minmsg, $maxmsg, $minoffset, $maxoffset) {
     // Mark as read
     try {
         if ($thread != null) {
-            $MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => $thread]);
+            $MP->messages->readDiscussion(peer: $id, read_max_id: $maxid, msg_id: $thread);
         } else if ($ch || (int)$id < 0) {
-            $MP->channels->readHistory(['channel' => $id, 'max_id' => $maxmsg['id']]);
+            $MP->channels->readHistory(channel: $id, max_id: $maxmsg['id']);
         } else {
-            $MP->messages->readHistory(['peer' => $id, 'max_id' => $maxmsg['id']]);
+            $MP->messages->readHistory(peer: $id, max_id: $maxmsg['id']);
         }
     } catch (Exception $e) {}
 }
@@ -142,7 +143,7 @@ try {
                 die;
             }
         }
-        return;
+        //return;
     }
     $r = null;
     if ($thread != null) {
@@ -207,11 +208,11 @@ try {
     // Mark as read
     try {
         if ($thread != null) {
-            $MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => $thread]);
+            $MP->messages->readDiscussion(peer: $id, msg_id: $thread, read_max_id: $maxid);
         } else if ($ch || (int)$id < 0) {
-            $MP->channels->readHistory(['channel' => $id, 'max_id' => $maxid]);
+            $MP->channels->readHistory(channel: $id, max_id: $maxid);
         } else {
-            $MP->messages->readHistory(['peer' => $id, 'max_id' => $maxid]);
+            $MP->messages->readHistory(peer: $id, max_id: $maxid);
         }
     } catch (Exception $e) {}
     unset($rm);

@@ -97,11 +97,11 @@ try {
     $folders = $MP->messages->getDialogFilters();
     if (($folders['_'] ?? '') == 'messages.dialogFilters')
         $folders = $folders['filters'];
-    $hasArchiveChats = count($MP->messages->getDialogs([
-        'limit' => 1, 
-        'exclude_pinned' => true,
-        'folder_id' => 1
-        ])['dialogs']) > 0;
+    $hasArchiveChats = count($MP->messages->getDialogs(
+        exclude_pinned: true,
+        folder_id: 1,
+        limit: 1
+    )['dialogs']) > 0;
     if (count($folders) > 1 || $hasArchiveChats) {
         echo '<div>';
         //echo MP::x($lng['folders']).': ';
@@ -125,15 +125,11 @@ try {
         $r = null;
         $dialogs = null;
         if ($fid == 1) {
-            $r = $MP->messages->getDialogs([
-            'offset_date' => 0,
-            'offset_id' => 0,
-            'add_offset' => 0,
-            'limit' => $count, 
-            'hash' => 0,
-            'exclude_pinned' => true,
-            'folder_id' => 1
-            ]);
+            $r = $MP->messages->getDialogs(
+                exclude_pinned: true,
+                folder_id: 1,
+                limit: $count
+            );
             $dialogs = $r['dialogs'];
             foreach ($r['messages'] as $m) {
                 foreach ($dialogs as $k => $d) {
@@ -277,14 +273,10 @@ try {
                 }
                 unset($all);
             } else {
-                $r = $MP->messages->getDialogs([
-                'offset_date' => 0,
-                'offset_id' => 0,
-                'add_offset' => 0,
-                'limit' => $count, 
-                'hash' => 0,
-                'folder_id' => 0
-                ]);
+                $r = $MP->messages->getDialogs(
+                    folder_id: 0,
+                    limit: $count
+                );
                 $dialogs = $r['dialogs'];
                 foreach ($r['messages'] as $m) {
                     foreach ($dialogs as $k => $d) {

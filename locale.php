@@ -1,9 +1,9 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 class MPLocale {
-    public static $lng = array(
+    public static array $lng = array(
     "lang" => "",
     "refresh" => "",
     "back" => "",

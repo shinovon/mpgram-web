@@ -107,18 +107,14 @@ try {
         $dialogs = null;
         if ($query !== null) {
             $dialogs = [];
-            $r = $MP->contacts->search(['q' => $query]);
+            $r = $MP->contacts->search(q: $query);
             $dialogs = $r[$globalsearch ? 'results' : 'my_results'];
         } elseif ($fid == 1) {
-            $r = $MP->messages->getDialogs([
-            'offset_date' => 0,
-            'offset_id' => 0,
-            'add_offset' => 0,
-            'limit' => $count, 
-            'hash' => 0,
-            'exclude_pinned' => true,
-            'folder_id' => 1
-            ]);
+            $r = $MP->messages->getDialogs(
+                exclude_pinned: true,
+                folder_id: 1,
+                limit: $count
+            );
             $dialogs = $r['dialogs'];
         } else {
             if ($fid > 1) {

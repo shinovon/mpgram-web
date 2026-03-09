@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 include 'mp.php';
 $user = MP::getUser();
@@ -26,7 +26,7 @@ set_error_handler('exceptions_error_handler');
 
 try {
     $MP = MP::getMadelineAPI($user);
-    $MP->messages->getBotCallbackAnswer(['peer' => $id, 'msg_id' => $msg, 'data' => base64_decode($data)]);
+    $MP->messages->getBotCallbackAnswer(peer: $id, msg_id: $msg, data: base64_decode($data));
 } catch (Exception) {}
 header('Location: chat.php?c='.$id.'&m='.$msg);
 die;

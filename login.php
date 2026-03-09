@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 include 'redirect.php';
 
@@ -47,7 +47,7 @@ $user = MP::getUser();
 $ipass = $_GET['ipass'] ?? $_POST['ipass'] ?? null;
 
 // Check session existance
-$nouser = $user == null || $user === false || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
+$nouser = empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
 function removeSession($logout=false): void
 {
     global $user;
@@ -336,7 +336,7 @@ if ($phone !== null) {
     // ввод кода
     if (isset($hash)) {
         try {
-            $MP->auth->resendCode(['phone' => $phone, 'phone_code_hash' => $hash]);
+            $MP->auth->resendCode(phone_number: $phone, phone_code_hash: $hash);
         } catch (Exception $e) {
             htmlStart();
             echo $e->getMessage();

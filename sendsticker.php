@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
@@ -37,11 +37,12 @@ try {
             $params['reply_to'] = ['_' => 'inputReplyToMessage', 'reply_to_msg_id' => $reply_to];
         }
         $params['media'] = ['_' => 'document', 'id' => (int) $_GET['id'], 'access_hash' => (int) $_GET['access_hash']];
+        /** @noinspection PhpParamsInspection */
         $MP->messages->sendMedia($params);
         header('Location: chat.php?c='.$id);
         die;
     }
-    $MP->messages->setTyping(['peer' => $id, 'action' => ['_' => 'sendMessageChooseStickerAction']]);
+    $MP->messages->setTyping(action: ['_' => 'sendMessageChooseStickerAction'], peer: $id);
     echo '<html><head><title>'.MP::x($lng['send_message']).'</title>';
     echo Themes::head();
     echo '</head>';
@@ -57,7 +58,7 @@ try {
                 break;
             }
         }
-        $documents = $MP->messages->getStickerSet(['stickerset' => ['_' => 'inputStickerSetID', 'id' => $s2['id'], 'access_hash' => $s2['access_hash']]])['documents'];
+        $documents = $MP->messages->getStickerSet(stickerset: ['_' => 'inputStickerSetID', 'id' => $s2['id'], 'access_hash' => $s2['access_hash']])['documents'];
         echo '<b>'.MP::dehtml($s2['title']).'</b><br>';
         foreach ($documents as $v) {
             echo '<a href="sendsticker.php?c='.$id.'&id='.$v['id'].'&access_hash='.$v['access_hash'].($reply_to?'&reply_to='.$reply_to:'').'"><img src="file.php?sticker='.$v['id'].'&access_hash='.$v['access_hash'].'&p=r'.(($v['mime_type'] ?? '') == 'application/x-tgsticker' ? 'tgss&s=100' : 'sprev').'"></a>';

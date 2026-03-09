@@ -214,6 +214,7 @@ function getAllDialogs($folder_id = -1): array
     $r = ['dialogs' => [], 'messages' => [], 'users' => [], 'chats' => []];
     $d = [];
     while ($p['count'] < $t['count']) {
+        /** @noinspection PhpParamsInspection */
         $t = $MP->messages->getDialogs($p);
         $r['users'] = array_merge($r['users'], $t['users']);
         $r['chats'] = array_merge($r['chats'], $t['chats']);
@@ -564,7 +565,7 @@ function parseMessage($rawMessage, $media = false, $short = false): array
                 $rawReplyMsg = (int) $peer < 0 ?
                     $MP->channels->getMessages(channel: $peer, id: [$reply['id']]) :
                     $MP->messages->getMessages(id: [$reply['id']]);
-                if ($rawReplyMsg && isset($rawReplyMsg['messages']) && isset($rawReplyMsg['messages'][0])) {
+                if ($rawReplyMsg && isset($rawReplyMsg['messages'][0])) {
                     $reply['msg'] = parseMessage($rawReplyMsg['messages'][0], false, true);
                 }
             } catch (Exception) {}
@@ -971,6 +972,7 @@ try {
         if ($f !== null) {
             if ((int) $f == 1) {
                 $p['folder_id'] = 1;
+                /** @noinspection PhpParamsInspection */
                 $rawData = $MP->messages->getDialogs($p);
             } else if ((int) $f > 1) {
                 $sort = false;
@@ -1104,9 +1106,11 @@ try {
                 unset($all);
             } else {
                 $p['folder_id'] = (int) $f;
+                /** @noinspection PhpParamsInspection */
                 $rawData = $MP->messages->getDialogs($p);
             }
         } else {
+            /** @noinspection PhpParamsInspection */
             $rawData = $MP->messages->getDialogs($p);
         }
         $res = [];
@@ -1800,6 +1804,7 @@ try {
             if (!isParamEmpty('reply')) {
                 $p['reply_to'] = getParam('reply');
             }
+            /** @noinspection PhpParamsInspection */
             $MP->messages->forwardMessages($p);
             if (!isset($_FILES['file']) && isParamEmpty('text')) {
                 json(['res' => '1']);
@@ -1884,10 +1889,13 @@ try {
             }
 
             if ($METHOD == 'editMessage') {
+                /** @noinspection PhpParamsInspection */
                 $MP->messages->editMessage($p);
             } else if ($METHOD == 'sendMedia') {
+                /** @noinspection PhpParamsInspection */
                 $MP->messages->sendMedia($p);
             } else {
+                /** @noinspection PhpParamsInspection */
                 $MP->messages->sendMessage($p);
             }
         } finally {
@@ -1986,12 +1994,12 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        $rawData = $MP->messages->getStickerSet(['stickerset' =>
+        $rawData = $MP->messages->getStickerSet(stickerset:
         (isParamEmpty('slug') ? ['_' => 'inputStickerSetID',
             'id' => (int) getParam('id'),
             'access_hash' => getParam('access_hash')]
         : ['_' => 'inputStickerSetShortName', 'short_name' => getParam('slug')]
-        )]);
+        ));
 
         $res = [];
         $res['res'] = [];
@@ -2027,12 +2035,12 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        $MP->messages->installStickerSet(['stickerset' =>
+        $MP->messages->installStickerSet(archived: false, stickerset:
         (isParamEmpty('slug') ? ['_' => 'inputStickerSetID',
             'id' => (int) getParam('id'),
             'access_hash' => getParam('access_hash')]
         : ['_' => 'inputStickerSetShortName', 'short_name' => getParam('slug')]
-        )]);
+        ));
 
         json(['res' => '1']);
         break;
@@ -2151,12 +2159,12 @@ try {
         checkAuth();
         setupMadelineProto();
 
-        $MP->messages->uninstallStickerSet(['stickerset' =>
+        $MP->messages->uninstallStickerSet(stickerset:
             (isParamEmpty('slug') ? ['_' => 'inputStickerSetID',
                 'id' => (int) getParam('id'),
                 'access_hash' => getParam('access_hash')]
                 : ['_' => 'inputStickerSetShortName', 'short_name' => getParam('slug')]
-            )]);
+            ));
 
         json(['res' => '1']);
         break;

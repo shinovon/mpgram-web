@@ -22,7 +22,7 @@ set_error_handler('exceptions_error_handler');
 include 'mp.php';
 MP::startSession();
 $user = MP::getUser();
-$nouser = $user == null || empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
+$nouser = empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
 
 $theme = 0;
 $ua = '';
@@ -62,7 +62,7 @@ if (defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
     }
 }
 if ($user === null || $nouser) {
-    if ($confirm === null || empty($confirm) || !isset($_SESSION['captcha']) || strtolower($confirm) !== $_SESSION['captcha']) {
+    if (empty($confirm) || !isset($_SESSION['captcha']) || strtolower($confirm) !== $_SESSION['captcha']) {
         unset($_SESSION['captcha']);
         htmlStart();
         echo 'CAPTCHA:<br>';

@@ -1,9 +1,10 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 $user = $_GET['user'] ?? die;
-function cookie($n, $v, $e=null) {
+function cookie($n, $v, $e=null): void
+{
     if ($e === null) $e = time() + (86400 * 365);
     $e = date('D, d M Y H:i:s \G\M\T', $e);
     header('Set-Cookie: '.$n.'='.$v.'; expires='.$e.'; path=/', false);
