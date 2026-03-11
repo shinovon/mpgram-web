@@ -2154,12 +2154,8 @@ try {
                 break;
             }
             json(['res' => $r]);
-        } catch (Exception) {
-            if (count($ids) == 1) {
-                json(['res' => ['0' => 0]]);
-                break;
-            }
-            json(['res' => []]);
+        } catch (Exception $e) {
+            error(['message' => $e->getMessage()]);
         }
         break;
     // v11
