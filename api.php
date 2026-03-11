@@ -2143,16 +2143,24 @@ try {
         checkAuth();
         setupMadelineProto();
         $ids = explode(',', getParam('id'));
-        $rawData = $MP->messages->getPeerDialogs(peers: $ids)['dialogs'];
-        $r = [];
-        foreach ($rawData as $raw) {
-            $r[] = parseDialog($raw);
+        try {
+            $rawData = $MP->messages->getPeerDialogs(peers: $ids)['dialogs'];
+            $r = [];
+            foreach ($rawData as $raw) {
+                $r[] = parseDialog($raw);
+            }
+            if (count($ids) == 1) {
+                json(['res' => $r[0]]);
+                break;
+            }
+            json(['res' => $r]);
+        } catch (Exception) {
+            if (count($ids) == 1) {
+                json(['res' => ['0' => 0]]);
+                break;
+            }
+            json(['res' => []]);
         }
-        if (count($ids) == 1) {
-            json(['res' => $r[0]]);
-            break;
-        }
-        json(['res' => $r]);
         break;
     // v11
     case 'uninstallStickerSet':

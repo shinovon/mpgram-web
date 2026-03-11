@@ -41,4 +41,4 @@ define('UPLOAD_SIZE_LIMIT', 20 * 1024 * 1024);
 define('ENABLE_PEER_DB', true);
 
 // Override $_SERVER["SERVER_NAME"] for links
-//defined('SERVER_NAME', "example.com")
+//define('SERVER_NAME', "example.com");
