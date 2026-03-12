@@ -1801,8 +1801,8 @@ try {
                 'to_peer' => $peer,
                 'id' => explode(',', getParam('id'))
             ];
-            if (!isParamEmpty('reply')) {
-                $p['reply_to'] = getParam('reply');
+            if (!isParamEmpty('top')) {
+                $p['top_msg_id'] = getParam('top');
             }
             /** @noinspection PhpParamsInspection */
             $MP->messages->forwardMessages($p);

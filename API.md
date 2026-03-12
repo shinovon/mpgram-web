@@ -896,6 +896,7 @@ Combined with message forwarding method, set `fwd_from` and `id` to forward a me
 - `reply` (optional): Message ID to reply
 - `fwd_from` (optional): Peer ID to forward message from
 - `id` (optional): Message ID to forward, required if `fwd_from` is set
+- `top` (optional): Topic message ID to forward to. **since v11**
 
 ### Response
 Object
