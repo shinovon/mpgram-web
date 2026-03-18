@@ -804,8 +804,8 @@ try {
                 $a = $MP->qrLogin();
                 if ($a) {
                     json(['res' => 'qr', 'text' => base64_encode($a->{'link'})]);
-                }
-                if ($MP->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
+                    break;
+                } else if ($MP->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
                     $a = ['_' => 'account.password'];
                 }
             } else {
@@ -1466,7 +1466,7 @@ try {
         $checkmuted = !isParamEmpty('m');
         $delay = (int) getParam('delay', '0');
         if (getParam('p', '0') == '1') {
-            $types = [
+            $t = [
             'updateUserStatus',
             'updateUserTyping',
             'updateChatUserTyping',
@@ -1480,6 +1480,11 @@ try {
             'updateReadHistoryOutbox',
             'updateReadChannelOutbox'
             ];
+            if (empty($types)) {
+                $types = $t;
+            } else {
+                $types = array_merge($types, $t);
+            }
         }
 
         $time = microtime(true);
