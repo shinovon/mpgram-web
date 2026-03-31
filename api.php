@@ -1151,7 +1151,6 @@ try {
         }
         if (checkField('users', true)) {
             $res['users'] = [];
-            $res['users']['_'] = 0;
             foreach ($rawData['users'] as $rawUser) {
                 $id = strval($rawUser['id']);
                 if (isset($res['users'][$id])
@@ -1162,7 +1161,6 @@ try {
         }
         if (checkField('chats', true)) {
             $res['chats'] = [];
-            $res['chats']['_'] = 0;
             foreach ($rawData['chats'] as $rawChat) {
                 $id = strval($rawChat['id']);
                 if (isset($res['chats'][$id])
@@ -1174,7 +1172,7 @@ try {
         if (checkField('messages', true)) {
             if ($v < 5) {
                 $res['messages'] = [];
-                $res['messages']['_'] = 0;
+                $res['messages']['-1'] = 0;
                 foreach ($messages as $message) {
                     $id = $message['peer_id'];
                     if (count($dialogPeers) != 0 && !in_array($id, $dialogPeers)) continue;
@@ -1196,6 +1194,13 @@ try {
                     $res['dialogs'][$idx]['msg'] = $message;
                 }
             }
+        }
+
+        if (isset($res['users']) && empty($res['users'])) {
+            unset($res['users']);
+        }
+        if (isset($res['chats']) && empty($res['chats'])) {
+            unset($res['chats']);
         }
         json($res);
         break;
@@ -1263,7 +1268,6 @@ try {
         }
         if (checkField('users')) {
             $res['users'] = [];
-            $res['users']['_'] = 0;
             foreach ($rawData['users'] as $rawUser) {
                 $id = strval($rawUser['id']);
                 if (isset($res['users'][$id])
@@ -1274,7 +1278,6 @@ try {
         }
         if (checkField('chats')) {
             $res['chats'] = [];
-            $res['chats']['_'] = 0;
             foreach ($rawData['chats'] as $rawChat) {
                 $id = strval($rawChat['id']);
                 if (isset($res['chats'][$id])
@@ -1285,12 +1288,18 @@ try {
         }
         if (checkField('messages', false) && $v < 5) {
             $res['messages'] = [];
-            $res['messages']['_'] = 0;
+            $res['messages']['-1'] = 0;
             foreach ($messages as $message) {
                 $id = $message['peer_id'];
                 if (count($dialogPeers) != 0 && !in_array($id, $dialogPeers)) continue;
                 $res['messages'][$id] = $message;
             }
+        }
+        if (isset($res['users']) && empty($res['users'])) {
+            unset($res['users']);
+        }
+        if (isset($res['chats']) && empty($res['chats'])) {
+            unset($res['chats']);
         }
         json($res);
         break;
@@ -1349,7 +1358,6 @@ try {
         }
         if (checkField('users')) {
             $res['users'] = [];
-            $res['users']['_'] = 0;
             foreach ($rawData['users'] as $rawUser) {
                 $id = strval($rawUser['id']);
                 if (isset($res['users'][$id])) continue;
@@ -1358,12 +1366,17 @@ try {
         }
         if (checkField('chats')) {
             $res['chats'] = [];
-            $res['chats']['_'] = 0;
             foreach ($rawData['chats'] as $rawChat) {
                 $id = strval($rawChat['id']);
                 if (isset($res['chats'][$id])) continue;
                 $res['chats'][$id] = parseChat($rawChat);
             }
+        }
+        if (isset($res['users']) && empty($res['users'])) {
+            unset($res['users']);
+        }
+        if (isset($res['chats']) && empty($res['chats'])) {
+            unset($res['chats']);
         }
         json($res);
         break;

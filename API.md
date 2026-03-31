@@ -546,8 +546,8 @@ Available since v4
 ### Response
 Object
 
-- `users` (object): Map of [User](#User) objects by their [Peer IDs](#Peer-ID)
-- `chats` (object): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
+- `users` (object, optional): Map of [User](#User) objects by their [Peer IDs](#Peer-ID)
+- `chats` (object, optional): Map of [Chat](#Chat) objects by their [Peer IDs](#Peer-ID)
 
 ---
 
