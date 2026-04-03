@@ -1543,10 +1543,19 @@ try {
                                     || ($type != 'updateNewChannelMessage' && $type != 'updateEditChannelMessage')) {
                                     continue;
                                 }
-                                if ($thread && (!isset($msg['reply_to'])
-                                    || ($msg['reply_to']['reply_to_top_id'] ?? $msg['reply_to']['reply_to_msg_id'] ?? 0) != $thread)) {
-                                    continue;
+                                if ($thread) {
+                                    if ($thread == 1) {
+                                        if ((isset($msg['reply_to']['reply_to_top_id']) && $msg['reply_to']['reply_to_top_id'] != $thread)
+                                            || (($msg['reply_to']['forum_topic'] ?? false) && isset($msg['reply_to']['reply_to_msg_id'])
+                                                && $msg['reply_to']['reply_to_msg_id'] != $thread)) {
+                                            continue;
+                                        }
+                                    } else if (!isset($msg['reply_to'])
+                                            || ($msg['reply_to']['reply_to_top_id'] ?? $msg['reply_to']['reply_to_msg_id'] ?? 1) != $thread) {
+                                        continue;
+                                    }
                                 }
+
                             }
                             if ($type != 'updateEditMessage' && $type != 'updateEditChannelMessage') {
                                 if ($msg['id'] < $i) continue;
