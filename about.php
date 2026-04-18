@@ -29,7 +29,7 @@ if (MP::getUser()) {
     echo '<a href="https://t.me/nnmidletschat">Discussion chat</a>';
 }
 ?>
-<br><a href="https://nnp.nnchan.ru/mp">Page on nnproject</a><br>
+<br><a href="https://nnproject.cc/mp">Page on nnproject</a><br>
 </p>
 <p>Developers:<br>
 <b>Shinovon</b> <a href="https://github.com/shinovon">github</a>
