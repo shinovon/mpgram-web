@@ -15,7 +15,7 @@ MP::startSession();
 if (!defined('LOGIN_CAPTCHA')) define('LOGIN_CAPTCHA', true);
 
 $theme = 0;
-$ua = '';
+$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $iev = MP::getIEVersion();
 if ($iev > 0 && $iev < 4) $theme = 1;
 $theme = MP::getSettingInt('theme', $theme, true);
@@ -140,7 +140,7 @@ if (defined('INSTANCE_PASSWORD') && INSTANCE_PASSWORD !== null) {
         echo '<form action="login.php"';
         if ($post) echo ' method="post"';
         echo '>';
-        echo '<input type="password" value="" name="ipass">';
+        echo '<input'.(str_contains($ua,'BlackBerry')?'':' type="password"').' name="ipass">';
         echo '<input type="submit">';
         echo '</form>';
         if ($ipass !== null) echo '<b>Wrong password</b>';
@@ -233,7 +233,7 @@ if ($phone !== null) {
                     echo '<form action="login.php"';
                     if ($post) echo ' method="post"';
                     echo '>';
-                    echo '<input type="password" name="pass">';
+                    echo '<input'.(str_contains($ua,'BlackBerry')?'':' type="password"').' name="pass">';
                     if ($phone !== null)
                         echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
                     if ($ipass !== null)
@@ -272,7 +272,7 @@ if ($phone !== null) {
                         echo '<form action="login.php"';
                         if ($post) echo ' method="post"';
                         echo '>';
-                        echo '<input type="password" name="pass">';
+                        echo '<input'.(str_contains($ua,'BlackBerry')?'':' type="password"').' name="pass">';
                         if ($phone !== null)
                             echo "<input type=\"hidden\" name=\"phone\" value=\"".MP::dehtml($phone)."\">";
                         if ($ipass !== null)
