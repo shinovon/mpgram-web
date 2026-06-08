@@ -191,6 +191,7 @@ try {
         } elseif (!$ch || $canpost) {
             $post = !str_contains($ua, 'Series60/3') && !str_contains($ua, 'EPOC');
             $opera = str_contains($ua, 'Opera') || ($iev != 0 && $iev <= 7);
+			$classilla = str_contains($ua, 'Classilla');
             $watchos = str_contains($ua, 'Watch OS');
             echo '<form action="write.php"'.($post ? ' method="post"' : '').' class="in">';
             echo '<input type="hidden" name="c" value="'.$id.'">';
@@ -204,7 +205,7 @@ try {
             //echo '<input type="checkbox" id="format" name="format">';
             //echo '<label for="format">'.MP::x($lng['html_formatting']).'</label>';
             echo '</form>';
-            echo '<form action="msg.php" style="margin: 0" class="in'.((!$opera) ? 'r' : '').'">';
+            echo '<form action="msg.php" style="margin: 0" class="in'.((!$opera && !$classilla) ? 'r' : '').'">';
             echo '<input type="hidden" name="c" value="'.$id.'">';
             echo '<input type="submit" value="'.MP::x($lng['send_file']).'">';
             echo '</form>';
