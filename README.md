@@ -16,7 +16,8 @@ You can deploy your own instance quickly with Docker Compose - [see how](https:/
 
 ### Manual deployment
 
-- Deny access to sessions folder (`s/` by default, see in `config.php`) and `MadelineProto.log`
+- Deny access to sessions directory (`s/` by default, see in `config.php`) and `MadelineProto.log`
+- Make sure www-data user has rights to edit sessions directory
 - Install required php extensions: `gd`, `mbstring`, `xml`, `json`, `fileinfo`, `gmp`, `iconv`, `ffi`
 - Download and set [browscap](https://browscap.org/) database in `php.ini` to get better logged in device names
 - Set `session.gc_maxlifetime = 8640000` in `php.ini`
