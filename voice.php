@@ -59,7 +59,7 @@ try {
     $outpath = $inpath.'.mp3';
     if (!file_exists($outpath)) {
         $MP->downloadToFile($di, $inpath);
-        $res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$inpath.'" -b:a 64k -ac 1 -y -acodec mp3 "'.$outpath.'"'.(WINDOWS?'':' 2>&1')) ?? '';
+        $res = shell_exec('"'.FFMPEG_DIR.'ffmpeg" -i '.escapeshellarg($inpath).' -b:a 64k -ac 1 -y -acodec mp3 '.escapeshellarg($outpath).(WINDOWS?'':' 2>&1')) ?? '';
         unlink($inpath);
         if (str_contains($res, 'failed')) {
             echo 'Conversion failed';

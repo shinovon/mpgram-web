@@ -133,7 +133,7 @@ try {
                             case 'ogg':
                             case 'm4a':
                                 $newfile = $file.'.ogg';
-                                $res = shell_exec(FFMPEG_DIR.'ffmpeg -i "'.$file.'" -ac 1 -y -map 0:a -map_metadata -1 "'.$newfile.'"'.(WINDOWS?'':' 2>&1')) ?? '';
+                                $res = shell_exec('"'.FFMPEG_DIR.'ffmpeg" -i '.escapeshellarg($file).' -ac 1 -y -map 0:a -map_metadata -1 '.escapeshellarg($newfile).(WINDOWS?'':' 2>&1')) ?? '';
                                 unlink($file);
                                 if (str_contains($res, 'failed')) {
                                     $result = 'Conversion failed';
@@ -153,7 +153,7 @@ try {
                                     }
                                 }
                                 try {
-                                    $res = shell_exec(FFMPEG_DIR.'ffprobe -v error -f lavfi -i "amovie='.$newfile.',asetnsamples=44100,astats=metadata=1:reset=1" -show_entries frame_tags=lavfi.astats.Overall.Peak_level -of json'.(WINDOWS?'':' 2>&1')) ?? false;
+                                    $res = shell_exec('"'.FFMPEG_DIR.'ffprobe" -v error -f lavfi -i '.escapeshellarg('amovie='.$newfile.',asetnsamples=44100,astats=metadata=1:reset=1').' -show_entries frame_tags=lavfi.astats.Overall.Peak_level -of json'.(WINDOWS?'':' 2>&1')) ?? false;
                                     
                                     if ($res) {
                                         $j = json_decode($res);

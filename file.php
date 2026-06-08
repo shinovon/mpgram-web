@@ -125,10 +125,14 @@ try {
                 }
                 $res = null;
                 if ($gif) {
-                    $res = shell_exec('bash `'.LOTTIE_DIR.'lottie_to_gif.sh --output "'.$outpath.'" --width '.$size.' --height '.$size.' --quality 70 --threads 1 --fps 10 "'.$inpath.'"'.(WINDOWS?'':' 2>&1').'`') ?? '';
+                    $cmd = LOTTIE_DIR.'lottie_to_gif.sh --output '.escapeshellarg($outpath).' --width '.$size.' --height '.$size.' --quality 70 --threads 1 --fps 10 '.escapeshellarg($inpath);
+                    $cmd = 'bash -c '. escapeshellarg($cmd).(WINDOWS?'':' 2>&1');
+                    $res = shell_exec($cmd) ?? '';
                 } else {
                     $outpath = $prefix;
-                    $res = shell_exec('bash `'.LOTTIE_DIR.'lottie_to_png.sh --output "'.$outpath.'" --width '.$size.' --height '.$size.' --quality 70 --threads 1 --fps 10 "'.$inpath.'"'.(WINDOWS?'':' 2>&1').'`') ?? '';
+                    $cmd = LOTTIE_DIR.'lottie_to_png.sh --output '.escapeshellarg($outpath).' --width '.$size.' --height '.$size.' --quality 70 --threads 1 --fps 10 '.escapeshellarg($inpath);
+                    $cmd = 'bash -c '. escapeshellarg($cmd).(WINDOWS?'':' 2>&1');
+                    $res = shell_exec($cmd) ?? '';
                     if (file_exists($outpath.'/')) {
                         if (file_exists($outpath.'/000.png')) {
                             rename($outpath.'/000.png', $outpath.'.png');

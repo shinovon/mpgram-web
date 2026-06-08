@@ -35,8 +35,7 @@ patch -p0 < patches/UpdateHandler.php.patch
 
 - Install `gifski`
 - Download and unpack: https://github.com/ed-asriyan/lottie-converter/releases
-- Make sure www-data user has rights to it
-- Edit `lottie_to_gif.sh`&`lottie_to_png.sh`, add `#!/usr/bin/env bash` as first line
+- Make sure www-data user has rights to access it
 - Edit `config.php` by setting `CONVERT_TGS_STICKERS` to true, and `LOTTIE_DIR` to path, where lottie_to_gif.sh is contained.
 
 Example:
