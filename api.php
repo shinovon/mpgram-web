@@ -10,6 +10,8 @@ ini_set('output_buffering', 0);
 require_once("api_values.php");
 require_once("config.php");
 
+define("WINDOWS", stripos(PHP_OS, 'WIN') === 0);
+
 const def = 1;
 const API_VERSION = 11;
 const MIN_LOGIN_API_VERSION = API_VERSION - 1;
@@ -1850,14 +1852,23 @@ try {
             $p['parse_mode'] = 'HTML';
         }
 
+        $voice = false;
+        if (!isParamEmpty('voice')) {
+            if (!defined('CONVERT_VOICE_MESSAGES') || !CONVERT_VOICE_MESSAGES) {
+                error(['message' => 'Voice conversion not supported']);
+                break;
+            }
+            $voice = true;
+        }
+
         if (!isset($_FILES['file'])) {
             if ($METHOD == 'sendMedia' && (isParamEmpty('doc_id') || isParamEmpty('doc_access_hash'))) {
-                json(['error' => ['message' => 'No file: ' . var_export($_FILES, true)]]);
+                error(['message' => 'No file: ' . var_export($_FILES, true)]);
                 break;
             }
         } else {
             if (($_FILES['file']['error'] ?? false) && $_FILES['file']['error'] != 4) {
-                json(['error' => ['message' => 'File error: ' . $_FILES['file']['error']]]);
+                error(['message' => 'File error: ' . $_FILES['file']['error']]);
                 break;
             }
         }
@@ -1865,28 +1876,123 @@ try {
         try {
             if ($file) {
                 if ($_FILES['file']['size'] == 0) {
-                    json(['error' => ['message' => 'Size error']]);
+                    error(['message' => 'Size error']);
                     break;
                 }
                 $max = 20 * 1024 * 1024;
                 if (defined('UPLOAD_SIZE_LIMIT')) $max = UPLOAD_SIZE_LIMIT;
                 if ($_FILES['file']['size'] > $max) {
-                    json(['error' => ['message' => 'File is too large']]);
+                    error(['message' => 'File is too large']);
                     break;
                 }
 
                 $filename = $_FILES['file']['name'];
                 $extidx = strrpos($filename, '.');
-                if ($extidx === false) {
-                    json(['error' => ['message' => 'Invalid file extension']]);
+                if ($extidx === false || !is_uploaded_file($file)) {
+                    error(['message' => 'Invalid file']);
                     break;
                 }
                 $ext = strtolower(substr($filename, $extidx + 1));
                 $attr = false;
                 $type = null;
+                $dur = 0;
+                $waveform = false;
                 if (!isParamEmpty('uncompressed')) {
                     $type = 'inputMediaUploadedDocument';
                     $attr = true;
+                } elseif ($voice) {
+                    switch ($ext) {
+                    case 'amr':
+                    case 'mp3':
+                    case 'aac':
+                    case 'ogg':
+                    case 'm4a':
+                    case 'wav':
+                        $newfile = $file.'.ogg';
+                        $res = shell_exec('"'.FFMPEG_DIR.'ffmpeg" -i '.escapeshellarg($file).' -ac 1 -ar 44100 -filter:a loudnorm=I=-14:TP=-1.5:LRA=11 -y -map 0:a -map_metadata -1 '.escapeshellarg($newfile).(WINDOWS?'':' 2>&1')) ?? '';
+                        unlink($file);
+                        if (str_contains($res, 'failed')) {
+                            $result = 'Conversion failed';
+                            break;
+                        }
+                        $i = strpos($res, 'Duration:');
+
+                        if ($i !== false) {
+                            $i = strpos($res, ' ', $i);
+                            $s = substr($res, $i, strpos($res, '.', $i));
+                            $s = explode(':', $s);
+                            $dur = ((int)$s[2])+((int)$s[1])*60+((int)$s[0])*60*60;
+                            if ($dur > 3600) {
+                                unlink($newfile);
+                                error(['message' => 'Duration is too long']);
+                                break;
+                            }
+                        }
+                        try {
+                            $res = shell_exec('"'.FFMPEG_DIR.'ffprobe" -v error -f lavfi -i '.escapeshellarg('amovie='.$newfile.',asetnsamples=44100,astats=metadata=1:reset=1').' -show_entries frame_tags=lavfi.astats.Overall.Peak_level -of json'.(WINDOWS?'':' 2>&1')) ?? false;
+
+                            if ($res) {
+                                $j = json_decode($res);
+                                if ($j) {
+                                    $frames = $j->{'frames'};
+                                    unset($j);
+                                    $waveform = array(100);
+                                    $sampleIndex = 0;
+                                    $peakSample = 0;
+                                    $index = 0;
+                                    $sampleRate = max(1, (int) (count($frames) / 100));
+                                    $s2 = 100 / count($frames);
+
+                                    foreach ($frames as $frame) {
+                                        $sample = $frame->{'tags'}->{'lavfi.astats.Overall.Peak_level'};
+                                        $sample = $sample == '-inf' ? -100.0 : floatval($sample);
+                                        $sample = max(0, (int) (32768 * (10 ** ($sample / 20.0))));
+                                        if ($sample > $peakSample) {
+                                            $peakSample = $sample;
+                                        }
+                                        if ($sampleIndex++ % $sampleRate == 0) {
+                                            if ($index < 100) {
+                                                if ($sampleRate == 1) {
+                                                    $i = 0;
+                                                    while ($i++ < $s2) $waveform[$index++] = $peakSample;
+                                                } else {
+                                                    $waveform[$index++] = $peakSample;
+                                                }
+                                            }
+                                            $peakSample = 0;
+                                        }
+                                    }
+                                    unset($frames);
+
+                                    if (count($waveform) > 100) {
+                                        $waveform = array_slice($waveform, 0, 100);
+                                    }
+
+                                    $sumSamples = 0;
+                                    foreach ($waveform as $sample) {
+                                        $sumSamples += $sample;
+                                    }
+
+                                    $peak = (int) ($sumSamples * 1.8 / 100);
+                                    if ($peak < 2500) $peak = 2500;
+
+                                    for ($i = 0; $i < 100; $i++) {
+                                        $sample = $waveform[$i];
+                                        if ($sample > $peak) $sample = $peak;
+                                        $waveform[$i] = max(0, min(31, (int) ($sample * 31 / $peak)));
+                                    }
+                                }
+                            }
+                        } catch (Exception) {
+                        }
+
+                        $file = $newfile;
+                        $type = 'inputMediaUploadedDocument';
+                        break;
+                    default:
+                        error(['message' => 'Unsupported audio format']);
+                        break;
+                    }
                 } else {
                     switch ($ext) {
                     case 'jpg':
@@ -1907,7 +2013,13 @@ try {
                     }
                 }
                 $attributes = [];
-                if ($attr) {
+                if ($voice) {
+                    $att = ['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => $dur];
+                    if ($waveform !== false) {
+                        $att['waveform'] = $waveform;
+                    }
+                    $attributes[] = $att;
+                } elseif ($attr) {
                     $attributes[] = ['_' => 'documentAttributeFilename', 'file_name' => $filename];
                 }
                 $p['media'] = ['_' => $type, 'file' => $file, 'attributes' => $attributes, 'spoiler' => !isParamEmpty('spoiler')];
