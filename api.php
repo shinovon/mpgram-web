@@ -1929,7 +1929,11 @@ try {
                             }
                         }
                         try {
-                            $res = shell_exec('"'.FFMPEG_DIR.'ffprobe" -v error -f lavfi -i '.escapeshellarg('amovie='.$newfile.',asetnsamples=44100,astats=metadata=1:reset=1').' -show_entries frame_tags=lavfi.astats.Overall.Peak_level -of json'.(WINDOWS?'':' 2>&1')) ?? false;
+                            $nsamples = 44100;
+                            if ($dur != 0) {
+                                $nsamples = max(512, (int)(($dur * 44100) / 100));
+                            }
+                            $res = shell_exec('"'.FFMPEG_DIR.'ffprobe" -v error -f lavfi -i '.escapeshellarg('amovie='.$newfile.',asetnsamples='.$nsamples.',astats=metadata=1:reset=1').' -show_entries frame_tags=lavfi.astats.Overall.Peak_level -of json'.(WINDOWS?'':' 2>&1')) ?? false;
 
                             if ($res) {
                                 $j = json_decode($res);
