@@ -1909,9 +1909,9 @@ try {
                     case 'm4a':
                     case 'wav':
                         $newfile = $file.'.ogg';
-                        $res = shell_exec('"'.FFMPEG_DIR.'ffmpeg" -i '.escapeshellarg($file).' -ac 1 -ar 44100 -filter:a loudnorm=I=-14:TP=-1.5:LRA=11 -y -map 0:a -map_metadata -1 '.escapeshellarg($newfile).(WINDOWS?'':' 2>&1')) ?? '';
+                        $res = shell_exec('"'.FFMPEG_DIR.'ffmpeg" -i '.escapeshellarg($file).' -ac 1 -ar 44100 -filter:a speechnorm=e=10:p=0.9 -y -map 0:a -map_metadata -1 '.escapeshellarg($newfile).(WINDOWS?'':' 2>&1')) ?? '';
                         unlink($file);
-                        if (str_contains($res, 'failed')) {
+                        if (str_contains($res, 'failed') || !file_exists($newfile)) {
                             $result = 'Conversion failed';
                             break;
                         }
