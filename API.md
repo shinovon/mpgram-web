@@ -924,6 +924,7 @@ Available since v6
 - `file` (optional): File via multipart request
 - `uncompressed` (optional): Set to 1 to send media uncompressed
 - `spoiler` (optional): Set to 1 to hide media under spoiler
+- `voice` (optional): Set to 1 to send audio file as voice message. **since v11**
 - `doc_id` (optional): Document ID
 - `doc_access_hash` (optional): Document access hash
 - `fwd_from` (optional): Peer ID to forward message from
