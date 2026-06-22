@@ -258,7 +258,7 @@ class MP {
                 $color = '';
                 if ($uid > 0 && isset(static::$users[$uid])) {
                     $user = static::$users[$uid];
-                    if (isset($user['color'])) {
+                    if (isset($user['color']['color'])) {
                         static::getPeerColors($MP);
                         if (isset(static::$colors[$user['color']['color']])) {
                             $color = 'style="color: #'. static::$colors[$user['color']['color']] . '"';
@@ -266,7 +266,7 @@ class MP {
                     }
                 } elseif ($uid < 0 && isset(static::$chats[$id])) {
                     $chat = static::$chats[$id];
-                    if (isset($chat['color'])) {
+                    if (isset($chat['color']['color'])) {
                         static::getPeerColors($MP);
                         if (isset(static::$colors[$chat['color']['color']])) {
                             $color = 'style="color: #'. static::$colors[$chat['color']['color']] . '"';
