@@ -483,7 +483,7 @@ alert("'.str_replace('"', '\"', $alert).'");
             if ($thread != null) {
                 $MP->messages->readDiscussion(['peer' => $id, 'read_max_id' => $maxid, 'msg_id' => $thread]);
                 $MP->messages->readMentions(['peer' => $id, 'top_msg_id' => $thread]);
-            } else if ($ch) {
+            } else if ($ch || MP::isChannel((int)$id)) {
                 $MP->channels->readHistory(['channel' => $id, 'max_id' => $maxid]);
                 $MP->messages->readMentions(['peer' => $id]);
             } else {
