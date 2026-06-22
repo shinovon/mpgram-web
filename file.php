@@ -245,9 +245,9 @@ try {
                     $h = ($h/$w)*$size;
                     $w = $size;
                     $img = resize($img, $w, $h);
-                } elseif ($h > 90) {
-                    $w = ($w/$h)*90;
-                    $h = 90;
+                } elseif ($h > $size) {
+                    $w = ($w/$h)*$size;
+                    $h = $size;
                     $img = resize($img, $w, $h);
                 }
             } elseif ($p == 'sprev') {
