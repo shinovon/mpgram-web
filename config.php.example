@@ -1,5 +1,5 @@
 <?php
-// dir where sessions will save
+// dir where sessions will be stored
 define('sessionspath', 's/');
 // transparent stickers
 define('PNG_STICKERS', true);
@@ -8,7 +8,7 @@ define('FORCE_HTTPS', false);
 // redirect http to https for chrome user-agent
 define('CHROME_HTTPS', false);
 
-// ffmpeg
+// ffmpeg for voice messages
 define('CONVERT_VOICE_MESSAGES', false);
 define('VOICE_TMP_DIR', sys_get_temp_dir().'/mp/');
 define('FFMPEG_DIR', '');
@@ -20,7 +20,7 @@ define('INSTANCE_PASSWORD', null);
 // Use file/ instead of file.php, see rewrite rule in .htaccess
 define('FILE_REWRITE', false);
 
-// https://github.com/ed-asriyan/lottie-converter (Add "#!/usr/bin/env bash" as first line in its bash scripts!)
+// https://github.com/ed-asriyan/lottie-converter
 define('CONVERT_TGS_STICKERS', false);
 define('LOTTIE_DIR', '');
 define('TGS_TMP_DIR', sys_get_temp_dir().'/mp/');
