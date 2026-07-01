@@ -979,7 +979,9 @@ class MP {
 
     static function getSetting($name, $def=null, $write=false)
     {
-        static::startSession();
+        if (isset($_COOKIE['PHPSESSID'])) {
+            static::startSession();
+        }
         $x = $def;
         if (isset($_GET[$name])) {
             $x = $_GET[$name];
@@ -1001,7 +1003,9 @@ class MP {
 
     static function getSettingInt($name, $def=0, $write=false)
     {
-        static::startSession();
+        if (isset($_COOKIE['PHPSESSID'])) {
+            static::startSession();
+        }
         $x = $def;
         if (isset($_GET[$name])) {
             $x = (int) $_GET[$name];

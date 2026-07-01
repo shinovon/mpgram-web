@@ -7,12 +7,12 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 
 include 'mp.php';
-MP::startSession();
 $user = MP::getUser();
 if (!$user) {
     header('Location: login.php?logout=1');
     die;
 }
+MP::startSession();
 
 $id = $_POST['c'] ?? $_GET['c'] ?? die;
 $msg = $_POST["msg"] ?? $_GET["msg"] ?? null;

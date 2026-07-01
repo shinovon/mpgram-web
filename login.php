@@ -10,8 +10,6 @@ ini_set('display_startup_errors', 1);
 
 include 'mp.php';
 
-MP::startSession();
-
 if (!defined('LOGIN_CAPTCHA')) define('LOGIN_CAPTCHA', true);
 
 $theme = 0;
@@ -50,6 +48,7 @@ $ipass = $_GET['ipass'] ?? $_POST['ipass'] ?? null;
 $nouser = empty($user) || strlen($user) < 32 || strlen($user) > 200 || !file_exists(sessionspath.$user.'.madeline');
 function removeSession($logout=false): void
 {
+    MP::startSession();
     global $user;
     $_SESSION = [];
     MP::delcookie('user');
@@ -153,6 +152,7 @@ if ($phone !== null) {
         header('Location: login.php?wrong=number');
         die;
     }
+    MP::startSession();
     if (!isset($_SESSION['captcha_entered']) && LOGIN_CAPTCHA) {
         if (!isset($_POST['c']) && !isset($_GET['c'])) {
             htmlStart();
