@@ -26,6 +26,7 @@ class MP {
     static $users;
     static $chats;
     static $colors;
+    static array|null $settings = null;
 
     // Removes html special characters and converts to browser encoding
     static function dehtml($s)
@@ -977,15 +978,42 @@ class MP {
         return $MP;
     }
 
+    static function getSettings(): array
+    {
+        if (!static::$settings) {
+            try {
+                if (isset($_COOKIE['sets'])) {
+                    $s = $_COOKIE['sets'];
+                    if (str_contains($s, ',')) {
+                        $s = substr($s, 0, strpos($s, ','));
+                    }
+                    static::$settings = json_decode(base64_decode($s), true) ?? [];
+                }
+            } catch (Exception) {}
+        }
+        return static::$settings;
+    }
+
+    static function setSettings($sets): void
+    {
+        static::$settings = $sets;
+        if (!str_contains($_SERVER['PHP_SELF'] ?? '', 'sets.php')) {
+            MP::cookie('sets', base64_encode(json_encode($sets)));
+        }
+    }
+
     static function getSetting($name, $def=null, $write=false)
     {
         if (isset($_COOKIE['PHPSESSID'])) {
             static::startSession();
         }
+        $sets = static::getSettings();
         $x = $def;
         if (isset($_GET[$name])) {
             $x = $_GET[$name];
             $write = true;
+        } elseif (isset($sets[$name])) {
+            $x = $sets[$name];
         } elseif (isset($_SESSION[$name])) {
             $x = $_SESSION[$name];
         } elseif (isset($_COOKIE[$name])) {
@@ -995,8 +1023,8 @@ class MP {
             }
         }
         if (isset($_GET[$name]) && $write) {
-            $_SESSION[$name] = $x;
-            //static::cookie($name, $x, time() + (86400 * 365));
+            $sets[$name] = $x;
+            self::setSettings($sets);
         }
         return $x;
     }
@@ -1006,9 +1034,12 @@ class MP {
         if (isset($_COOKIE['PHPSESSID'])) {
             static::startSession();
         }
+        $sets = static::getSettings();
         $x = $def;
         if (isset($_GET[$name])) {
             $x = (int) $_GET[$name];
+        } elseif (isset($sets[$name])) {
+            $x = (int) $sets[$name];
         } elseif (isset($_SESSION[$name])) {
             $x = (int) $_SESSION[$name];
         } elseif (isset($_COOKIE[$name])) {
@@ -1019,7 +1050,8 @@ class MP {
             $x = (int)$x;
         }
         if (isset($_GET[$name]) && $write) {
-            $_SESSION[$name] = $x;
+            $sets[$name] = $x;
+            self::setSettings($sets);
             //static::cookie($name, $x, time() + (86400 * 365));
         }
         return $x;

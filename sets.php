@@ -27,6 +27,81 @@ include 'mp.php';
 
 MP::startSession();
 
+$sets = [];
+
+if (isset($_COOKIE['lang']))
+    $lang = $_COOKIE['lang'];
+if (isset($_COOKIE['autoupd']))
+    $autoupd = (int)$_COOKIE['autoupd'];
+if (isset($_COOKIE['updint']))
+    $updint = (int)$_COOKIE['updint'];
+if (isset($_COOKIE['theme']))
+    $theme = (int)$_COOKIE['theme'];
+if (isset($_COOKIE['chats']))
+    $chats = (int)$_COOKIE['chats'];
+if (isset($_COOKIE['reverse']))
+    $reverse = (int)$_COOKIE['reverse'];
+if (isset($_COOKIE['autoscroll']))
+    $autoscroll = (int)$_COOKIE['autoscroll'];
+if (isset($_COOKIE['limit']))
+    $limit = (int)$_COOKIE['limit'];
+if (isset($_COOKIE['avas']))
+    $avas = (int)$_COOKIE['avas'];
+if (isset($_COOKIE['texttop']))
+    $texttop = (int)$_COOKIE['texttop'];
+if (isset($_COOKIE['longpoll']))
+    $longpoll = (int)$_COOKIE['longpoll'];
+if (isset($_COOKIE['status']))
+    $status = (int)$_COOKIE['status'];
+if (isset($_COOKIE['imgs']))
+    $imgs = (int)$_COOKIE['imgs'];
+if (isset($_COOKIE['pngava']))
+    $pngava = (int)$_COOKIE['pngava'];
+if (isset($_COOKIE['oldchat']))
+    $oldchat = (int)$_COOKIE['oldchat'];
+if (isset($_COOKIE['photosize']))
+    $photosize = (int)$_COOKIE['photosize'];
+if (isset($_COOKIE['bgsize']))
+    $bgsize = (int)$_COOKIE['bgsize'];
+
+if (isset($_SESSION['lang']))
+    $lang = $_SESSION['lang'];
+if (isset($_SESSION['autoupd']))
+    $autoupd = (int)$_SESSION['autoupd'];
+if (isset($_SESSION['updint']))
+    $updint = (int)$_SESSION['updint'];
+if (isset($_SESSION['theme']))
+    $theme = (int)$_SESSION['theme'];
+if (isset($_SESSION['chats']))
+    $chats = (int)$_SESSION['chats'];
+if (isset($_SESSION['reverse']))
+    $reverse = (int)$_SESSION['reverse'];
+if (isset($_SESSION['autoscroll']))
+    $autoscroll = (int)$_SESSION['autoscroll'];
+if (isset($_SESSION['limit']))
+    $limit = (int)$_SESSION['limit'];
+if (isset($_SESSION['avas']))
+    $avas = (int)$_SESSION['avas'];
+if (isset($_SESSION['texttop']))
+    $texttop = (int)$_SESSION['texttop'];
+if (isset($_SESSION['longpoll']))
+    $longpoll = (int)$_SESSION['longpoll'];
+if (isset($_SESSION['status']))
+    $status = (int)$_SESSION['status'];
+if (isset($_SESSION['imgs']))
+    $imgs = (int)$_SESSION['imgs'];
+if (isset($_SESSION['pngava']))
+    $pngava = (int)$_SESSION['pngava'];
+if (isset($_SESSION['oldchat']))
+    $oldchat = (int)$_SESSION['oldchat'];
+if (isset($_SESSION['photosize']))
+    $photosize = (int)$_SESSION['photosize'];
+if (isset($_SESSION['bgsize']))
+    $bgsize = (int)$_SESSION['bgsize'];
+
+
+$sets = array_merge($sets, MP::getSettings());
+
 if ($set) {
     $autoupd = isset($_GET['autoupd']) ? 1 : 0;
     $reverse = isset($_GET['reverse']) ? 1 : 0;
@@ -82,97 +157,66 @@ if ($set) {
     MP::cookie('lang', $lang, time() + (86400 * 365));
     MP::cookie('updint', $updint, time() + (86400 * 365));
     MP::cookie('theme', $theme, time() + (86400 * 365));
-    
-    $_SESSION['lang'] = $lang;
-    $_SESSION['autoupd'] = $autoupd;
-    $_SESSION['updint'] = $updint;
-    $_SESSION['theme'] = $theme;
-    $_SESSION['chats'] = $chats;
-    $_SESSION['reverse'] = $reverse;
-    $_SESSION['autoscroll'] = $autoscroll;
-    $_SESSION['limit'] = $limit;
-    $_SESSION['avas'] = $avas;
-    $_SESSION['texttop'] = $texttop;
-    $_SESSION['longpoll'] = $longpoll;
-    $_SESSION['status'] = $status;
-    $_SESSION['imgs'] = $imgs;
-    $_SESSION['pngava'] = $pngava;
-    $_SESSION['oldchat'] = $oldchat;
-    $_SESSION['photosize'] = $photosize;
-    $_SESSION['bgsize'] = $bgsize;
+
+    $sets['lang'] = $lang;
+    $sets['autoupd'] = $autoupd;
+    $sets['updint'] = $updint;
+    $sets['theme'] = $theme;
+    $sets['chats'] = $chats;
+    $sets['reverse'] = $reverse;
+    $sets['autoscroll'] = $autoscroll;
+    $sets['limit'] = $limit;
+    $sets['avas'] = $avas;
+    $sets['texttop'] = $texttop;
+    $sets['longpoll'] = $longpoll;
+    $sets['status'] = $status;
+    $sets['imgs'] = $imgs;
+    $sets['pngava'] = $pngava;
+    $sets['oldchat'] = $oldchat;
+    $sets['photosize'] = $photosize;
+    $sets['bgsize'] = $bgsize;
 } else {
-    if (isset($_COOKIE['lang']))
-        $lang = $_COOKIE['lang'];
-    if (isset($_COOKIE['autoupd']))
-        $autoupd = (int)$_COOKIE['autoupd'];
-    if (isset($_COOKIE['updint']))
-        $updint = (int)$_COOKIE['updint'];
-    if (isset($_COOKIE['theme']))
-        $theme = (int)$_COOKIE['theme'];
-    if (isset($_COOKIE['chats']))
-        $chats = (int)$_COOKIE['chats'];
-    if (isset($_COOKIE['reverse']))
-        $reverse = (int)$_COOKIE['reverse'];
-    if (isset($_COOKIE['autoscroll']))
-        $autoscroll = (int)$_COOKIE['autoscroll'];
-    if (isset($_COOKIE['limit']))
-        $limit = (int)$_COOKIE['limit'];
-    if (isset($_COOKIE['avas']))
-        $avas = (int)$_COOKIE['avas'];
-    if (isset($_COOKIE['texttop']))
-        $texttop = (int)$_COOKIE['texttop'];
-    if (isset($_COOKIE['longpoll']))
-        $longpoll = (int)$_COOKIE['longpoll'];
-    if (isset($_COOKIE['status']))
-        $status = (int)$_COOKIE['status'];
-    if (isset($_COOKIE['imgs']))
-        $imgs = (int)$_COOKIE['imgs'];
-    if (isset($_COOKIE['pngava']))
-        $pngava = (int)$_COOKIE['pngava'];
-    if (isset($_COOKIE['oldchat']))
-        $oldchat = (int)$_COOKIE['oldchat'];
-    if (isset($_COOKIE['photosize']))
-        $photosize = (int)$_COOKIE['photosize'];
-    if (isset($_COOKIE['bgsize']))
-        $bgsize = (int)$_COOKIE['bgsize'];
-    
-    if (isset($_SESSION['lang']))
-        $lang = $_SESSION['lang'];
-    if (isset($_SESSION['autoupd']))
-        $autoupd = (int)$_SESSION['autoupd'];
-    if (isset($_SESSION['updint']))
-        $updint = (int)$_SESSION['updint'];
-    if (isset($_SESSION['theme']))
-        $theme = (int)$_SESSION['theme'];
-    if (isset($_SESSION['chats']))
-        $chats = (int)$_SESSION['chats'];
-    if (isset($_SESSION['reverse']))
-        $reverse = (int)$_SESSION['reverse'];
-    if (isset($_SESSION['autoscroll']))
-        $autoscroll = (int)$_SESSION['autoscroll'];
-    if (isset($_SESSION['limit']))
-        $limit = (int)$_SESSION['limit'];
-    if (isset($_SESSION['avas']))
-        $avas = (int)$_SESSION['avas'];
-    if (isset($_SESSION['texttop']))
-        $texttop = (int)$_SESSION['texttop'];
-    if (isset($_SESSION['longpoll']))
-        $longpoll = (int)$_SESSION['longpoll'];
-    if (isset($_SESSION['status']))
-        $status = (int)$_SESSION['status'];
-    if (isset($_SESSION['imgs']))
-        $imgs = (int)$_SESSION['imgs'];
-    if (isset($_SESSION['pngava']))
-        $pngava = (int)$_SESSION['pngava'];
-    if (isset($_SESSION['oldchat']))
-        $oldchat = (int)$_SESSION['oldchat'];
-    if (isset($_SESSION['photosize']))
-        $photosize = (int)$_SESSION['photosize'];
-    if (isset($_SESSION['bgsize']))
-        $bgsize = (int)$_SESSION['bgsize'];
+    if (isset($sets['lang']))
+        $lang = $sets['lang'];
+    if (isset($sets['autoupd']))
+        $autoupd = (int)$sets['autoupd'];
+    if (isset($sets['updint']))
+        $updint = (int)$sets['updint'];
+    if (isset($sets['theme']))
+        $theme = (int)$sets['theme'];
+    if (isset($sets['chats']))
+        $chats = (int)$sets['chats'];
+    if (isset($sets['reverse']))
+        $reverse = (int)$sets['reverse'];
+    if (isset($sets['autoscroll']))
+        $autoscroll = (int)$sets['autoscroll'];
+    if (isset($sets['limit']))
+        $limit = (int)$sets['limit'];
+    if (isset($sets['avas']))
+        $avas = (int)$sets['avas'];
+    if (isset($sets['texttop']))
+        $texttop = (int)$sets['texttop'];
+    if (isset($sets['longpoll']))
+        $longpoll = (int)$sets['longpoll'];
+    if (isset($sets['status']))
+        $status = (int)$sets['status'];
+    if (isset($sets['imgs']))
+        $imgs = (int)$sets['imgs'];
+    if (isset($sets['pngava']))
+        $pngava = (int)$sets['pngava'];
+    if (isset($sets['oldchat']))
+        $oldchat = (int)$sets['oldchat'];
+    if (isset($sets['photosize']))
+        $photosize = (int)$sets['photosize'];
+    if (isset($sets['bgsize']))
+        $bgsize = (int)$sets['bgsize'];
 }
 
+MP::setSettings($sets);
+
 $lng = MP::initLocale();
+
+MP::cookie('sets', base64_encode(json_encode($sets)));
 
 header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store');
