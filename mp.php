@@ -981,6 +981,7 @@ class MP {
     static function getSettings(): array
     {
         if (!static::$settings) {
+            static::$settings = [];
             try {
                 if (isset($_COOKIE['sets'])) {
                     $s = $_COOKIE['sets'];

@@ -717,7 +717,7 @@ try {
                 error(['message' => "Instance password is required"]);
             }
         }
-        $id = $PARAMS['captcha_id'] ?? md5(random_bytes(32));
+        $id = $PARAMS['captcha_id'] ?? md5(random_bytes(200));
         session_id('API' . $id);
         session_start(['use_cookies' => '0']);
         if (!isset($PARAMS['captcha_id']) || !isset($PARAMS['captcha_key'])) {
