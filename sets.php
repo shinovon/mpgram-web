@@ -216,7 +216,7 @@ MP::setSettings($sets);
 
 $lng = MP::initLocale();
 
-MP::cookie('sets', base64_encode(json_encode($sets)));
+MP::sendSettings();
 
 header('Content-Type: text/html; charset='.MP::$enc);
 header('Cache-Control: private, no-cache, no-store');

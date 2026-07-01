@@ -987,7 +987,7 @@ class MP {
                     if (str_contains($s, ',')) {
                         $s = substr($s, 0, strpos($s, ','));
                     }
-                    static::$settings = json_decode(base64_decode($s), true) ?? [];
+                    static::$settings = json_decode(strtr(base64_decode($s), '-_', '+/'), true) ?? [];
                 }
             } catch (Exception) {}
         }
@@ -998,8 +998,12 @@ class MP {
     {
         static::$settings = $sets;
         if (!str_contains($_SERVER['PHP_SELF'] ?? '', 'sets.php')) {
-            MP::cookie('sets', base64_encode(json_encode($sets)));
+            sendSettings();
         }
+    }
+
+    static function sendSettings(): void {
+        MP::cookie('sets', base64_encode(rtrim(strtr(base64_encode(json_encode(static::$settings)), '+/', '-_'), '=')));
     }
 
     static function getSetting($name, $def=null, $write=false)
