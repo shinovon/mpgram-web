@@ -683,12 +683,17 @@ try {
         $c = getCaptchaText(rand(6, 10));
         $_SESSION['captcha_key'] = $c;
         session_write_close();
+        /** @noinspection PhpComposerExtensionStubsInspection */
         $img = imagecreatetruecolor(120, 40);
+        /** @noinspection PhpComposerExtensionStubsInspection */
         imagefill($img, 0, 0, -1);
+        /** @noinspection PhpComposerExtensionStubsInspection */
         imagestring($img, rand(4, 10), rand(0, 30), rand(0, 20), $c, 0x000000);
         header("Cache-Control: no-store, no-cache, must-revalidate");
         header('Content-type: image/png');
+        /** @noinspection PhpComposerExtensionStubsInspection */
         imagepng($img);
+        /** @noinspection PhpComposerExtensionStubsInspection */
         imagedestroy($img);
         break;
         /** @noinspection PhpMissingBreakStatementInspection */
@@ -1766,7 +1771,7 @@ try {
         $peer = getParam('peer');
         $ids = explode(',', getParam('id'));
         if (is_numeric($peer) && ((int) $peer > 0 || (int) $peer > Magic::ZERO_CHANNEL_ID)) {
-            $MP->messages->deleteMessages(id: $ids);
+            $MP->messages->deleteMessages(revoke: !isParamEmpty('revoke'), id: $ids);
         } else {
             $MP->channels->deleteMessages(channel: $peer, id: $ids);
         }

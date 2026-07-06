@@ -49,8 +49,8 @@ try {
         $MP = MP::getMadelineAPI($user);
         switch ($act) {
         case 'delete':
-            if (is_numeric($id) && (int)$id > 0) {
-                $MP->messages->deleteMessages(id: [(int)$msg]);
+            if (is_numeric($id) && ((int) $id > 0 || (int) $id > Magic::ZERO_CHANNEL_ID)) {
+                $MP->messages->deleteMessages(revoke: true, id: [(int)$msg]);
             } else {
                 $MP->channels->deleteMessages(channel: $id, id: [(int)$msg]);
             }

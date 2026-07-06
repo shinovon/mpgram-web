@@ -980,7 +980,7 @@ class MP {
 
     static function getSettings(): array
     {
-        if (!static::$settings) {
+        if (static::$settings === null) {
             static::$settings = [];
             try {
                 if (isset($_COOKIE['sets'])) {
@@ -999,12 +999,13 @@ class MP {
     {
         static::$settings = $sets;
         if (!str_contains($_SERVER['PHP_SELF'] ?? '', 'sets.php')) {
-            sendSettings();
+            static::sendSettings();
         }
     }
 
-    static function sendSettings(): void {
-        MP::cookie('sets', base64_encode(rtrim(strtr(base64_encode(json_encode(static::$settings)), '+/', '-_'), '=')));
+    static function sendSettings(): void
+    {
+        MP::cookie('sets', rtrim(strtr(base64_encode(json_encode(static::$settings)), '+/', '-_'), '='));
     }
 
     static function getSetting($name, $def=null, $write=false)

@@ -869,6 +869,7 @@ Available since v5
 ### Parameters
 - `peer`: [Peer ID](#Peer-ID)
 - `id`: Comma-separated list of message IDs. **since v9**
+- `revoke` (optional): Set to 1 to remove message for everyone. **since v11**
 
 #### Changed since v9
 - `id`: Message ID.
@@ -1018,7 +1019,7 @@ Available since v7
 ### Parameters
 - `peer`: [Peer ID](#Peer-ID)
 - `id`: Message ID
-- `unpin` (optional): set 1 to unpin previous pinned message
+- `unpin` (optional): set to 1 to unpin previous pinned message
 - `silent` (optional): set to 0 to send notification or 1 to not, 1 by default
 
 ### Response
