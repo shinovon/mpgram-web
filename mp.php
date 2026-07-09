@@ -1005,7 +1005,7 @@ class MP {
 
     static function sendSettings(): void
     {
-        MP::cookie('sets', rtrim(strtr(base64_encode(json_encode(static::$settings)), '+/', '-_'), '='));
+        static::cookie('sets', rtrim(strtr(base64_encode(json_encode(static::$settings)), '+/', '-_'), '='));
     }
 
     static function getSetting($name, $def=null, $write=false)
@@ -1024,8 +1024,8 @@ class MP {
             $x = $_SESSION[$name];
         } elseif (isset($_COOKIE[$name])) {
             $x = $_COOKIE[$name];
-            if (str_contains($x, ', ')) {
-                $x = substr($x, 0, strpos($x, ', '));
+            if (str_contains($x, ',')) {
+                $x = substr($x, 0, strpos($x, ','));
             }
         }
         if (isset($_GET[$name]) && $write) {
@@ -1050,8 +1050,8 @@ class MP {
             $x = (int) $_SESSION[$name];
         } elseif (isset($_COOKIE[$name])) {
             $x = $_COOKIE[$name];
-            if (str_contains($x, ', ')) {
-                $x = substr($x, 0, strpos($x, ', '));
+            if (str_contains($x, ',')) {
+                $x = substr($x, 0, strpos($x, ','));
             }
             $x = (int)$x;
         }
