@@ -210,6 +210,30 @@ if ($phone !== null) {
         }
     }
     if (!isset($user) || $nouser) {
+        if (function_exists('apcu_enabled') && apcu_enabled() && defined('LOGIN_REQUESTS_BY_IP')) {
+            $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+            if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+            }
+            $ip = hash('sha384', $ip);
+
+            /** @noinspection PhpComposerExtensionStubsInspection */
+            $a = apcu_fetch($ip);
+            if ($a === false) {
+                /** @noinspection PhpComposerExtensionStubsInspection */
+                apcu_store($ip, 1, 86400);
+            } else if ($a >= LOGIN_REQUESTS_BY_IP) {
+                htmlStart();
+                echo '<b>'.MP::x($lng['error']).'</b><br>';
+                echo "Too many login requests. Try again later.";
+                echo Themes::bodyEnd();
+                die;
+            } else {
+                /** @noinspection PhpComposerExtensionStubsInspection */
+                apcu_inc($ip);
+            }
+        }
+
         $SESSION['user'] = $user = rtrim(strtr(base64_encode(hash('sha384', sha1(md5($phone.rand(0,1000).random_bytes(6))).random_bytes(30), true)), '+/', '-_'), '=');
         MP::cookie('user', $user, time() + (86400 * 365));
         $MP = MP::getMadelineAPI($user, true);

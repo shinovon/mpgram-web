@@ -752,6 +752,26 @@ try {
         unset($_SESSION['captcha_key']);
         session_write_close();
 
+        if (function_exists('apcu_enabled') && apcu_enabled() && defined('LOGIN_REQUESTS_BY_IP')) {
+            $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+            if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+            }
+            $ip = hash('sha384', $ip);
+
+            /** @noinspection PhpComposerExtensionStubsInspection */
+            $a = apcu_fetch($ip);
+            if ($a === false) {
+                /** @noinspection PhpComposerExtensionStubsInspection */
+                apcu_store($ip, 1, 86400);
+            } else if ($a >= LOGIN_REQUESTS_BY_IP) {
+                error(['message' => "Too many login requests. Try again later."]);
+            } else {
+                /** @noinspection PhpComposerExtensionStubsInspection */
+                apcu_inc($ip);
+            }
+        }
+
         $phone = getParam('phone', 'qr');
         $user = $_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user'] ?? null;
         // generate user id
