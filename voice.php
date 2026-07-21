@@ -67,7 +67,8 @@ try {
         }
     }
     header('Content-Type: audio/mpeg');
-    echo file_get_contents($outpath);
+    header('Content-Length: ' . filesize($outpath));
+    readfile($outpath);
 } catch (Exception $e) {
     echo $e;
 }

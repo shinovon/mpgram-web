@@ -1471,7 +1471,7 @@ Object
 
 ### Description
 
-Cancels `[updates](#updates)` method long-poll.
+Cancels [`updates`](#updates) method long-poll.
 
 Available since v9
 
