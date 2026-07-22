@@ -898,6 +898,7 @@ Combined with message forwarding method, set `fwd_from` and `id` to forward a me
 - `fwd_from` (optional): Peer ID to forward message from
 - `id` (optional): Message ID to forward, required if `fwd_from` is set
 - `top` (optional): Topic message ID to forward to. **since v11**
+- `r` (optional): Seed for duplication check
 
 ### Response
 Object
@@ -930,6 +931,7 @@ Available since v6
 - `doc_access_hash` (optional): Document access hash
 - `fwd_from` (optional): Peer ID to forward message from
 - `id` (optional): Message ID to forward, required if `fwd_from` is set
+- `r` (optional): Seed for duplication check
 
 ### Response
 Object

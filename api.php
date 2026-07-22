@@ -1849,6 +1849,17 @@ try {
         setupMadelineProto();
         $peer = (int) getParam('peer');
 
+        if (!isParamEmpty('r')) {
+            $r = getParam('r');
+            session_id('API' . md5($_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user']));
+            session_start(['use_cookies' => '0']);
+            if ($_SESSION['r'] == $r) {
+                json(['res' => '2']);
+            }
+            $_SESSION['r'] = $r;
+            session_write_close();
+        }
+
         if ($METHOD != 'editMessage' && !isParamEmpty('fwd_from')) {
             $p = [
                 'from_peer' => (int) getParam('fwd_from'),
