@@ -1853,7 +1853,7 @@ try {
             $r = getParam('r');
             session_id('API' . md5($_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user']));
             session_start(['use_cookies' => '0']);
-            if ($_SESSION['r'] == $r) {
+            if (isset($_SESSION['r']) && $_SESSION['r'] == $r) {
                 json(['res' => '2']);
             }
             $_SESSION['r'] = $r;
