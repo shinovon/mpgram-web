@@ -13,7 +13,7 @@ require_once("config.php");
 define("WINDOWS", stripos(PHP_OS, 'WIN') === 0);
 
 const def = 1;
-const API_VERSION = 11;
+const API_VERSION = 12;
 const MIN_LOGIN_API_VERSION = API_VERSION - 1;
 const MIN_API_VERSION = 2;
 

@@ -9,7 +9,7 @@
 
 Usage example: `https://MPGRAM_INSTANCE/api.php?v=11&method=getPeer&id=nnmidlets`
 
-- Current version: 11
+- Current version: 12
 - Minimum compatible version: 2
 
 ## Methods rules
@@ -898,7 +898,7 @@ Combined with message forwarding method, set `fwd_from` and `id` to forward a me
 - `fwd_from` (optional): Peer ID to forward message from
 - `id` (optional): Message ID to forward, required if `fwd_from` is set
 - `top` (optional): Topic message ID to forward to. **since v11**
-- `r` (optional): Seed for duplication check
+- `r` (optional): Seed for duplication check. **since v12**
 
 ### Response
 Object
@@ -926,12 +926,12 @@ Available since v6
 - `file` (optional): File via multipart request
 - `uncompressed` (optional): Set to 1 to send media uncompressed
 - `spoiler` (optional): Set to 1 to hide media under spoiler
-- `voice` (optional): Set to 1 to send audio file as voice message. **since v11**
+- `voice` (optional): Set to 1 to send audio file as voice message. **since v12**
 - `doc_id` (optional): Document ID
 - `doc_access_hash` (optional): Document access hash
 - `fwd_from` (optional): Peer ID to forward message from
 - `id` (optional): Message ID to forward, required if `fwd_from` is set
-- `r` (optional): Seed for duplication check
+- `r` (optional): Seed for duplication check. **since v12**
 
 ### Response
 Object
@@ -1798,3 +1798,5 @@ v11:
 - `sendVote`
 - `logout`
 - `getPeerInfo`
+
+v12:
