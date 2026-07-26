@@ -694,7 +694,7 @@ try {
         /** @noinspection PhpComposerExtensionStubsInspection */
         imagepng($img);
         /** @noinspection PhpComposerExtensionStubsInspection */
-        imagedestroy($img);
+//        imagedestroy($img);
         break;
         /** @noinspection PhpMissingBreakStatementInspection */
     case 'initLogin':

@@ -80,12 +80,12 @@ try {
         if ($png) {
             header('Content-Type: image/png');
             imagepng($img);
-            imagedestroy($img);
+//            imagedestroy($img);
             die;
         }
         header('Content-Type: image/jpeg');
         imagejpeg($img, null, 80);
-        imagedestroy($img);
+//        imagedestroy($img);
     } else if ($default) {
         header('Content-Type: image/png');
         if ((int) $cid < 0) {
