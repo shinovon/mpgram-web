@@ -435,7 +435,9 @@ function parseMessage($rawMessage, $media = false, $short = false): array
             $media = [];
             if (isset($rawMedia['photo'])) {
                 $media['type'] = 'photo';
-                $media['id'] = strval($rawMedia['photo']['id']);
+                if (isset($rawMedia['photo']['id'])) {
+                    $media['id'] = strval($rawMedia['photo']['id']);
+                }
                 $media['date'] = $rawMedia['photo']['date'] ?? null;
                 if ($v >= 9 && isset($rawMedia['photo']['sizes'])) {
                     foreach ($rawMedia['photo']['sizes'] as $size) {

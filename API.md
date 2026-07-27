@@ -95,8 +95,8 @@ Object
     - `type`: `photo`
     - `id` (string): ID of photo
     - `date` (long or null): Date of photo
-    - `w` (int): Width of photo. **since v9**
-    - `h` (int): Height of photo. **since v9**
+    - `w` (int, optional): Width of photo. **since v9**
+    - `h` (int, optional): Height of photo. **since v9**
   - Document:
     - `type`: `document`
     - `id` (string)
