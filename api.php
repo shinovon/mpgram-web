@@ -701,7 +701,6 @@ try {
         /** @noinspection PhpComposerExtensionStubsInspection */
         imagepng($img);
         /** @noinspection PhpComposerExtensionStubsInspection */
-//        imagedestroy($img);
         break;
         /** @noinspection PhpMissingBreakStatementInspection */
     case 'initLogin':

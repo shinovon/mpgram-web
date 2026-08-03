@@ -21,4 +21,3 @@ imagestring($img, rand(4, 10), rand(0, 50),rand(0, 25), $c, 0x000000);
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header('Content-type: image/jpeg');
 imagejpeg($img);
-//imagedestroy($img);

@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2022-2026 Arman Jussupgaliyev
 */
 include 'redirect.php';
 
