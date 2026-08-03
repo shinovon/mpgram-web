@@ -291,7 +291,12 @@ function findPeer($id, $r)
 
 function parsePeer($peer): string
 {
-    return strval(getId($peer) ?? error(['message' => 'Peer with null id detected']));
+//    global $v;
+    $id = getId($peer) ?? error(['message' => 'Peer with null id detected']);
+//    if ($v >= 13) {
+//        return (int) $id;
+//    }
+    return strval($id);
 }
 
 function parseDialog($rawDialog): array
@@ -2295,7 +2300,7 @@ try {
 
         json([
             'id' => $msg['id'],
-            'peer_id' => strval(getId($msg['peer_id'])),
+            'peer_id' => parsePeer($msg['peer_id']),
             'unread' => $r['unread_count'] ?? 0,
             'read' => max($r['read_inbox_max_id'] ?? 0, $r['read_outbox_max_id'] ?? 0, $msg['id']),
             'max_id' => $r['max_id'] ?? 0
