@@ -1704,6 +1704,9 @@ Does not require authorization.
 
 ### GET Parameters
 - `t`: Base64 encoded text
+- `s` (optional): Scale
+- `tw` (optional): Target width
+- `th` (optional): Target height
 
 ### Response
 PNG Image
