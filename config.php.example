@@ -45,3 +45,4 @@ define('ENABLE_PEER_DB', true);
 
 // login requests limit
 define('LOGIN_REQUESTS_BY_IP', 5);
+define('LOGIN_TOTAL_DAILY_LIMIT', 50);
