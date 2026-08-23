@@ -2460,8 +2460,10 @@ try {
         setupMadelineProto();
 
         $options = [];
-        foreach (explode(',', getParam('options')) as $v) {
-            $options[] = base64_decode($v);
+        if (!isParamEmpty('options')) {
+            foreach (explode(',', getParam('options')) as $v) {
+                $options[] = base64_decode($v);
+            }
         }
         $MP->messages->sendVote(peer: getParam('peer'), msg_id: getParam('id'), options: $options);
 
