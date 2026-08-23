@@ -382,6 +382,55 @@ function getCaptchaText($length): string
     return $s;
 }
 
+function parsePoll($out, $poll, $results): array
+{
+    if (isset($results['total_voters'])) {
+        $out['voted'] = $results['total_voters'];
+    }
+    if (!empty($poll)) {
+        $out['id'] = strval($poll['id']);
+        $out['closed'] = $poll['closed'] ?? false;
+        if ($poll['public_votes'] ?? false) {
+            $out['public'] = true;
+        }
+        if ($poll['multiple_choice'] ?? false) {
+            $out['multi'] = true;
+        }
+        if ($poll['quiz'] ?? false) {
+            $out['quiz'] = true;
+        }
+        if (isset($poll['question']['text'])) {
+            $out['text'] = $poll['question']['text'];
+        } else {
+            $out['text'] = $poll['question'] ?? '';
+        }
+    }
+    $out['options'] = [];
+    foreach ($results['results'] ?? $poll['answers'] ?? [] as $k => $v) {
+        $option = [];
+        if (!empty($poll)) {
+            $t = $poll['answers'][$k]['text'];
+            if (isset($t['text'])) {
+                $option['text'] = $t['text'];
+            } else {
+                $option['text'] = $t;
+            }
+        }
+        if ($v['chosen'] ?? false) {
+            $option['chosen'] = true;
+        }
+        if ($v['correct'] ?? false) {
+            $option['correct'] = true;
+        }
+        if (isset($v['voters'])) {
+            $option['voters'] = $v['voters'];
+        }
+        $option['data'] = base64_encode($v['option']);
+        $out['options'][] = $option;
+    }
+    return $out;
+}
+
 function parseMessage($rawMessage, $media = false, $short = false): array
 {
     global $v;
@@ -495,47 +544,7 @@ function parseMessage($rawMessage, $media = false, $short = false): array
             } elseif (isset($rawMedia['poll'])) {
                 $media['type'] = 'poll';
                 if ($v >= 11) {
-                    $poll = $rawMedia['poll'];
-                    if (isset($rawMedia['results']['total_voters'])) {
-                        $media['voted'] = $rawMedia['results']['total_voters'];
-                    }
-                    $media['id'] = strval($poll['id']);
-                    $media['closed'] = $poll['closed'] ?? false;
-                    if ($poll['public_votes'] ?? false) {
-                        $media['public'] = true;
-                    }
-                    if ($poll['multiple_choice'] ?? false) {
-                        $media['multi'] = true;
-                    }
-                    if ($poll['quiz'] ?? false) {
-                        $media['quiz'] = true;
-                    }
-                    if (isset($poll['question']['text'])) {
-                        $media['text'] = $poll['question']['text'];
-                    } else {
-                        $media['text'] = $poll['question'] ?? '';
-                    }
-                    $media['options'] = [];
-                    foreach ($rawMedia['results']['results'] ?? $poll['answers'] as $k => $v) {
-                        $option = [];
-                        $t = $poll['answers'][$k]['text'];
-                        if (isset($t['text'])) {
-                            $option['text'] = $t['text'];
-                        } else {
-                            $option['text'] = $t;
-                        }
-                        if ($v['chosen'] ?? false) {
-                            $option['chosen'] = true;
-                        }
-                        if ($v['correct'] ?? false) {
-                            $option['correct'] = true;
-                        }
-                        if (isset($v['voters'])) {
-                            $option['voters'] = $v['voters'];
-                        }
-                        $option['data'] = base64_encode($v['option']);
-                        $media['options'][] = $option;
-                    }
+                    $media = parsePoll($media, $rawMedia['poll'], $rawMedia['results']);
                 }
             } else {
                 // TODO
@@ -1526,21 +1535,41 @@ try {
         $longpoll = (int) getParam('longpoll', '1');
         $checkmuted = !isParamEmpty('m');
         $delay = (int) getParam('delay', '0');
-        if (getParam('p', '0') == '1') {
-            $t = [
-            'updateUserStatus',
-            'updateUserTyping',
-            'updateChatUserTyping',
-            'updateChannelUserTyping',
-            'updateNewMessage',
-            'updateNewChannelMessage',
-            'updateDeleteChannelMessages',
-            'updateDeleteMessages',
-            'updateEditMessage',
-            'updateEditChannelMessage',
-            'updateReadHistoryOutbox',
-            'updateReadChannelOutbox'
-            ];
+        $preset = getParam('p', '0');
+        if ($preset != '0') {
+            $t = [];
+            if ($preset == '1') {
+                $t = [
+                    'updateUserStatus',
+                    'updateUserTyping',
+                    'updateChatUserTyping',
+                    'updateChannelUserTyping',
+                    'updateNewMessage',
+                    'updateNewChannelMessage',
+                    'updateDeleteChannelMessages',
+                    'updateDeleteMessages',
+                    'updateEditMessage',
+                    'updateEditChannelMessage',
+                    'updateReadHistoryOutbox',
+                    'updateReadChannelOutbox'
+                ];
+            } else if ($preset == '2') {
+                $t = [
+                    'updateUserStatus',
+                    'updateUserTyping',
+                    'updateChatUserTyping',
+                    'updateChannelUserTyping',
+                    'updateNewMessage',
+                    'updateNewChannelMessage',
+                    'updateDeleteChannelMessages',
+                    'updateDeleteMessages',
+                    'updateEditMessage',
+                    'updateEditChannelMessage',
+                    'updateReadHistoryOutbox',
+                    'updateReadChannelOutbox',
+                    'updateMessagePoll'
+                ];
+            }
             if (empty($types)) {
                 $types = $t;
             } else {
@@ -1659,6 +1688,21 @@ try {
                         if ($peer) {
                             if (isset($update['update']['peer']) && $update['update']['peer'] != $peer) continue;
                             if (isset($update['update']['channel_id']) && $update['update']['channel_id'] != $peer) continue;
+                            $res[] = $update;
+                        }
+                    }
+                    if ($type == 'updateMessagePoll') {
+                        if (isset($update['update']['peer'])) {
+                            $update['update']['peer'] = parsePeer($update['update']['peer']);
+                        }
+                        $poll = parsePoll([], $update['update']['poll'], $update['update']['results']);
+                        $poll['id'] = strval($update['update']['poll_id']);
+                        $update['update']['poll'] = $poll;
+                        unset($update['update']['results']);
+                        if ($peer) {
+                            if (isset($update['update']['peer']) && $update['update']['peer'] != $peer) continue;
+                            if ($thread && isset($update['update']['top_msg_id']) && $update['update']['top_msg_id'] != $thread)
+                                continue;
                             $res[] = $update;
                         }
                     }
