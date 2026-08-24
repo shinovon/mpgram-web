@@ -1695,7 +1695,7 @@ try {
                         if (isset($update['update']['peer'])) {
                             $update['update']['peer'] = parsePeer($update['update']['peer']);
                         }
-                        $poll = parsePoll([], $update['update']['poll'], $update['update']['results']);
+                        $poll = parsePoll([], $update['update']['poll'] ?? null, $update['update']['results']);
                         $poll['id'] = strval($update['update']['poll_id']);
                         $update['update']['poll'] = $poll;
                         unset($update['update']['results']);
