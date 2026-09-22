@@ -12,7 +12,7 @@ Lightweight Telegram web client based on MadelineProto.
 
 ### Docker
 
-You can deploy your own instance quickly with Docker Compose - [see how](https://github.com/shinovon/mpgram-web/blob/main/docker/README.md).
+You can deploy your own instance quickly with Docker Compose - [see how](https://github.com/shinovon/mpgram-web/blob/master/docker/README.md).
 
 ### Manual deployment
 
