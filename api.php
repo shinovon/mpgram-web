@@ -637,11 +637,26 @@ function parseMessage($rawMessage, $media = false, $short = false): array
         }
     }
     if ($v >= 10 && isset($rawMessage['reactions'])) {
-        $count = 0;
-        foreach (($rawMessage['reactions']['results'] ?? []) as $react) {
-            $count += $react['count'] ?? 0;
+        if ($v >= 13) {
+            $message['reacts'] = [];
+            foreach (($rawMessage['reactions']['results'] ?? []) as $react) {
+                $r = ['count' => ($react['count'] ?? 0)];
+                if ($react['_'] == 'reactionPaid') {
+                    $r['paid'] = true;
+                } else if (isset($react['document_id'])) {
+                    $r['id'] = $react['document_id'];
+                } else {
+                    $r['e'] = $react['emoticon'];
+                }
+                $message['reacts'][] = $r;
+            }
+        } else {
+            $count = 0;
+            foreach (($rawMessage['reactions']['results'] ?? []) as $react) {
+                $count += $react['count'] ?? 0;
+            }
+            $message['reacts']['count'] = $count;
         }
-        $message['reacts']['count'] = $count;
     }
     //$message['raw'] = $rawMessage;
     return $message;
