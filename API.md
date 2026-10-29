@@ -1611,6 +1611,13 @@ Object
 - `tw` (optional): Target width for `p=rview`
 - `th` (optional): Target height for `p=rview`
 
+**Profile picture:**
+- `ava`: Peer ID
+- `p` (optional): Conversion parameters, see below.
+- `s` (optional): Size parameter for `p`, 180 by default
+- `tw` (optional): Target width for `p=rview`
+- `th` (optional): Target height for `p=rview`
+
 **`p` format:**
 
 Parsed in order:
