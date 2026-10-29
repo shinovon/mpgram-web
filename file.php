@@ -36,7 +36,9 @@ try {
     $di = null;
     if (isset($_GET['sticker'])) {
         $di = $MP->getDownloadInfo(['_' => 'document', 'id' => (int)$_GET['sticker'], 'access_hash' => (int)$_GET['access_hash'], 'attributes' => [], 'dc_id' => 2, 'mime_type' => 'image/webp']);
-    } else {
+    } else if (isset($_GET['ava'])) {
+		$di = $MP->getPropicInfo($MP->getInfo($_GET['ava']));
+	} else {
         if (!isset($_GET['c']) || !isset($_GET['m'])) die;
         $cid = $_GET['c'];
         $mid = $_GET['m'];
