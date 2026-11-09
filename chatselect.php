@@ -83,12 +83,12 @@ try {
     if ($query === null && (count($folders) > 1 || $hasArchiveChats)) {
         echo '<div><b>'.MP::x($lng['folders']).'</b>: ';
         foreach ($folders as $f) {
-            if (!isset($f['id'])) {
+            if (($f['_'] ?? '') == 'dialogFilterDefault' || !isset($f['id'])) {
                 echo '<a href="'.$url.'">'.MP::x($lng['all_chats']).'</a> ';
             } else {
                 $sel = $fid == $f['id'];
                 if ($sel) echo '<u>';
-                echo '<a href="'.$url.'f='.$f['id'].'">'.MP::dehtml($f['title']).'</a>';
+                echo '<a href="'.$url.'f='.$f['id'].'">'.MP::dehtml($f['title']['text'] ?? $f['title']).'</a>';
                 if ($sel) echo '</u>';
                 echo ' ';
             }
