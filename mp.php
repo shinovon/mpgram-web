@@ -7,6 +7,7 @@ define('mp_loaded', true);
 
 require_once("config.php");
 require_once("api_values.php");
+require_once __DIR__ . '/mp_runtime.php';
 
 define("WINDOWS", stripos(PHP_OS, 'WIN') === 0);
 
@@ -869,115 +870,17 @@ class MP {
         return $user;
     }
     
-    static function getMadelineSettings(): \danog\MadelineProto\Settings
+    static function getMadelineSettings(bool $api = false): \danog\MadelineProto\Settings
     {
-        $sets = new \danog\MadelineProto\Settings;
-        $app = new \danog\MadelineProto\Settings\AppInfo;
-        $app->setApiId(api_id);
-        $app->setApiHash(api_hash);
-        $app->setShowPrompt(false);
-        try {
-            if (ini_get('browscap') && isset($_SERVER['HTTP_USER_AGENT'])) {
-                $ua = $_SERVER['HTTP_USER_AGENT'];
-                $b = get_browser($ua, true);
-                if ($b && isset($b['parent'])) {
-                    $info = $br = $b['parent'];
-                    if (isset($b['device_name'])) {
-                        $d = $b['device_name'];
-                        if ($d !== 'unknown' && !str_starts_with($b['device_name'], 'general')) {
-                            if (isset($b['device_brand_name']) && $b['device_brand_name'] !== 'unknown') {
-                                $dbn = $b['device_brand_name'];
-                                if (!stripos($dbn, 'desktop')) {
-                                    $d = $dbn.' '.$d;
-                                }
-                            }
-                            $info = $br . ' on ' . $d;
-                        }
-                    }
-                    $pl = null;
-                    if (str_contains($ua, 'Opera Mini')) {
-                        if (str_contains($ua, 'J2ME/MIDP')) {
-                            $pl = 'J2ME';
-                        } elseif (str_contains($ua, 'BlackBerry')) {
-                            $pl = 'BlackBerry OS';
-                        } elseif (str_contains($ua, 'Android')) {
-                            $pl = 'Android';
-                        }
-                    } elseif (str_contains($ua, 'Series60/')) {
-                        $s60 = substr($ua, strpos($ua, 'Series60/')+9, 3);
-                        switch ($s60) {
-                        case '3.0':
-                            $pl = 'Symbian 9.1';
-                            break;
-                        case '3.1':
-                            $pl = 'Symbian 9.2';
-                            break;
-                        case '3.2':
-                            $pl = 'Symbian 9.3';
-                            break;
-                        case '5.0':
-                            $pl = 'Symbian 9.4';
-                            break;
-                        case '5.2':
-                            $pl = 'Symbian^3';
-                            break;
-                        case '5.3':
-                            $pl = 'Symbian Belle';
-                            break;
-                        case '5.4':
-                            $pl = 'Symbian Belle FP1';
-                            break;
-                        case '5.5':
-                            $pl = 'Symbian Belle FP2';
-                            break;
-                        default:
-                            if (str_contains($ua, 'Symbian/3')) {
-                                $pl = 'Symbian^3';
-                            } else {
-                                $pl = 'Symbian OS';
-                            }
-                        }
-                    } elseif (isset($b['platform_description'])) {
-                        $pl = $b['platform_description'];
-                    } elseif (isset($b['platform'])) {
-                        $pl = $b['platform'];
-                    }
-                    if ($info) {
-                        $app->setDeviceModel($info);
-                    }
-                    if ($pl) {
-                        $app->setSystemVersion($pl);
-                    }
-                }
-            }
-        } catch (Exception) {}
-        $app->setAppVersion('web');
-        $sets->setAppInfo($app);
-        $peer = $sets->getPeer();
-        $peer->setFullFetch(false);
-        $peer->setCacheAllPeersOnStartup(false);
-        $db = $sets->getDb();
-        $db->setEnableMinDb(false);
-        $db->setEnableUsernameDb(true);
-        $db->setEnableFullPeerDb(false);
-        $db->setEnablePeerInfoDb(!defined('ENABLE_PEER_DB') || ENABLE_PEER_DB);
-        $c = $sets->getConnection();
-        $c->setTimeout(10);
-        $c->setRetry(false);
-        return $sets;
+        return mpSettings($api);
     }
     
-    static function getMadelineAPI($user, $settings = false): \danog\MadelineProto\API
+    static function getMadelineAPI($user): \danog\MadelineProto\API
     {
         require_once 'vendor/autoload.php';
-        if ($settings) {
-            $MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline', static::getMadelineSettings());
-        } else {
-            $MP = new \danog\MadelineProto\API(sessionspath.$user.'.madeline');
-        }
-        return $MP;
+        return new \danog\MadelineProto\API(sessionspath.$user.'.madeline', static::getMadelineSettings());
     }
-
+    
     static function getSettings(): array
     {
         if (static::$settings === null) {
