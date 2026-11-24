@@ -35,17 +35,7 @@ function exceptions_error_handler($severity, $message, $filename, $lineno) {
 set_error_handler('exceptions_error_handler');
 
 try {
-    if (PHP_OS_FAMILY === "Linux") {
-        // Automatically kill madeline sessions
-        $x = false;
-        try {
-            $x = file_get_contents('./lastclean');
-        } catch (Exception) {}
-        if (!$x || (time() - (int)$x) > 30 * 60) {
-            exec("kill -9 `ps -ef | grep -v grep | grep 'MadelineProto worker' | awk '{print $2}'` > /dev/null &");
-            file_put_contents('./lastclean', time());
-        }
-    }
+    mpCleanupWorkers();
 } catch (Exception) {}
 
 header('Content-Type: text/html; charset='.MP::$enc);

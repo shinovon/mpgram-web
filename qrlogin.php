@@ -123,10 +123,10 @@ if ($user === null || $nouser) {
 
         $user = 'qr_'.hash('sha384', sha1(random_bytes(32).rand(0,1000)).sha1(random_bytes(32)));
         MP::cookie('user', $user, time() + (86400 * 365));
-        $MP = MP::getMadelineAPI($user, true);
+        $MP = MP::getMadelineAPI($user);
     }
 } else {
-    $MP = MP::getMadelineAPI($user, true);
+    $MP = MP::getMadelineAPI($user);
 }
 $qr = $MP->qrLogin();
 if (!$qr) {
