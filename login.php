@@ -59,7 +59,7 @@ function removeSession($logout=false): void
         if (file_exists(sessionspath.$user.'.madeline')) {
             if ($logout) {
                 try {
-                    $MP = MP::getMadelineAPI($user, true);
+                    $MP = MP::getMadelineAPI($user);
                     $MP->logout();
                     unset($MP);
                 } catch (Exception) {}
@@ -120,7 +120,7 @@ if ($user != null && !$logout && !$nouser) {
         header('Location: chats.php');
         die;
     } else {
-        $MP = MP::getMadelineAPI($user, true);
+        $MP = MP::getMadelineAPI($user);
         if ($MP->getAuthorization() === 3) {
             MP::cookie('code', '1', time() + (86400 * 365));
             header('Location: chats.php');
@@ -255,14 +255,14 @@ if ($phone !== null) {
 
         $SESSION['user'] = $user = rtrim(strtr(base64_encode(hash('sha384', sha1(md5($phone.rand(0,1000).random_bytes(6))).random_bytes(30), true)), '+/', '-_'), '=');
         MP::cookie('user', $user, time() + (86400 * 365));
-        $MP = MP::getMadelineAPI($user, true);
+        $MP = MP::getMadelineAPI($user);
     } else {
         if (isset($_COOKIE['code']) && !empty($_COOKIE['code'])) {
             unset($_SESSION['captcha_entered']);
             header('Location: chats.php');
             die;
         } elseif (isset($_POST['pass']) || isset($_GET['pass'])) {
-            $MP = MP::getMadelineAPI($user, true);
+            $MP = MP::getMadelineAPI($user);
             try {
                 $password = $_POST['pass'] ?? $_GET['pass'] ?? null;
                 $MP->complete2faLogin($password);
@@ -298,7 +298,7 @@ if ($phone !== null) {
             $code = $_POST['code'] ?? $_GET['code'] ?? null;
             if (!empty($code) && is_numeric($code)) {
                 try {
-                    $MP = MP::getMadelineAPI($user, true);
+                    $MP = MP::getMadelineAPI($user);
                     $a = $MP->completePhoneLogin($code);
                     $hash = null;
                     if (isset($a['phone_code_hash'])) {
@@ -372,7 +372,7 @@ if ($phone !== null) {
                 die;
             }
         } else {
-            $MP = MP::getMadelineAPI($user, true);
+            $MP = MP::getMadelineAPI($user);
             htmlStart();
         }
     }

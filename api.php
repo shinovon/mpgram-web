@@ -177,22 +177,10 @@ function setupMadelineProto($user = null): void
         $user = $_SERVER['HTTP_X_MPGRAM_USER'] ?? $PARAMS['user'];
     }
     require_once 'vendor/autoload.php';
-    $sets = new \danog\MadelineProto\Settings;
-    $app = new \danog\MadelineProto\Settings\AppInfo;
-    $app->setApiId(api_id);
-    $app->setApiHash(api_hash);
-    $app->setShowPrompt(false);
-
-    $app->setAppVersion($_SERVER['HTTP_X_MPGRAM_APP_VERSION'] ?? 'api');
-    if (isset($_SERVER['HTTP_X_MPGRAM_DEVICE'])) {
-        $app->setDeviceModel($_SERVER['HTTP_X_MPGRAM_DEVICE']);
-    }
-    if (isset($_SERVER['HTTP_X_MPGRAM_SYSTEM'])) {
-        $app->setSystemVersion($_SERVER['HTTP_X_MPGRAM_SYSTEM']);
-    }
-    $sets->setAppInfo($app);
+    require_once __DIR__ . '/mp_runtime.php';
+    mpCleanupWorkers();
     try {
-        $MP = new \danog\MadelineProto\API(sessionspath . $user . '.madeline', $sets);
+        $MP = new \danog\MadelineProto\API(sessionspath . $user . '.madeline', mpSettings(true));
     } catch (Exception $e) {
         http_response_code(401);
         error(['message' => "Failed to load session", 'stack_trace' => strval($e)]);
